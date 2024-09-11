@@ -3,7 +3,7 @@
 
 1. Correr el siguiente comando para iniciar el contenedor:
 ```bash
-docker run -p 8080:8080 --name sk-keycloak -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:25.0.5 start-dev
+docker run -p 8080:8080 --name sk-keycloak -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:21.0.1 start-dev
 ```
 Las creedenciales son: admin y admin.
 

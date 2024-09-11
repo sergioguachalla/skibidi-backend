@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import static org.keycloak.OAuth2Constants.CLIENT_CREDENTIALS;
+
 @Configuration
 public class KeycloakConfig {
 
@@ -29,7 +31,7 @@ public class KeycloakConfig {
     public Keycloak keycloak() {
         log.info("Creating Keycloak bean");
         return KeycloakBuilder.builder()
-                .grantType("client_credentials")
+                .grantType(CLIENT_CREDENTIALS)
                 .clientId(clientId)
                 .clientSecret(clientSecret)
                 .serverUrl(keycloakAuthServerUrl)
