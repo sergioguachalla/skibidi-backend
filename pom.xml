@@ -53,6 +53,16 @@
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
+
+		<!-- Keycloak -->
+		<dependency>
+			<groupId>org.keycloak</groupId>
+			<artifactId>keycloak-admin-client</artifactId>
+			<version>21.0.1</version>
+		</dependency>
+
+		<!-- Keycloak -->
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
