@@ -33,7 +33,9 @@ public class UserBl {
         log.info("Creating user...");
 
         validateUser(userDto);
-
+        ValidationUtils.validateEmail(userDto.getEmail());
+        //TODO: add person dto
+        ValidationUtils.validateAddress("address");
         var credential = preparePassword(userDto.getPassword());
         var user = prepareUser(userDto, credential);
 
@@ -48,6 +50,8 @@ public class UserBl {
         ValidationUtils.validateName(userDto.getName());
         ValidationUtils.validateEmail(userDto.getEmail());
     }
+
+
 
 
 
