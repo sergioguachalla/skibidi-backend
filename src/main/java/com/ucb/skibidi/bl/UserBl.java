@@ -27,17 +27,19 @@ public class UserBl {
 
     public void createUser(UserDto userDto) {
         log.info("Creating user...");
-
         var credential = preparePassword(userDto.getPassword());
         var user = prepareUser(userDto, credential);
 
         var response = keycloak.realm(realm).users().create(user);
-        log.info("response: " + response.getStatusInfo());
+        log.info("response: {}", response.getStatusInfo());
         String userKcId = response.getLocation().getPath().replaceAll(".*/([^/]+)$", "$1");
 
-        log.info("User created with id: " + userKcId);
+        log.info("User created with id: {}", userKcId);
 
     }
+
+
+
 
 
 
