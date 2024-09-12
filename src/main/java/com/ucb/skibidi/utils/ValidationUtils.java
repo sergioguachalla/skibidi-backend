@@ -23,6 +23,9 @@ public class ValidationUtils {
         return name.matches("^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$");
     }
 
+    private static boolean isEmailValid(String email) {
+        return email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
 
     public static void validateName(String name) {
         if (isNullOrEmpty(name)) {
@@ -36,6 +39,9 @@ public class ValidationUtils {
     public static void validateEmail(String email) {
         if (isNullOrEmpty(email)) {
             throw new InvalidInputException("Email is required");
+        }
+        if (!isEmailValid(email)) {
+            throw new InvalidInputException("Invalid email");
         }
     }
 
