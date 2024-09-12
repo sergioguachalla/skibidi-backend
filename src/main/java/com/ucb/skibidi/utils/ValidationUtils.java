@@ -2,6 +2,8 @@ package com.ucb.skibidi.utils;
 
 import com.ucb.skibidi.config.exceptions.InvalidInputException;
 
+import java.util.Date;
+
 public class ValidationUtils {
 
 
@@ -34,6 +36,19 @@ public class ValidationUtils {
         }
     }
 
+    public static void validateAddress(String address) {
+        if (isNullOrEmpty(address)) {
+            throw new InvalidInputException("Address is required");
+        }
+        if (!isAddressValid(address)) {
+            throw new InvalidInputException("Invalid address");
+        }
+    }
+
+
+    private static boolean isAddressValid(String address) {
+        return address.length() < 500 && address.matches("^[a-zA-Z0-9# ]*$");
+    }
     private static boolean isNullOrEmpty(String str) {
         return str == null || str.isEmpty();
     }
@@ -47,6 +62,7 @@ public class ValidationUtils {
         return String.valueOf(idNumber).length() > 4 && String.valueOf(idNumber).length() < 10
                 && String.valueOf(idNumber).matches("[0-9]+");
     }
+
 
 
 
