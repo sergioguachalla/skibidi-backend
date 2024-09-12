@@ -9,12 +9,11 @@ spring:
       hibernate:
         ddl-auto: none
 server:
-    port: 8090
+    port: 8091
 
 keycloak:
   auth-server-url: ${AUTH_SERVER_URL:http://localhost:8080}
-  autodetect-bearer-only: true
   credentials:
-    secret: ${CLIENT_SECRET:vPLcbNiPZrEcjh6Hy44Mjdt4FNbxrs6d}
+    secret: ${CLIENT_SECRET:SBcbFEti8CuGOdtGZ504Siv4eW0sBD4J}
     realm: skibidi-realm
     resource: sk-backend
