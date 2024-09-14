@@ -68,6 +68,19 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+
+		<!-- Google API -->
+		<!-- https://mvnrepository.com/artifact/com.google.apis/google-api-services-books -->
+		<dependency>
+			<groupId>com.google.apis</groupId>
+			<artifactId>google-api-services-books</artifactId>
+			<version>v1-rev114-1.25.0</version>
+		</dependency>
+
+
+
+
 	</dependencies>
 
 	<build>
