@@ -79,6 +79,10 @@ CREATE TABLE Person (
     expedition varchar(4)  NOT NULL,
     registration_date date  NOT NULL,
     address varchar(500)  NOT NULL,
+<<<<<<< HEAD
+=======
+    email varchar(100)  NOT NULL,
+>>>>>>> ee0ceca8e46dc5343804999cd5fcb35d244026be
     CONSTRAINT Person_pk PRIMARY KEY (person_id)
 );
 

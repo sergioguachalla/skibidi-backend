@@ -1,6 +1,8 @@
 package com.ucb.skibidi.bl;
 
+import com.ucb.skibidi.config.exceptions.InvalidInputException;
 import com.ucb.skibidi.dto.UserDto;
+import com.ucb.skibidi.utils.ValidationUtils;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -17,6 +19,8 @@ public class UserBl {
     @Autowired
     private Keycloak keycloak;
 
+
+
     public UserBl(Keycloak keycloak) {
         this.keycloak = keycloak;
     }
@@ -28,16 +32,30 @@ public class UserBl {
     public void createUser(UserDto userDto) {
         log.info("Creating user...");
 
+        validateUser(userDto);
+        ValidationUtils.validateEmail(userDto.getEmail());
+        //TODO: add person dto
+        ValidationUtils.validateAddress("address");
         var credential = preparePassword(userDto.getPassword());
         var user = prepareUser(userDto, credential);
 
         var response = keycloak.realm(realm).users().create(user);
-        log.info("response: " + response.getStatusInfo());
+        log.info("response: {}", response.getStatusInfo());
         String userKcId = response.getLocation().getPath().replaceAll(".*/([^/]+)$", "$1");
 
-        log.info("User created with id: " + userKcId);
 
     }
+
+    private void validateUser(UserDto userDto) {
+        ValidationUtils.validateName(userDto.getName());
+        ValidationUtils.validateEmail(userDto.getEmail());
+    }
+
+
+
+
+
+
 
 
 
