@@ -1,0 +1,19 @@
+networks:
+  skibidi-network:
+    driver: bridge
+
+services:
+  skibidi-db:
+    container_name: skibidi-db
+    image: postgres
+    ports:
+      - 5433:5432
+    volumes:
+      - ./src/main/resources/db/skibidi_db.sql:/docker-entrypoint-initdb.d/create_database.sql.sql
+      - ./src/main/resources/db/docker/data:/var/lib/postgresql/data &&  sudo chmod 0700 /var/lib/postgresql/data
+    environment:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+        POSTGRES_DB: skibidi
+    networks:
+        - skibidi-network
