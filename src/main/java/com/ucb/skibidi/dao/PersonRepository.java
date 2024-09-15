@@ -6,5 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface PersonRepository extends JpaRepository<Person, Long> {
 
     Boolean existsByName(String name);
+    Boolean existsByLastname(String lastname);
 
 }

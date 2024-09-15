@@ -5,7 +5,9 @@ import com.ucb.skibidi.dao.PersonRepository;
 import com.ucb.skibidi.dto.PersonDto;
 import com.ucb.skibidi.dto.UserDto;
 import com.ucb.skibidi.dto.UserRegistrationDto;
+import com.ucb.skibidi.entity.Person;
 import com.ucb.skibidi.utils.ValidationUtils;
+import jakarta.transaction.Transactional;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -33,18 +36,27 @@ public class UserBl {
     @Value("${keycloak.credentials.realm}")
     private String realm;
 
+    @Transactional
     public void createUser(UserRegistrationDto userDto) {
         PersonDto personDto = userDto.getPersonDto();
-        if (personRepository.existsByName(personDto.getName())) {
-            throw new InvalidInputException("Person with name " + personDto.getName() + " already exists");
+        if (personRepository.existsByName(personDto.getName()) && personRepository.existsByLastname(personDto.getLastName())) {
+            throw new InvalidInputException("Person already exists!");
         }
-
-
-        log.info("Creating user...");
-
         validateUser(userDto.getUserDto());
         ValidationUtils.validateEmail(userDto.getUserDto().getEmail());
-        ValidationUtils.validateAddress("address");
+        ValidationUtils.validateAddress(userDto.getPersonDto().getAddress());
+
+        Person person = new Person();
+        person.setName(personDto.getName());
+        person.setLastname(personDto.getLastName());
+        person.setAddress(personDto.getAddress());
+        person.setIdNumber(personDto.getIdNumber());
+        person.setExpeditionPlace(personDto.getExpedition());
+        person.setRegistrationDate(new Date());
+        Person newPerson = personRepository.save(person);
+
+
+
         var credential = preparePassword(userDto.getUserDto().getPassword());
         var user = prepareUser(userDto.getUserDto(), credential);
 
@@ -74,6 +86,8 @@ public class UserBl {
         user.setFirstName(userDto.getName());
         user.setCredentials(List.of(password));
         user.setEnabled(true);
+        //TODO: set group according to user type
+        user.setGroups(Arrays.asList("ADMIN"));
         return user;
     }
 }
