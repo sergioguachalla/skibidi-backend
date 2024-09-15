@@ -27,7 +27,7 @@ public class UserBlTests {
         userDto.setEmail("john@gmail.com");
         userDto.setPassword("123456");
         userDto.setIsBlocked(false);
-        userBl.createUser(userDto);
+        userBl.createUser(userDto.);
 
 
     }

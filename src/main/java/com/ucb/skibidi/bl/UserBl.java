@@ -1,7 +1,10 @@
 package com.ucb.skibidi.bl;
 
 import com.ucb.skibidi.config.exceptions.InvalidInputException;
+import com.ucb.skibidi.dao.PersonRepository;
+import com.ucb.skibidi.dto.PersonDto;
 import com.ucb.skibidi.dto.UserDto;
+import com.ucb.skibidi.dto.UserRegistrationDto;
 import com.ucb.skibidi.utils.ValidationUtils;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.idm.CredentialRepresentation;
@@ -18,24 +21,32 @@ import java.util.List;
 public class UserBl {
     @Autowired
     private Keycloak keycloak;
+    @Autowired
+    private PersonRepository personRepository;
 
-    public UserBl(@Autowired  Keycloak keycloak) {
+    public UserBl(@Autowired  Keycloak keycloak, @Autowired PersonRepository personRepository) {
         this.keycloak = keycloak;
+        this.personRepository = personRepository;
     }
 
     private static final Logger log = org.slf4j.LoggerFactory.getLogger(UserBl.class);
     @Value("${keycloak.credentials.realm}")
     private String realm;
 
-    public void createUser(UserDto userDto) {
+    public void createUser(UserRegistrationDto userDto) {
+        PersonDto personDto = userDto.getPersonDto();
+        if (personRepository.existsByName(personDto.getName())) {
+            throw new InvalidInputException("Person with name " + personDto.getName() + " already exists");
+        }
+
+
         log.info("Creating user...");
 
-        validateUser(userDto);
-        ValidationUtils.validateEmail(userDto.getEmail());
-        //TODO: add person dto
+        validateUser(userDto.getUserDto());
+        ValidationUtils.validateEmail(userDto.getUserDto().getEmail());
         ValidationUtils.validateAddress("address");
-        var credential = preparePassword(userDto.getPassword());
-        var user = prepareUser(userDto, credential);
+        var credential = preparePassword(userDto.getUserDto().getPassword());
+        var user = prepareUser(userDto.getUserDto(), credential);
 
         var response = keycloak.realm(realm).users().create(user);
         log.info("Response status: {}", response.getStatus());
