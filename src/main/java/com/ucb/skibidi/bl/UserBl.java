@@ -2,10 +2,12 @@ package com.ucb.skibidi.bl;
 
 import com.ucb.skibidi.config.exceptions.InvalidInputException;
 import com.ucb.skibidi.dao.PersonRepository;
+import com.ucb.skibidi.dao.UserClientRepository;
 import com.ucb.skibidi.dto.PersonDto;
 import com.ucb.skibidi.dto.UserDto;
 import com.ucb.skibidi.dto.UserRegistrationDto;
 import com.ucb.skibidi.entity.Person;
+import com.ucb.skibidi.entity.UserClient;
 import com.ucb.skibidi.utils.ValidationUtils;
 import jakarta.transaction.Transactional;
 import org.keycloak.admin.client.Keycloak;
@@ -26,10 +28,15 @@ public class UserBl {
     private Keycloak keycloak;
     @Autowired
     private PersonRepository personRepository;
+    @Autowired
+    private UserClientRepository userClientRepository;
 
-    public UserBl(@Autowired  Keycloak keycloak, @Autowired PersonRepository personRepository) {
+    public UserBl(@Autowired  Keycloak keycloak,
+                  @Autowired PersonRepository personRepository,
+                  @Autowired UserClientRepository userClientRepository) {
         this.keycloak = keycloak;
         this.personRepository = personRepository;
+        this.userClientRepository = userClientRepository;
     }
 
     private static final Logger log = org.slf4j.LoggerFactory.getLogger(UserBl.class);
@@ -51,7 +58,7 @@ public class UserBl {
         person.setLastname(personDto.getLastName());
         person.setAddress(personDto.getAddress());
         person.setIdNumber(personDto.getIdNumber());
-        person.setExpeditionPlace(personDto.getExpedition());
+        person.setExpedition(personDto.getExpedition());
         person.setRegistrationDate(new Date());
         Person newPerson = personRepository.save(person);
 
@@ -64,7 +71,11 @@ public class UserBl {
         log.info("Response status: {}", response.getStatus());
         String userKcId = response.getLocation().getPath().replaceAll(".*/([^/]+)$", "$1");
         log.info("User created with id: {}", userKcId);
-
+        UserClient userClient = new UserClient();
+        userClient.setGroup("CLIENT");
+        userClient.setPersonId(newPerson);
+        userClient.setUsername(userDto.getUserDto().getName());
+        this.userClientRepository.save(userClient);
     }
 
     private void validateUser(UserDto userDto) {
@@ -87,7 +98,7 @@ public class UserBl {
         user.setCredentials(List.of(password));
         user.setEnabled(true);
         //TODO: set group according to user type
-        user.setGroups(Arrays.asList("ADMIN"));
+        user.setGroups(Arrays.asList("CLIENT"));
         return user;
     }
 }

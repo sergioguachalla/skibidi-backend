@@ -21,9 +21,13 @@ public class Person {
     @Column(name = "lastname")
     private String lastname;
 
+    @Column(name = "id_number")
     private Integer idNumber;
-    private String expeditionPlace;
+
+    private String expedition;
     private String address;
+
+    @Column(name = "registration_date")
     private Date registrationDate;
 
 

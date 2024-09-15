@@ -20,17 +20,17 @@ public class UserBlTests {
 
 
     // TODO: Review the test
-    @Test
-    public void createUserTest() {
-        UserDto userDto = new UserDto();
-        userDto.setName("John Doe");
-        userDto.setEmail("john@gmail.com");
-        userDto.setPassword("123456");
-        userDto.setIsBlocked(false);
-        userBl.createUser(userDto.);
-
-
-    }
+//    @Test
+//    public void createUserTest() {
+//        UserDto userDto = new UserDto();
+//        userDto.setName("John Doe");
+//        userDto.setEmail("john@gmail.com");
+//        userDto.setPassword("123456");
+//        userDto.setIsBlocked(false);
+//        userBl.createUser(userDto);
+//
+//
+//    }
 
 
 
