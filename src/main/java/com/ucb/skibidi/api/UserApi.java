@@ -22,4 +22,9 @@ public class UserApi {
         return "User created";
     }
 
+    @PostMapping("/StudyEnvironment")
+    public String createUserStudyEnvironment(@RequestBody UserDto userDto) {
+        return "User created";
+    }
+
 }

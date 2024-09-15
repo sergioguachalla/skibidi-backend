@@ -15,7 +15,7 @@ public class BookApi {
     @Autowired
     private BookBl bookBl;
 
-    @PostMapping("/create")
+    @PostMapping("/")
     public ResponseDto<BookDto> createBook(@RequestBody BookDto bookDto) {
         try {
             bookBl.createBookManually(bookDto);
@@ -33,7 +33,7 @@ public class BookApi {
         }
     }
 
-    @PostMapping("/create/{isbn}")
+    @PostMapping("/{isbn}")
     public ResponseDto<BookDto> createBook(@PathVariable String isbn) {
         try {
             ResponseDto<BookDto> responseDto = new ResponseDto<>();
@@ -50,7 +50,7 @@ public class BookApi {
         }
     }
 
-    @GetMapping("/get/{isbn}")
+    @GetMapping("/{isbn}")
     public ResponseDto<BookDto> getBook(@PathVariable String isbn) {
         try {
             ResponseDto<BookDto> responseDto = new ResponseDto<>();
@@ -67,7 +67,7 @@ public class BookApi {
         }
     }
 
-    @GetMapping("/get")
+    @GetMapping("/")
     public ResponseDto<List<BookDto>> getAllBooks() {
         try {
             ResponseDto<List<BookDto>> responseDto = new ResponseDto<>();
