@@ -80,23 +80,29 @@ public class EnvironmentUseBl {
             }
         }
 
+        LocalDateTime now = LocalDateTime.now().withSecond(0).withNano(0);
+
         if (environmentUse.getClockIn() == null) {
             throw new RuntimeException("Clock in is required");
         } else {
-            LocalDateTime now = LocalDateTime.now();
+            LocalDateTime clockInDateTime = environmentUse.getClockIn().withSecond(0).withNano(0);
 
-            log.info("Clock in (LocalDateTime): " + environmentUse.getClockIn());
+            log.info("Clock in (LocalDateTime): " + clockInDateTime);
             log.info("Current time (LocalDateTime): " + now);
 
-            if (environmentUse.getClockIn().toLocalDate().isBefore(now.toLocalDate())) {
+            if (clockInDateTime.isBefore(now)) {
                 throw new RuntimeException("Clock in must be in the future or today");
             }
         }
 
         if (environmentUse.getClockOut() == null) {
             throw new RuntimeException("Clock out is required");
-        } else if (environmentUse.getClockOut().isBefore(environmentUse.getClockIn())) {
-            throw new RuntimeException("Clock out can't be before clock in");
+        } else {
+            LocalDateTime clockOutDateTime = environmentUse.getClockOut().withSecond(0).withNano(0);
+
+            if (clockOutDateTime.isBefore(environmentUse.getClockIn().withSecond(0).withNano(0))) {
+                throw new RuntimeException("Clock out can't be before clock in");
+            }
         }
 
         if (environmentUse.getPurpose() == null || environmentUse.getPurpose().isEmpty()) {
@@ -107,10 +113,12 @@ public class EnvironmentUseBl {
             throw new RuntimeException("Environment is not available");
         }
 
+        if (environmentUse.getClockIn().withSecond(0).withNano(0).equals(environmentUse.getClockOut().withSecond(0).withNano(0))) {
+            throw new RuntimeException("Clock in and clock out can't be the same");
+        }
 
         log.info("Environment use validated successfully");
     }
-
 
 
 

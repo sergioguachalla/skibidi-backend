@@ -2,6 +2,7 @@ package com.ucb.skibidi.api;
 
 import com.ucb.skibidi.bl.EnvironmentUseBl;
 import com.ucb.skibidi.dto.EnvironmentUseDto;
+import com.ucb.skibidi.dto.ResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,12 +16,19 @@ public class EnvironmentUseAPI {
     private EnvironmentUseBl environmentUseBl;
 
     @PostMapping("/")
-    public String createEnvironmentUse(@RequestBody EnvironmentUseDto environmentUseDto) {
+    public ResponseDto<EnvironmentUseDto> createEnvironmentUse(@RequestBody EnvironmentUseDto environmentUseDto) {
+        ResponseDto<EnvironmentUseDto> responseDto = new ResponseDto<>();
         try {
             environmentUseBl.createEnvironmentUse(environmentUseDto);
-            return "Environment use created";
+            responseDto.setData(environmentUseDto);
+            responseDto.setMessage("Environment use created");
+            responseDto.setSuccessful(true);
+            return responseDto;
         } catch (Exception e) {
-            return "Error creating environment use: " + e.getMessage();
+            responseDto.setData(null);
+            responseDto.setMessage("Error creating environment use: " + e.getMessage());
+            responseDto.setSuccessful(false);
+            return responseDto;
         }
     }
 }
