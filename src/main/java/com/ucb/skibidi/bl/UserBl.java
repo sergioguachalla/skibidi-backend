@@ -19,9 +19,7 @@ public class UserBl {
     @Autowired
     private Keycloak keycloak;
 
-
-
-    public UserBl(Keycloak keycloak) {
+    public UserBl(@Autowired  Keycloak keycloak) {
         this.keycloak = keycloak;
     }
 
@@ -40,9 +38,9 @@ public class UserBl {
         var user = prepareUser(userDto, credential);
 
         var response = keycloak.realm(realm).users().create(user);
-        log.info("response: {}", response.getStatusInfo());
+        log.info("Response status: {}", response.getStatus());
         String userKcId = response.getLocation().getPath().replaceAll(".*/([^/]+)$", "$1");
-
+        log.info("User created with id: {}", userKcId);
 
     }
 
@@ -51,14 +49,6 @@ public class UserBl {
         ValidationUtils.validateEmail(userDto.getEmail());
     }
 
-
-
-
-
-
-
-
-
     private CredentialRepresentation preparePassword(String password) {
         CredentialRepresentation credential = new CredentialRepresentation();
         credential.setType(CredentialRepresentation.PASSWORD);
@@ -66,7 +56,6 @@ public class UserBl {
         credential.setTemporary(false);
         return credential;
     }
-
     private UserRepresentation prepareUser(UserDto userDto, CredentialRepresentation password) {
         UserRepresentation user = new UserRepresentation();
         user.setUsername(userDto.getName());
