@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -28,7 +29,7 @@ public class EnvironmentUse {
     @JoinColumn(name = "librarian_id")
     private UserLibrarian librarianId;
 
-    private Date reservationDate;
+    private LocalDate reservationDate;
 
     private LocalDateTime clockIn;
 
@@ -36,5 +37,5 @@ public class EnvironmentUse {
 
     private String purpose;
 
-    private Boolean status = true;
+    private int status = 1;
 }
