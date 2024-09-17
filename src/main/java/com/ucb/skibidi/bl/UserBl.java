@@ -63,10 +63,13 @@ public class UserBl {
         Person newPerson = personRepository.save(person);
 
 
+        var userExists = keycloak.realm(realm).users().search(userDto.getUserDto().getEmail());
+        if (!userExists.isEmpty()) {
+            throw new InvalidInputException("User already exists!");
+        }
 
         var credential = preparePassword(userDto.getUserDto().getPassword());
         var user = prepareUser(userDto.getUserDto(), credential);
-
         var response = keycloak.realm(realm).users().create(user);
         log.info("Response status: {}", response.getStatus());
         String userKcId = response.getLocation().getPath().replaceAll(".*/([^/]+)$", "$1");
