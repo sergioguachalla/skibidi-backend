@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -44,7 +45,7 @@ public class UserBl {
     private String realm;
 
     @Transactional
-    public void createUser(UserRegistrationDto userDto) {
+    public void createUser(UserRegistrationDto userDto, String group) {
         PersonDto personDto = userDto.getPersonDto();
         if (personRepository.existsByName(personDto.getName()) && personRepository.existsByLastname(personDto.getLastName())) {
             throw new InvalidInputException("Person already exists!");
@@ -70,16 +71,15 @@ public class UserBl {
         }
 
         var credential = preparePassword(userDto.getUserDto().getPassword());
-        var user = prepareUser(userDto.getUserDto(), credential);
+        var user = prepareUser(userDto.getUserDto(), credential, group);
         var response = keycloak.realm(realm).users().create(user);
         log.info("Response status: {}", response.getStatus());
         String userKcId = response.getLocation().getPath().replaceAll(".*/([^/]+)$", "$1");
         log.info("User created with id: {}", userKcId);
         UserClient userClient = new UserClient();
-        userClient.setGroup("CLIENT");
+        userClient.setGroup(group);
         userClient.setPersonId(newPerson);
         userClient.setUsername(userDto.getUserDto().getName());
-        log.info("User group: {}", userClient.getGroup());
 
         this.userClientRepository.save(userClient);
     }
@@ -96,7 +96,7 @@ public class UserBl {
         credential.setTemporary(false);
         return credential;
     }
-    private UserRepresentation prepareUser(UserDto userDto, CredentialRepresentation password) {
+    private UserRepresentation prepareUser(UserDto userDto, CredentialRepresentation password, String group) {
         UserRepresentation user = new UserRepresentation();
         user.setUsername(userDto.getName());
         user.setEmail(userDto.getEmail());
@@ -104,7 +104,7 @@ public class UserBl {
         user.setCredentials(List.of(password));
         user.setEnabled(true);
         //TODO: set group according to user type
-        user.setGroups(Arrays.asList("CLIENT"));
+        user.setGroups(Collections.singletonList(group));
         return user;
     }
 }
