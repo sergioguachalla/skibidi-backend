@@ -30,6 +30,8 @@ public class Person {
     @Column(name = "registration_date")
     private Date registrationDate;
 
+    @Column(name = "email")
+    private String email;
 
 
 }

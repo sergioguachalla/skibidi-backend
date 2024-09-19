@@ -60,6 +60,7 @@ public class UserBl {
         person.setIdNumber(personDto.getIdNumber());
         person.setExpedition(personDto.getExpedition());
         person.setRegistrationDate(new Date());
+        person.setEmail(userDto.getUserDto().getEmail());
         Person newPerson = personRepository.save(person);
 
 
@@ -78,6 +79,8 @@ public class UserBl {
         userClient.setGroup("CLIENT");
         userClient.setPersonId(newPerson);
         userClient.setUsername(userDto.getUserDto().getName());
+        log.info("User group: {}", userClient.getGroup());
+
         this.userClientRepository.save(userClient);
     }
 

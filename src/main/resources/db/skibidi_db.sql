@@ -1,5 +1,5 @@
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2024-09-12 01:49:27.628
+-- Last modification date: 2024-09-19 01:09:47.718
 
 -- tables
 -- Table: Book
@@ -54,6 +54,9 @@ CREATE TABLE Infractions (
     user_id int  NOT NULL,
     status int  NOT NULL,
     infraction_type int  NOT NULL,
+    duration int  NOT NULL,
+    start_date date  NOT NULL,
+    serverity int  NOT NULL,
     CONSTRAINT Infractions_pk PRIMARY KEY (infraction_id)
 );
 
@@ -79,10 +82,7 @@ CREATE TABLE Person (
     expedition varchar(4)  NOT NULL,
     registration_date date  NOT NULL,
     address varchar(500)  NOT NULL,
-<<<<<<< HEAD
-=======
     email varchar(100)  NOT NULL,
->>>>>>> ee0ceca8e46dc5343804999cd5fcb35d244026be
     CONSTRAINT Person_pk PRIMARY KEY (person_id)
 );
 
@@ -108,7 +108,7 @@ CREATE TABLE User_Client (
     person_id int  NOT NULL,
     username varchar(100)  NOT NULL,
     is_blocked boolean  NOT NULL,
-    "group" varchar(20)  NOT NULL,
+    user_group varchar(20)  NOT NULL,
     status boolean  NOT NULL,
     infraction_count int  NOT NULL,
     CONSTRAINT User_Client_pk PRIMARY KEY (client_id)
@@ -120,7 +120,7 @@ CREATE TABLE User_Librarian (
     person_id int  NOT NULL,
     username varchar(100)  NOT NULL,
     is_blocked boolean  NOT NULL,
-    "group" varchar(20)  NOT NULL,
+    user_group varchar(20)  NOT NULL,
     status boolean  NOT NULL,
     CONSTRAINT User_Librarian_pk PRIMARY KEY (librarian_id)
 );
