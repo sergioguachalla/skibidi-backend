@@ -1,11 +1,12 @@
 package com.ucb.skibidi.bl;
 
 import com.ucb.skibidi.dao.*;
-import com.ucb.skibidi.dto.EnvironmentUseDto;
+import com.ucb.skibidi.dto.EnvironmentReservationDto;
 import com.ucb.skibidi.entity.Environment;
 import com.ucb.skibidi.entity.EnvironmentUse;
 import com.ucb.skibidi.entity.UserClient;
 import com.ucb.skibidi.entity.UserLibrarian;
+import org.apache.catalina.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
 
 @Service
 public class EnvironmentUseBl {
@@ -22,30 +21,30 @@ public class EnvironmentUseBl {
 
     @Autowired
     private EnvironmentUseRepository environmentUseRepository;
-    @Autowired
-    private EnvironmentRepository environmentRepository;
-    @Autowired
-    private UserClientRepository userClientRepository;
-    @Autowired
-    private UserLibrarianRepository userLibrarianRepository;
 
-    public void createEnvironmentUse(EnvironmentUseDto environmentUseDto) {
-        log.info("Creating environment use...");
+    // create a reservation to be approved by a librarian
+    public void createEnvironmentReservation(EnvironmentReservationDto environmentReservationDto) {
+        log.info("Creating environment reservation...");
         try {
-            Environment environment = environmentRepository.findByName(environmentUseDto.getEnvironmentName());
-            UserClient client = userClientRepository.findByUsername(environmentUseDto.getClientName());
-            UserLibrarian librarian = userLibrarianRepository.findByUsername(environmentUseDto.getLibrarianName());
+            Environment environment = new Environment();
+            environment.setEnvironmentId(environmentReservationDto.getEnvironmentId());
+
             EnvironmentUse environmentUse = new EnvironmentUse();
             environmentUse.setEnvironmentId(environment);
+
+            UserClient client = new UserClient();
+            client.setClientId(environmentReservationDto.getClientId());
+
             environmentUse.setClientId(client);
-            environmentUse.setLibrarianId(librarian);
-            environmentUse.setReservationDate(environmentUseDto.getReservationDate());
-            environmentUse.setClockIn(environmentUseDto.getClockIn());
-            environmentUse.setClockOut(environmentUseDto.getClockOut());
-            environmentUse.setPurpose(environmentUseDto.getPurpose());
+
+            environmentUse.setReservationDate(environmentReservationDto.getReservationDate());
+            environmentUse.setClockIn(environmentReservationDto.getClockIn());
+            environmentUse.setClockOut(environmentReservationDto.getClockOut());
+
+            environmentUse.setPurpose(environmentReservationDto.getPurpose());
             validateEnvironmentUse(environmentUse);
             environmentUseRepository.save(environmentUse);
-            log.info("Environment use created");
+            log.info("Environment reservation created");
         } catch (Exception e) {
             log.error("Error creating environment use: {}", e.getMessage());
             throw e;
@@ -62,9 +61,9 @@ public class EnvironmentUseBl {
         if (environmentUse.getClientId() == null) {
             throw new RuntimeException("Client not found");
         }
-        if (environmentUse.getLibrarianId() == null) {
-            throw new RuntimeException("Librarian not found");
-        }
+//    if (environmentUse.getLibrarianId() == null) {
+//        throw new RuntimeException("Librarian not found");
+//    }
         if (environmentUse.getReservationDate() == null) {
             throw new RuntimeException("Reservation date is required");
         } else {
@@ -93,6 +92,11 @@ public class EnvironmentUseBl {
             if (clockInDateTime.isBefore(now)) {
                 throw new RuntimeException("Clock in must be in the future or today");
             }
+
+            // Validar que clockIn esté en el mismo día que reservationDate
+            if (!clockInDateTime.toLocalDate().equals(environmentUse.getReservationDate())) {
+                throw new RuntimeException("Clock in must be on the same day as the reservation date");
+            }
         }
 
         if (environmentUse.getClockOut() == null) {
@@ -102,6 +106,11 @@ public class EnvironmentUseBl {
 
             if (clockOutDateTime.isBefore(environmentUse.getClockIn().withSecond(0).withNano(0))) {
                 throw new RuntimeException("Clock out can't be before clock in");
+            }
+
+            // Validar que clockOut esté en el mismo día que reservationDate
+            if (!clockOutDateTime.toLocalDate().equals(environmentUse.getReservationDate())) {
+                throw new RuntimeException("Clock out must be on the same day as the reservation date");
             }
         }
 
@@ -119,6 +128,7 @@ public class EnvironmentUseBl {
 
         log.info("Environment use validated successfully");
     }
+
 
 
 

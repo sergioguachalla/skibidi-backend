@@ -67,8 +67,8 @@ public class BookBl {
             Book bookEntity = new Book();
             bookEntity.setTitle(bookDto.getTitle());
             bookEntity.setIsbn(bookDto.getIsbn());
-            bookEntity.setRegistrationDate(bookDto.getRegistrationDate());
-            bookEntity.setStatus(bookDto.getStatus());
+            //bookEntity.setRegistrationDate(bookDto.getRegistrationDate());
+            //bookEntity.setStatus(bookDto.getStatus());
             bookRepository.save(bookEntity);
             log.info("Book saved {}", bookEntity.toString());
         } catch (Exception e) {
@@ -131,8 +131,9 @@ public class BookBl {
     public void validateBook(BookDto bookDto) throws InvalidInputException {
         ValidationUtils.validateISBN(bookDto.getIsbn());
         ValidationUtils.validateTitle(bookDto.getTitle());
-        ValidationUtils.validateRegistrationDate(bookDto.getRegistrationDate());
-        ValidationUtils.validateStatus(bookDto.getStatus());
+        // deberia validar? o se asigna automaticamente a la fecha actual
+        //ValidationUtils.validateRegistrationDate(bookDto.getRegistrationDate());
+        //ValidationUtils.validateStatus(bookDto.getStatus());
     }
 
     public BookDto getBookInfo(BookDto bookDto) {

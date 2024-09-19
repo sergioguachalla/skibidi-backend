@@ -16,6 +16,6 @@ public class Book {
     private Long BookId;
     private String title;
     private String isbn;
-    private Date registrationDate;
-    private Boolean status;
+    private Date registrationDate = new Date();
+    private Boolean status = true;
 }

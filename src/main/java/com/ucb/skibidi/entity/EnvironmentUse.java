@@ -26,8 +26,8 @@ public class EnvironmentUse {
     private UserClient clientId;
 
     @ManyToOne
-    @JoinColumn(name = "librarian_id")
-    private UserLibrarian librarianId;
+    @JoinColumn(name = "librarian_id", nullable = true)
+    private UserLibrarian librarianId = null;
 
     private LocalDate reservationDate;
 
@@ -36,6 +36,8 @@ public class EnvironmentUse {
     private LocalDateTime clockOut;
 
     private String purpose;
+
+    private Boolean reservationStatus = false;
 
     private int status = 1;
 }

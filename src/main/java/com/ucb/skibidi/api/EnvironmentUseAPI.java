@@ -1,7 +1,7 @@
 package com.ucb.skibidi.api;
 
 import com.ucb.skibidi.bl.EnvironmentUseBl;
-import com.ucb.skibidi.dto.EnvironmentUseDto;
+import com.ucb.skibidi.dto.EnvironmentReservationDto;
 import com.ucb.skibidi.dto.ResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,11 +16,11 @@ public class EnvironmentUseAPI {
     private EnvironmentUseBl environmentUseBl;
 
     @PostMapping("/")
-    public ResponseDto<EnvironmentUseDto> createEnvironmentUse(@RequestBody EnvironmentUseDto environmentUseDto) {
-        ResponseDto<EnvironmentUseDto> responseDto = new ResponseDto<>();
+    public ResponseDto<EnvironmentReservationDto> createEnvironmentReservation(@RequestBody EnvironmentReservationDto environmentReservationDto) {
+        ResponseDto<EnvironmentReservationDto> responseDto = new ResponseDto<>();
         try {
-            environmentUseBl.createEnvironmentUse(environmentUseDto);
-            responseDto.setData(environmentUseDto);
+            environmentUseBl.createEnvironmentReservation(environmentReservationDto);
+            responseDto.setData(environmentReservationDto);
             responseDto.setMessage("Environment use created");
             responseDto.setSuccessful(true);
             return responseDto;
