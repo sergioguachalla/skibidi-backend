@@ -1,5 +1,5 @@
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2024-09-12 01:49:27.628
+-- Last modification date: 2024-09-19 03:13:49.121
 
 -- tables
 -- Table: Book
@@ -25,12 +25,13 @@ CREATE TABLE Environment (
 CREATE TABLE Environment_Use (
     environment_use serial  NOT NULL,
     environment_id int  NOT NULL,
+    librarian_id int  NULL,
     client_id int  NOT NULL,
-    librarian_id int  NOT NULL,
     reservation_date date  NOT NULL,
     clock_in timestamp  NOT NULL,
     clock_out timestamp  NOT NULL,
     purpose varchar(500)  NOT NULL,
+    reservation_status boolean  NOT NULL,
     status int  NOT NULL,
     CONSTRAINT Environment_Use_pk PRIMARY KEY (environment_use)
 );
@@ -54,6 +55,9 @@ CREATE TABLE Infractions (
     user_id int  NOT NULL,
     status int  NOT NULL,
     infraction_type int  NOT NULL,
+    duration int  NOT NULL,
+    start_date date  NOT NULL,
+    serverity int  NOT NULL,
     CONSTRAINT Infractions_pk PRIMARY KEY (infraction_id)
 );
 
@@ -95,7 +99,7 @@ CREATE TABLE Type_Fines (
 CREATE TABLE User_Admin (
     person_id serial  NOT NULL,
     username varchar(100)  NOT NULL,
-    "group" varchar(20)  NOT NULL,
+    user_group varchar(20)  NOT NULL,
     CONSTRAINT User_Admin_pk PRIMARY KEY (person_id)
 );
 
@@ -105,7 +109,7 @@ CREATE TABLE User_Client (
     person_id int  NOT NULL,
     username varchar(100)  NOT NULL,
     is_blocked boolean  NOT NULL,
-    "group" varchar(20)  NOT NULL,
+    user_group varchar(20)  NOT NULL,
     status boolean  NOT NULL,
     infraction_count int  NOT NULL,
     CONSTRAINT User_Client_pk PRIMARY KEY (client_id)
@@ -117,7 +121,7 @@ CREATE TABLE User_Librarian (
     person_id int  NOT NULL,
     username varchar(100)  NOT NULL,
     is_blocked boolean  NOT NULL,
-    "group" varchar(20)  NOT NULL,
+    user_group varchar(20)  NOT NULL,
     status boolean  NOT NULL,
     CONSTRAINT User_Librarian_pk PRIMARY KEY (librarian_id)
 );

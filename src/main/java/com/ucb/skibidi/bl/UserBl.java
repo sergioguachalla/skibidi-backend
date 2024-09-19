@@ -60,13 +60,17 @@ public class UserBl {
         person.setIdNumber(personDto.getIdNumber());
         person.setExpedition(personDto.getExpedition());
         person.setRegistrationDate(new Date());
+        person.setEmail(userDto.getUserDto().getEmail());
         Person newPerson = personRepository.save(person);
 
 
+        var userExists = keycloak.realm(realm).users().search(userDto.getUserDto().getEmail());
+        if (!userExists.isEmpty()) {
+            throw new InvalidInputException("User already exists!");
+        }
 
         var credential = preparePassword(userDto.getUserDto().getPassword());
         var user = prepareUser(userDto.getUserDto(), credential);
-
         var response = keycloak.realm(realm).users().create(user);
         log.info("Response status: {}", response.getStatus());
         String userKcId = response.getLocation().getPath().replaceAll(".*/([^/]+)$", "$1");
@@ -75,6 +79,8 @@ public class UserBl {
         userClient.setGroup("CLIENT");
         userClient.setPersonId(newPerson);
         userClient.setUsername(userDto.getUserDto().getName());
+        log.info("User group: {}", userClient.getGroup());
+
         this.userClientRepository.save(userClient);
     }
 
