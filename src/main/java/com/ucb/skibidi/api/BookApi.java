@@ -6,6 +6,7 @@ import com.ucb.skibidi.dto.ResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.ws.rs.PUT;
 import java.util.List;
 
 @RestController
@@ -84,4 +85,20 @@ public class BookApi {
         }
     }
 
+//    @PutMapping("/{id}")
+//    public ResponseDto<BookDto> updateBookAvailability(@PathVariable Long id) {
+//        try {
+//            ResponseDto<BookDto> responseDto = new ResponseDto<>();
+//            responseDto.setData(bookBl.updateBook(id));
+//            responseDto.setMessage("Book updated");
+//            responseDto.setSuccessful(true);
+//            return responseDto;
+//        } catch (Exception e) {
+//            ResponseDto<BookDto> responseDto = new ResponseDto<>();
+//            responseDto.setData(null);
+//            responseDto.setMessage("Error updating book: " + e.getMessage());
+//            responseDto.setSuccessful(false);
+//            return responseDto;
+//        }
+//    }
 }

@@ -57,6 +57,11 @@ public class BookBl {
 
     }
 
+    public BookDto updateBookAvailability(Long bookId){
+        BookDto bookDto = new BookDto();
+
+        return bookDto;
+    }
 
     //////////////////
 
@@ -76,6 +81,26 @@ public class BookBl {
             throw e;
         }
     }
+
+    public void updateBookStatus(BookDto bookDto) throws Exception {
+        log.info("Updating book status...");
+        try {
+            Book bookEntity = bookRepository.findByIsbn(bookDto.getIsbn());
+            if (bookEntity == null) {
+                log.error("Book with ISBN {} not found", bookDto.getIsbn());
+                throw new NullPointerException("Book not found with ISBN: " + bookDto.getIsbn());
+            }
+            bookEntity.setStatus(bookDto.getStatus());
+            bookRepository.save(bookEntity);
+            log.info("Book status updated {}", bookEntity.toString());
+        } catch (Exception e) {
+            log.error("Error updating book status: {}", e.getMessage());
+            throw e;
+        }
+    }
+
+
+
 
     public BookDto getBookByISBN(String isbn) throws Exception {
         log.info("Getting book...");
