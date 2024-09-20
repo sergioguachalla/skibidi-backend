@@ -4,6 +4,7 @@ import com.ucb.skibidi.config.exceptions.InvalidInputException;
 import com.ucb.skibidi.dao.BookRepository;
 import com.ucb.skibidi.dto.BookDto;
 import com.ucb.skibidi.entity.Book;
+import com.ucb.skibidi.entity.Genre;
 import com.ucb.skibidi.utils.ValidationUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,8 @@ public class BookBl {
     // bl de google libros
     @Autowired
     GoogleBooksBl googleBooksBl;
+    @Autowired
+    GenreBl genreBl;
 
     //dao libros
     @Autowired
@@ -57,6 +60,11 @@ public class BookBl {
 
     }
 
+    public BookDto updateBookAvailability(Long bookId){
+        BookDto bookDto = new BookDto();
+
+        return bookDto;
+    }
 
     //////////////////
 
@@ -67,8 +75,13 @@ public class BookBl {
             Book bookEntity = new Book();
             bookEntity.setTitle(bookDto.getTitle());
             bookEntity.setIsbn(bookDto.getIsbn());
-            bookEntity.setRegistrationDate(bookDto.getRegistrationDate());
-            bookEntity.setStatus(bookDto.getStatus());
+            bookEntity.setImageUrl(bookDto.getImageUrl());
+
+            //genero
+            bookEntity.setGenreId(genreBl.createGenre(bookDto.getGenre()));
+
+            //bookEntity.setRegistrationDate(bookDto.getRegistrationDate());
+            //bookEntity.setStatus(bookDto.getStatus());
             bookRepository.save(bookEntity);
             log.info("Book saved {}", bookEntity.toString());
         } catch (Exception e) {
@@ -76,6 +89,26 @@ public class BookBl {
             throw e;
         }
     }
+
+    public void updateBookStatus(BookDto bookDto) throws Exception {
+        log.info("Updating book status...");
+        try {
+            Book bookEntity = bookRepository.findByIsbn(bookDto.getIsbn());
+            if (bookEntity == null) {
+                log.error("Book with ISBN {} not found", bookDto.getIsbn());
+                throw new NullPointerException("Book not found with ISBN: " + bookDto.getIsbn());
+            }
+            bookEntity.setStatus(bookDto.getStatus());
+            bookRepository.save(bookEntity);
+            log.info("Book status updated {}", bookEntity.toString());
+        } catch (Exception e) {
+            log.error("Error updating book status: {}", e.getMessage());
+            throw e;
+        }
+    }
+
+
+
 
     public BookDto getBookByISBN(String isbn) throws Exception {
         log.info("Getting book...");
@@ -131,8 +164,9 @@ public class BookBl {
     public void validateBook(BookDto bookDto) throws InvalidInputException {
         ValidationUtils.validateISBN(bookDto.getIsbn());
         ValidationUtils.validateTitle(bookDto.getTitle());
-        ValidationUtils.validateRegistrationDate(bookDto.getRegistrationDate());
-        ValidationUtils.validateStatus(bookDto.getStatus());
+        // deberia validar? o se asigna automaticamente a la fecha actual
+        //ValidationUtils.validateRegistrationDate(bookDto.getRegistrationDate());
+        //ValidationUtils.validateStatus(bookDto.getStatus());
     }
 
     public BookDto getBookInfo(BookDto bookDto) {

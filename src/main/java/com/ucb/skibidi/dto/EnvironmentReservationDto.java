@@ -4,13 +4,11 @@ import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Data
-public class EnvironmentUseDto {
-    private String librarianName;
-    private String clientName;
-    private String environmentName;
+public class EnvironmentReservationDto {
+    private Long clientId;
+    private Long environmentId;
     private LocalDate reservationDate;
     private LocalDateTime clockIn;
     private LocalDateTime clockOut;
