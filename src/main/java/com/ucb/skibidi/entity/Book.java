@@ -7,6 +7,7 @@ import java.util.Date;
 
 @Entity(name = "book")
 @Data
+@Table(name = "book")
 public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // O GenerationType.AUTO

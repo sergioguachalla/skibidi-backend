@@ -1,10 +1,10 @@
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2024-09-20 01:38:35.812
+-- Last modification date: 2024-09-20 02:30:24.212
 
 -- tables
 -- Table: Author
 CREATE TABLE Author (
-                        author_id int  NOT NULL,
+                        author_id serial  NOT NULL,
                         name varchar(300)  NOT NULL,
                         status boolean  NOT NULL,
                         CONSTRAINT Author_pk PRIMARY KEY (author_id)
@@ -24,9 +24,9 @@ CREATE TABLE Book (
 
 -- Table: Book_Authors
 CREATE TABLE Book_Authors (
-                              book_authors_id int  NOT NULL,
-                              Author_author_id int  NOT NULL,
-                              Book_book_id int  NOT NULL,
+                              book_authors_id serial  NOT NULL,
+                              book_id int  NOT NULL,
+                              author_id int  NOT NULL,
                               CONSTRAINT Book_Authors_pk PRIMARY KEY (book_authors_id)
 );
 
@@ -155,7 +155,7 @@ CREATE TABLE User_Librarian (
 -- foreign keys
 -- Reference: Book_Authors_Author (table: Book_Authors)
 ALTER TABLE Book_Authors ADD CONSTRAINT Book_Authors_Author
-    FOREIGN KEY (Author_author_id)
+    FOREIGN KEY (author_id)
         REFERENCES Author (author_id)
         NOT DEFERRABLE
             INITIALLY IMMEDIATE
@@ -163,7 +163,7 @@ ALTER TABLE Book_Authors ADD CONSTRAINT Book_Authors_Author
 
 -- Reference: Book_Authors_Book (table: Book_Authors)
 ALTER TABLE Book_Authors ADD CONSTRAINT Book_Authors_Book
-    FOREIGN KEY (Book_book_id)
+    FOREIGN KEY (book_id)
         REFERENCES Book (book_id)
         NOT DEFERRABLE
             INITIALLY IMMEDIATE

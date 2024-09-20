@@ -1,9 +1,12 @@
 package com.ucb.skibidi.bl;
 
 import com.ucb.skibidi.config.exceptions.InvalidInputException;
+import com.ucb.skibidi.dao.BookAuthorsRepository;
 import com.ucb.skibidi.dao.BookRepository;
 import com.ucb.skibidi.dto.BookDto;
+import com.ucb.skibidi.entity.Author;
 import com.ucb.skibidi.entity.Book;
+import com.ucb.skibidi.entity.BookAuthors;
 import com.ucb.skibidi.entity.Genre;
 import com.ucb.skibidi.utils.ValidationUtils;
 import org.slf4j.Logger;
@@ -22,12 +25,20 @@ public class BookBl {
     GoogleBooksBl googleBooksBl;
     @Autowired
     GenreBl genreBl;
+    @Autowired
+    AuthorBl authorBl;
+    @Autowired
+    BookAuthorsBl bookAuthorsBl;
 
     //dao libros
     @Autowired
     BookRepository bookRepository;
 
+
+
     private static final Logger log = org.slf4j.LoggerFactory.getLogger(BookBl.class);
+    @Autowired
+    private BookAuthorsRepository bookAuthorsRepository;
 
     public void createBookManually(BookDto bookDto) throws Exception {
         log.info("Creating book...");
@@ -60,11 +71,6 @@ public class BookBl {
 
     }
 
-    public BookDto updateBookAvailability(Long bookId){
-        BookDto bookDto = new BookDto();
-
-        return bookDto;
-    }
 
     //////////////////
 
@@ -82,7 +88,8 @@ public class BookBl {
 
             //bookEntity.setRegistrationDate(bookDto.getRegistrationDate());
             //bookEntity.setStatus(bookDto.getStatus());
-            bookRepository.save(bookEntity);
+            bookEntity = bookRepository.save(bookEntity);
+            saveBookAuthors(bookEntity, bookDto.getAuthors());
             log.info("Book saved {}", bookEntity.toString());
         } catch (Exception e) {
             log.error("Error saving book: {}", e.getMessage());
@@ -90,23 +97,21 @@ public class BookBl {
         }
     }
 
-    public void updateBookStatus(BookDto bookDto) throws Exception {
-        log.info("Updating book status...");
-        try {
-            Book bookEntity = bookRepository.findByIsbn(bookDto.getIsbn());
-            if (bookEntity == null) {
-                log.error("Book with ISBN {} not found", bookDto.getIsbn());
-                throw new NullPointerException("Book not found with ISBN: " + bookDto.getIsbn());
+    public void saveBookAuthors(Book bookToSave, List<String> authors) throws Exception {
+        log.info("Saving book authors...");
+        for(String author : authors){
+            try {
+                log.debug("Author to be saved: {}", author);
+                //entidad autor
+                Author authorToSave = authorBl.createAuthor(author);
+                bookAuthorsBl.createBookAuthors(bookToSave, authorToSave);
+                log.info("Book author saved {}", author);
+            } catch (Exception e) {
+                log.error("Error saving book authors: {}", e.getMessage());
+                throw e;
             }
-            bookEntity.setStatus(bookDto.getStatus());
-            bookRepository.save(bookEntity);
-            log.info("Book status updated {}", bookEntity.toString());
-        } catch (Exception e) {
-            log.error("Error updating book status: {}", e.getMessage());
-            throw e;
         }
     }
-
 
 
 
@@ -144,12 +149,27 @@ public class BookBl {
                 bookDto.setIsbn(bookEntity.getIsbn());
                 bookDto.setRegistrationDate(bookEntity.getRegistrationDate());
                 bookDto.setStatus(bookEntity.getStatus());
+                bookDto.setImageUrl(bookEntity.getImageUrl());
+                bookDto.setGenre(bookEntity.getGenreId().getName());
+                List<String> authors = bookAuthorsBl.getAuthorsByBook(bookEntity.getBookId());
+                bookDto.setAuthors(authors);
                 booksDto.add(bookDto);
             }
             log.info("Books found {}",booksDto.toString());
             return booksDto;
         } catch (Exception e) {
             log.error("Error getting books: {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    public void updateBookAvailability(Long bookId) throws Exception {
+        log.info("Updating book availability...");
+        try {
+            bookRepository.updateBookStatus(bookId);
+            log.info("Book availability updated");
+        } catch (Exception e) {
+            log.error("Error updating book availability: {}", e.getMessage());
             throw e;
         }
     }
