@@ -265,5 +265,11 @@ ALTER TABLE User_Librarian ADD CONSTRAINT User_Librarian_Person
             INITIALLY IMMEDIATE
 ;
 
--- End of file.
-
+-- Insert Genre Data
+INSERT INTO Genre (name, status) VALUES ('Ficción', true);
+INSERT INTO Genre (name, status) VALUES ('No Ficción', true);
+INSERT INTO Genre (name, status) VALUES ('Ciencia Ficción', true);
+INSERT INTO Genre (name, status) VALUES ('Fantasía', true);
+INSERT INTO Genre (name, status) VALUES ('Misterio', true);
+INSERT INTO Genre (name, status) VALUES ('Biografía', true);
+INSERT INTO Genre (name, status) VALUES ('Poesía', true);
