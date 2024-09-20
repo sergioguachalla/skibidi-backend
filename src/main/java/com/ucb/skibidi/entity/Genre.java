@@ -1,22 +1,21 @@
+
 package com.ucb.skibidi.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name = "Genre")
+@Entity(name = "genre")
 @Data
-@NoArgsConstructor
 public class Genre {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long genreId;
 
-    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "status", nullable = false)
-    private Boolean status;
+    private Boolean status = true;
 }
+
