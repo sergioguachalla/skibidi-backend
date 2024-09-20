@@ -15,6 +15,6 @@ server:
 keycloak:
   auth-server-url: ${AUTH_SERVER_URL:http://localhost:8080}
   credentials:
-    secret: ${CLIENT_SECRET:bT5IdnmJZkRXaG7OE74zrnwPllN2K8ux}
+    secret: ${CLIENT_SECRET:6WPxzJN2CnFPajEbo6gVpqGrLZ5hsr0U}
     realm: skibidi-realm
     resource: sk-backend
