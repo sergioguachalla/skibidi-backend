@@ -50,7 +50,7 @@ public class UserBl {
         if (personRepository.existsByName(personDto.getName()) && personRepository.existsByLastname(personDto.getLastName())) {
             throw new InvalidInputException("Person already exists!");
         }
-        validateUser(userDto.getUserDto());
+        validateUser(userDto);
         ValidationUtils.validateEmail(userDto.getUserDto().getEmail());
         ValidationUtils.validateAddress(userDto.getPersonDto().getAddress());
 
@@ -84,9 +84,10 @@ public class UserBl {
         this.userClientRepository.save(userClient);
     }
 
-    private void validateUser(UserDto userDto) {
-        ValidationUtils.validateName(userDto.getName());
-        ValidationUtils.validateEmail(userDto.getEmail());
+    private void validateUser(UserRegistrationDto userDto) {
+        ValidationUtils.validateName(userDto.getPersonDto().getName());
+        ValidationUtils.validateName(userDto.getPersonDto().getLastName());
+        ValidationUtils.validateEmail(userDto.getUserDto().getEmail());
     }
 
     private CredentialRepresentation preparePassword(String password) {

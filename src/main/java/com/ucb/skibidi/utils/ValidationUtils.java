@@ -47,8 +47,9 @@ public class ValidationUtils {
 
 
     private static boolean isAddressValid(String address) {
-        return address.length() < 500 && address.matches("^[a-zA-Z0-9# ]*$");
+        return address.length() < 500 && address.matches("^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ#.,\\- ]*$");
     }
+
     private static boolean isNullOrEmpty(String str) {
         return str == null || str.isEmpty();
     }
