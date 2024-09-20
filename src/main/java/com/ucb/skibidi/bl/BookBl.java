@@ -4,6 +4,7 @@ import com.ucb.skibidi.config.exceptions.InvalidInputException;
 import com.ucb.skibidi.dao.BookRepository;
 import com.ucb.skibidi.dto.BookDto;
 import com.ucb.skibidi.entity.Book;
+import com.ucb.skibidi.entity.Genre;
 import com.ucb.skibidi.utils.ValidationUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,8 @@ public class BookBl {
     // bl de google libros
     @Autowired
     GoogleBooksBl googleBooksBl;
+    @Autowired
+    GenreBl genreBl;
 
     //dao libros
     @Autowired
@@ -72,6 +75,11 @@ public class BookBl {
             Book bookEntity = new Book();
             bookEntity.setTitle(bookDto.getTitle());
             bookEntity.setIsbn(bookDto.getIsbn());
+            bookEntity.setImageUrl(bookDto.getImageUrl());
+
+            //genero
+            bookEntity.setGenreId(genreBl.createGenre(bookDto.getGenre()));
+
             //bookEntity.setRegistrationDate(bookDto.getRegistrationDate());
             //bookEntity.setStatus(bookDto.getStatus());
             bookRepository.save(bookEntity);

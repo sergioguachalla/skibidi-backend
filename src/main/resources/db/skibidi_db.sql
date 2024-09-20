@@ -1,5 +1,5 @@
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2024-09-19 23:25:55.815
+-- Last modification date: 2024-09-19 23:44:44.961
 
 -- tables
 -- Table: Author
@@ -18,7 +18,7 @@ CREATE TABLE Book (
                       isbn varchar(25)  NOT NULL,
                       registration_date date  NOT NULL,
                       status boolean  NOT NULL,
-                      image_url varchar(500)  NOT NULL,
+                      image_url varchar(500)  NULL,
                       genre_id int  NOT NULL,
                       CONSTRAINT Book_pk PRIMARY KEY (book_id)
 );

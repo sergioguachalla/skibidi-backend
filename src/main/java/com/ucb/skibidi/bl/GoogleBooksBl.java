@@ -15,7 +15,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class GoogleBooksBl {
@@ -54,8 +56,29 @@ public class GoogleBooksBl {
                 bookDto.setIsbn(isbn);  // Asignar el ISBN proporcionado
                 bookDto.setRegistrationDate(new Date());  // Asignar la fecha actual
                 bookDto.setStatus(true);  // Asignar estado
-                bookDto.setImage_url(volume.getVolumeInfo().getImageLinks() != null ?
+                bookDto.setImageUrl(volume.getVolumeInfo().getImageLinks() != null ?
                         volume.getVolumeInfo().getImageLinks().getThumbnail() : null);
+
+                // Asignar el género (categoría)
+                if (volume.getVolumeInfo().getCategories() != null && !volume.getVolumeInfo().getCategories().isEmpty()) {
+                    List<String> categories = volume.getVolumeInfo().getCategories();
+                    bookDto.setGenre(categories.get(0));  // Establecer la primera categoría como género
+                    if (categories.size() > 1) {
+                        logger.info("Más de una categoría encontrada. Usando la primera: {}, categorías adicionales: {}",
+                                categories.get(0), categories.subList(1, categories.size()));
+                    }
+                } else {
+                    bookDto.setGenre("Desconocido");  // Si no hay categorías, establecer como desconocido
+                }
+
+                // Asignar autores
+                if (volume.getVolumeInfo().getAuthors() != null && !volume.getVolumeInfo().getAuthors().isEmpty()) {
+                    List<String> authors = volume.getVolumeInfo().getAuthors();
+                    bookDto.setAuthors(authors);  // Asignar la lista completa de autores
+                    logger.info("Autores asignados: {}", authors);
+                } else {
+                    bookDto.setAuthors(new ArrayList<>());  // Si no hay autores, asignar lista vacía
+                }
 
                 logger.info("DTO generado: {}", bookDto);
                 return bookDto;
