@@ -1,12 +1,11 @@
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2024-09-19 23:44:44.961
+-- Last modification date: 2024-09-20 01:38:35.812
 
 -- tables
 -- Table: Author
 CREATE TABLE Author (
                         author_id int  NOT NULL,
-                        name varchar(100)  NOT NULL,
-                        lastname varchar(200)  NOT NULL,
+                        name varchar(300)  NOT NULL,
                         status boolean  NOT NULL,
                         CONSTRAINT Author_pk PRIMARY KEY (author_id)
 );
