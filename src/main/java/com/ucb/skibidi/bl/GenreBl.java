@@ -1,11 +1,14 @@
 package com.ucb.skibidi.bl;
 
 import com.ucb.skibidi.dao.GenreRepository;
+import com.ucb.skibidi.dto.GenreDto;
 import com.ucb.skibidi.entity.Genre;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class GenreBl {
@@ -26,5 +29,15 @@ public class GenreBl {
             log.error("Error creating genre: {}", e.getMessage());
             throw e;
         }
+    }
+
+    public List<GenreDto> getAllGenres (){
+        List<Genre> genres = genreRepository.findAll();
+        return genres.stream().map(genre -> {
+            GenreDto genreDto = new GenreDto();
+            genreDto.setGenreId(genre.getGenreId());
+            genreDto.setGenreName(genre.getName());
+            return genreDto;
+        }).toList();
     }
 }
