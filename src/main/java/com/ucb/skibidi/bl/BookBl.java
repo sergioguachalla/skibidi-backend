@@ -1,13 +1,11 @@
 package com.ucb.skibidi.bl;
 
 import com.ucb.skibidi.config.exceptions.InvalidInputException;
-import com.ucb.skibidi.dao.BookAuthorsRepository;
 import com.ucb.skibidi.dao.BookRepository;
 import com.ucb.skibidi.dto.BookDto;
 import com.ucb.skibidi.dto.BookManualDto;
 import com.ucb.skibidi.entity.Author;
 import com.ucb.skibidi.entity.Book;
-import com.ucb.skibidi.entity.BookAuthors;
 import com.ucb.skibidi.entity.Genre;
 import com.ucb.skibidi.utils.BookSpecification;
 import com.ucb.skibidi.utils.ValidationUtils;
@@ -17,12 +15,12 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
 public class BookBl {
+
+    private static final Logger log = org.slf4j.LoggerFactory.getLogger(BookBl.class);
 
     // bl de google libros
     @Autowired
@@ -39,15 +37,15 @@ public class BookBl {
     BookRepository bookRepository;
 
 
-    private static final Logger log = org.slf4j.LoggerFactory.getLogger(BookBl.class);
-    @Autowired
-    private BookAuthorsRepository bookAuthorsRepository;
 
     public void createBookManually(BookManualDto bookDto) throws Exception {
         log.info("Creating book...");
         try {
-            //validateBook(bookDto);
-            saveManually(bookDto);
+            BookDto bookInfo = new BookDto();
+            bookInfo.setIsbn(bookDto.getIsbn());
+            bookInfo.setTitle(bookDto.getTitle());
+            validateBook(bookInfo);
+            saveBook(bookDto);
             log.info("Book created {}", bookDto.toString());
         } catch (Exception e) {
             log.error("Error creating book: {}", e.getMessage());
@@ -56,26 +54,6 @@ public class BookBl {
 
     }
 
-
-    public void saveManually(BookManualDto bookManualDto){
-        Book book = new Book();
-        Genre genre = new Genre();
-        genre.setGenreId((long) bookManualDto.getGenreId());
-        book.setTitle(bookManualDto.getTitle());
-        book.setIsbn(bookManualDto.getIsbn());
-        book.setRegistrationDate(new Date());
-        book.setStatus(true);
-        book.setImageUrl(bookManualDto.getImageUrl());
-        book.setGenreId(genre);
-        bookRepository.save(book);
-        for(String author : bookManualDto.getAuthors()){
-            Author authorEntity = authorBl.createAuthor(author);
-            BookAuthors bookAuthors = new BookAuthors();
-            bookAuthors.setBookId(book);
-            bookAuthors.setAuthorId(authorEntity);
-            bookAuthorsRepository.save(bookAuthors);
-        }
-    }
 
     public BookDto createBookByISBN(String isbn) throws Exception{
         log.info("Creating book...");
@@ -98,7 +76,25 @@ public class BookBl {
 
     //////////////////
 
-    public void saveBook(BookDto bookDto) throws Exception {
+//    public void saveManually(BookManualDto bookManualDto){
+//        Book book = new Book();
+//        Genre genre = new Genre();
+//        genre.setGenreId((long) bookManualDto.getGenreId());
+//
+//        book.setTitle(bookManualDto.getTitle());
+//        book.setIsbn(bookManualDto.getIsbn());
+//        book.setRegistrationDate(new Date());
+//        book.setStatus(true);
+//        book.setImageUrl(bookManualDto.getImageUrl());
+//        book.setGenreId(genre);
+//
+//        BookDto bookDto = new BookDto();
+//
+//        saveBook(book);
+//    }
+
+    //save book manually
+    public void saveBook(BookManualDto bookDto) throws Exception {
         log.info("Saving book...");
         try {
             //entidad libro
@@ -108,7 +104,10 @@ public class BookBl {
             bookEntity.setImageUrl(bookDto.getImageUrl());
 
             //genero
-            bookEntity.setGenreId(genreBl.createGenre(bookDto.getGenre()));
+            Genre genre = new Genre();
+            //log.info("Genre id: {}", bookDto.getGenreId());
+            genre.setGenreId((long) bookDto.getGenreId());
+            bookEntity.setGenreId(genre);
 
             //bookEntity.setRegistrationDate(bookDto.getRegistrationDate());
             //bookEntity.setStatus(bookDto.getStatus());
@@ -121,14 +120,49 @@ public class BookBl {
         }
     }
 
+
+    public void saveBook(BookDto bookDto) throws Exception {
+        log.info("Saving book...");
+        try {
+            //entidad libro
+            Book bookEntity = new Book();
+            bookEntity.setTitle(bookDto.getTitle());
+            bookEntity.setIsbn(bookDto.getIsbn());
+            bookEntity.setImageUrl(bookDto.getImageUrl());
+
+            //genero
+            //bookEntity.setGenreId(genreBl.createGenre(bookDto.getGenre()));
+
+            try {
+                bookEntity.setGenreId(genreBl.findGenreByName(bookDto.getGenre()));
+            } catch (Exception e) {
+                bookEntity.setGenreId(genreBl.createGenre(bookDto.getGenre()));
+            }
+
+            bookEntity = bookRepository.save(bookEntity);
+            saveBookAuthors(bookEntity, bookDto.getAuthors());
+            log.info("Book saved {}", bookEntity.toString());
+        } catch (Exception e) {
+            log.error("Error saving book: {}", e.getMessage());
+            throw e;
+        }
+    }
+
+
     public void saveBookAuthors(Book bookToSave, List<String> authors) throws Exception {
         log.info("Saving book authors...");
-        for(String author : authors){
+        for(String authorName : authors){
             try {
-                log.debug("Author to be saved: {}", author);
+                log.debug("Author to be saved: {}", authorName);
                 //entidad autor
-                Author authorToSave = authorBl.createAuthor(author);
-                bookAuthorsBl.createBookAuthors(bookToSave, authorToSave);
+                Author authorToBeFound = authorBl.findAuthorByName(authorName);
+                Author author = new Author();
+                if(authorToBeFound != null){
+                    author = authorToBeFound;
+                }else {
+                    author = authorBl.createAuthor(authorName);
+                }
+                bookAuthorsBl.createBookAuthors(bookToSave, author);
                 log.info("Book author saved {}", author);
             } catch (Exception e) {
                 log.error("Error saving book authors: {}", e.getMessage());
