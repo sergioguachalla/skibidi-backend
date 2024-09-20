@@ -4,8 +4,8 @@ import lombok.Data;
 
 import java.util.Date;
 import java.util.List;
-@Data
 
+@Data
 public class BookManualDto {
     private String title;
     private String isbn;

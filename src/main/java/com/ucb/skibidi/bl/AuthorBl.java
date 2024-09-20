@@ -30,4 +30,16 @@ public class AuthorBl {
         }
     }
 
+    public Author findAuthorByName(String authorName) {
+        log.info("Finding author...");
+        try {
+            Author author = authorRepository.findByName(authorName);
+            log.info("Author exists already");
+            return author;
+        } catch (Exception e) {
+            log.error("Author doesn't exist: {}", e.getMessage());
+            throw e;
+        }
+    }
+
 }

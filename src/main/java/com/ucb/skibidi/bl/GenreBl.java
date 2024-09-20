@@ -40,4 +40,16 @@ public class GenreBl {
             return genreDto;
         }).toList();
     }
+
+    public Genre findGenreByName(String genreName) {
+        log.info("Finding genre...");
+        try {
+            Genre genre = genreRepository.findByName(genreName);
+            log.info("Genre exists already");
+            return genre;
+        } catch (Exception e) {
+            log.error("Genre doesn't exist: {}", e.getMessage());
+            throw e;
+        }
+    }
 }
