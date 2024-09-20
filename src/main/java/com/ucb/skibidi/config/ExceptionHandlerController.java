@@ -1,6 +1,7 @@
 package com.ucb.skibidi.config;
 
 import com.ucb.skibidi.config.exceptions.InvalidInputException;
+import com.ucb.skibidi.config.exceptions.UserAlreadyExistsException;
 import com.ucb.skibidi.dto.ResponseDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,16 @@ public class ExceptionHandlerController {
     @ExceptionHandler(InvalidInputException.class)
     public ResponseEntity<ResponseDto<String>> handleInvalidInputException(InvalidInputException e) {
         log.error("Invalid input exception", e);
+        ResponseDto<String> responseDto = new ResponseDto<>();
+        responseDto.setData(null);
+        responseDto.setMessage(e.getMessage());
+        responseDto.setSuccessful(false);
+        return ResponseEntity.badRequest().body(responseDto);
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ResponseDto<String>> handleUserAlreadyExistsException(UserAlreadyExistsException e) {
+        log.error("User already exists exception", e);
         ResponseDto<String> responseDto = new ResponseDto<>();
         responseDto.setData(null);
         responseDto.setMessage(e.getMessage());

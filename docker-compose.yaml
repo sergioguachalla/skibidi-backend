@@ -1,0 +1,40 @@
+networks:
+  skibidi-network:
+    driver: bridge
+
+x-common-keycloak-environment: &common-keycloak-environment
+  KEYCLOAK_ADMIN: admin
+  KEYCLOAK_ADMIN_PASSWORD: admin
+  AUTH_SERVER_URL: http://keycloak:8080
+  ISSUER_URI: http://keycloak:8080/realms/skibidi-realm
+
+services:
+  skibidi-db:
+    container_name: skibidi-db
+    image: postgres
+    ports:
+      - 5433:5432
+    volumes:
+      - ./src/main/resources/db/skibidi_db.sql:/docker-entrypoint-initdb.d/create_database.sql.sql
+      - ./src/main/resources/db/docker/data:/var/lib/postgresql/data &&  sudo chmod 0700 /var/lib/postgresql/data
+    environment:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+        POSTGRES_DB: skibidi
+    networks:
+        - skibidi-network
+  skibidi-keycloak:
+    container_name: skibidi-keycloak
+    image: quay.io/keycloak/keycloak:21.0.1
+    command:
+      - start-dev
+      - --import-realm
+    environment:
+      <<: *common-keycloak-environment
+    volumes:
+      - ./src/main/resources/keycloak/skibidi-realm.json:/opt/keycloak/data/import/skibidi-realm.json
+    ports:
+      - 8080:8080
+    networks:
+      - skibidi-network
+

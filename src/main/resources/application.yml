@@ -2,18 +2,19 @@ spring:
   application:
     name: skibidi-backend
   datasource:
-    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5432/skibidi}
+    url: jdbc:postgresql://localhost:5433/skibidi
     username: ${POSTGRES_USER:postgres}
-    password: ${POSTGRES_PASSWORD:admin}
+    password: ${POSTGRES_PASSWORD:postgres}
     jpa:
       hibernate:
         ddl-auto: none
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 server:
     port: 8091
 
 keycloak:
   auth-server-url: ${AUTH_SERVER_URL:http://localhost:8080}
   credentials:
-    secret: ${CLIENT_SECRET:SBcbFEti8CuGOdtGZ504Siv4eW0sBD4J}
+    secret: ${CLIENT_SECRET:6WPxzJN2CnFPajEbo6gVpqGrLZ5hsr0U}
     realm: skibidi-realm
     resource: sk-backend
