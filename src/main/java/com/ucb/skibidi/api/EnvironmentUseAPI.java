@@ -1,13 +1,15 @@
 package com.ucb.skibidi.api;
 
 import com.ucb.skibidi.bl.EnvironmentUseBl;
+import com.ucb.skibidi.dto.EnvironmentDto;
 import com.ucb.skibidi.dto.EnvironmentReservationDto;
 import com.ucb.skibidi.dto.ResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/environments")
@@ -27,6 +29,27 @@ public class EnvironmentUseAPI {
         } catch (Exception e) {
             responseDto.setData(null);
             responseDto.setMessage("Error creating environment use: " + e.getMessage());
+            responseDto.setSuccessful(false);
+            return responseDto;
+        }
+    }
+
+    // disponibilidad
+    @GetMapping("/availability")
+    public ResponseDto<List<EnvironmentDto>> getEnvironmentsAvailability(
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Date from,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Date to
+    ) {
+        ResponseDto<List<EnvironmentDto>> responseDto = new ResponseDto<>();
+        try {
+            List<EnvironmentDto> environments = environmentUseBl.getEnvironmentsAvailability(from,to);
+            responseDto.setData(environments);
+            responseDto.setMessage("Environments availability fetched successfully");
+            responseDto.setSuccessful(true);
+            return responseDto;
+        } catch (Exception e) {
+            responseDto.setData(null);
+            responseDto.setMessage("Error fetching environments availability: " + e.getMessage());
             responseDto.setSuccessful(false);
             return responseDto;
         }

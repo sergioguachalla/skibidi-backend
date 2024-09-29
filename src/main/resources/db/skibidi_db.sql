@@ -1,5 +1,5 @@
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2024-09-20 02:30:24.212
+-- Last modification date: 2024-09-29 14:09:54.241
 
 -- tables
 -- Table: Author
@@ -35,7 +35,7 @@ CREATE TABLE Environment (
                              environment_id serial  NOT NULL,
                              name varchar(50)  NOT NULL,
                              capacity int  NOT NULL,
-                             is_available boolean  NOT NULL,
+                             status boolean  NOT NULL,
                              CONSTRAINT Environment_pk PRIMARY KEY (environment_id)
 );
 
@@ -265,6 +265,8 @@ ALTER TABLE User_Librarian ADD CONSTRAINT User_Librarian_Person
             INITIALLY IMMEDIATE
 ;
 
+-- End of file.
+
 -- Insert Genre Data
 INSERT INTO Genre (name, status) VALUES ('Ficción', true);
 INSERT INTO Genre (name, status) VALUES ('No Ficción', true);
@@ -273,3 +275,13 @@ INSERT INTO Genre (name, status) VALUES ('Fantasía', true);
 INSERT INTO Genre (name, status) VALUES ('Misterio', true);
 INSERT INTO Genre (name, status) VALUES ('Biografía', true);
 INSERT INTO Genre (name, status) VALUES ('Poesía', true);
+
+-- Insert Environment Data
+
+INSERT INTO Environment (name, capacity, status) VALUES ('SALA-B1', 7, true);
+INSERT INTO Environment (name, capacity, status) VALUES ('SALA-B2', 5, true);
+INSERT INTO Environment (name, capacity, status) VALUES ('SALA-B3', 6, true);
+INSERT INTO Environment (name, capacity, status) VALUES ('SALA-B4', 4, true);
+INSERT INTO Environment (name, capacity, status) VALUES ('SALA-B5', 4, true);
+INSERT INTO Environment (name, capacity, status) VALUES ('SALA-B6', 12, true);
+
