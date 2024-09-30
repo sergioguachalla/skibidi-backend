@@ -34,5 +34,11 @@ public class UserApi {
         return new ResponseDto<UserRegistrationDto>(response, "User found successfully", true);
     }
 
+    @PutMapping("/client")
+    public ResponseDto<String> updateUser(@RequestBody UserRegistrationDto userDto, @RequestParam String kcId) {
+        userBl.updateUserInformation(userDto, kcId);
+        return new ResponseDto<String>(null,"User updated successfully", true);
+    }
+
 
 }

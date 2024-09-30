@@ -105,7 +105,26 @@ public class UserBl {
         return userRegistrationDto;
     }
 
+    public void updateUserInformation(UserRegistrationDto userDto, String kcId){
+        var user = keycloak.realm(realm).users().get(kcId).toRepresentation();
+        if (user == null) {
+            throw new InvalidInputException("User not found!");
+        }
+        var newUserInformation = new UserRepresentation();
+        newUserInformation.setUsername(userDto.getUserDto().getName());
+        newUserInformation.setEmail(userDto.getUserDto().getEmail());
+        newUserInformation.setFirstName(userDto.getPersonDto().getName());
+        newUserInformation.setLastName(userDto.getPersonDto().getLastName());
 
+        keycloak.realm(realm).users().get(kcId).update(newUserInformation);
+        log.info("keycloak user updated");
+
+        var userEntity = userClientRepository.findByPersonIdKcUuid(kcId);
+        userEntity.setUsername(userDto.getUserDto().getName());
+        userClientRepository.save(userEntity);
+        log.info("user entity updated");
+
+    }
 
     private void validateUser(UserRegistrationDto userDto) {
         ValidationUtils.validateName(userDto.getPersonDto().getName());
@@ -128,7 +147,6 @@ public class UserBl {
         user.setLastName(userDto.getPersonDto().getLastName());
         user.setCredentials(List.of(password));
         user.setEnabled(true);
-        //TODO: set group according to user type
         user.setGroups(Collections.singletonList(group));
         return user;
     }
