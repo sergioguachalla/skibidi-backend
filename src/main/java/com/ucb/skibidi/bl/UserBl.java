@@ -8,6 +8,7 @@ import com.ucb.skibidi.dto.UserDto;
 import com.ucb.skibidi.dto.UserRegistrationDto;
 import com.ucb.skibidi.entity.Person;
 import com.ucb.skibidi.entity.UserClient;
+import com.ucb.skibidi.utils.EntityMapper;
 import com.ucb.skibidi.utils.ValidationUtils;
 import jakarta.transaction.Transactional;
 import org.keycloak.admin.client.Keycloak;
@@ -71,18 +72,40 @@ public class UserBl {
         }
 
         var credential = preparePassword(userDto.getUserDto().getPassword());
-        var user = prepareUser(userDto.getUserDto(), credential, group);
+        var user = prepareUser(userDto, credential, group);
         var response = keycloak.realm(realm).users().create(user);
-        log.info("Response status: {}", response.getStatus());
+        log.info("Response status from keycloak: {}", response.getStatus());
         String userKcId = response.getLocation().getPath().replaceAll(".*/([^/]+)$", "$1");
         log.info("User created with id: {}", userKcId);
         UserClient userClient = new UserClient();
         userClient.setGroup(group);
+        newPerson.setKcUuid(userKcId);
         userClient.setPersonId(newPerson);
         userClient.setUsername(userDto.getUserDto().getName());
 
         this.userClientRepository.save(userClient);
     }
+
+    public UserRegistrationDto findUserByKcId(String kcId) {
+        var user = keycloak.realm(realm).users().get(kcId).toRepresentation();
+        var person = personRepository.findByKcUuid(kcId);
+        if (user == null) {
+            throw new InvalidInputException("User not found!");
+        }
+        PersonDto personDto = EntityMapper.toPersonDto(person);
+        log.info("person: {}", personDto.toString());
+
+        UserRegistrationDto userRegistrationDto = new UserRegistrationDto();
+        userRegistrationDto.setPersonDto(personDto);
+        UserDto userdto = new UserDto();
+        userdto.setName(user.getUsername());
+        userdto.setEmail(user.getEmail());
+        userRegistrationDto.setUserDto(userdto);
+
+        return userRegistrationDto;
+    }
+
+
 
     private void validateUser(UserRegistrationDto userDto) {
         ValidationUtils.validateName(userDto.getPersonDto().getName());
@@ -97,11 +120,12 @@ public class UserBl {
         credential.setTemporary(false);
         return credential;
     }
-    private UserRepresentation prepareUser(UserDto userDto, CredentialRepresentation password, String group) {
+    private UserRepresentation prepareUser(UserRegistrationDto userDto, CredentialRepresentation password, String group) {
         UserRepresentation user = new UserRepresentation();
-        user.setUsername(userDto.getName());
-        user.setEmail(userDto.getEmail());
-        user.setFirstName(userDto.getName());
+        user.setUsername(userDto.getUserDto().getName());
+        user.setEmail(userDto.getUserDto().getEmail());
+        user.setFirstName(userDto.getPersonDto().getName());
+        user.setLastName(userDto.getPersonDto().getLastName());
         user.setCredentials(List.of(password));
         user.setEnabled(true);
         //TODO: set group according to user type

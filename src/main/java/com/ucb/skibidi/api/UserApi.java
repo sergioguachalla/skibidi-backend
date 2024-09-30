@@ -28,5 +28,11 @@ public class UserApi {
     }
 
 
+    @GetMapping("/client")
+    public ResponseDto<UserRegistrationDto> findUserByKcId(@RequestParam String kcId) {
+        UserRegistrationDto response = userBl.findUserByKcId(kcId);
+        return new ResponseDto<UserRegistrationDto>(response, "User found successfully", true);
+    }
+
 
 }
