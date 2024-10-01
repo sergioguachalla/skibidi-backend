@@ -31,6 +31,9 @@ public class EnvironmentUseBl {
     // create a reservation to be approved by a librarian
     public void createEnvironmentReservation(EnvironmentReservationDto environmentReservationDto) {
         log.info("Creating environment reservation...");
+        System.out.println("date1: " + environmentReservationDto.getClockIn());
+        System.out.println("dat2: " + environmentReservationDto.getClockOut());
+
         try {
             Environment environment = new Environment();
             environment.setEnvironmentId(environmentReservationDto.getEnvironmentId());
@@ -48,7 +51,7 @@ public class EnvironmentUseBl {
             environmentUse.setClockOut(environmentReservationDto.getClockOut());
 
             environmentUse.setPurpose(environmentReservationDto.getPurpose());
-            validateEnvironmentUse(environmentUse);
+            //validateEnvironmentUse(environmentUse);
             environmentUseRepository.save(environmentUse);
             log.info("Environment reservation created");
         } catch (Exception e) {
