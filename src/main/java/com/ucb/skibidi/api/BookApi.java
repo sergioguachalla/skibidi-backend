@@ -109,4 +109,36 @@ public class BookApi {
             return responseDto;
         }
     }
+    @GetMapping("/search")
+    public ResponseDto<List<BookDto>> searchBooksByTitle(@RequestParam String title) {
+        try {
+            ResponseDto<List<BookDto>> responseDto = new ResponseDto<>();
+            responseDto.setData(bookBl.searchBooksByTitle(title));
+            responseDto.setMessage("Books found");
+            responseDto.setSuccessful(true);
+            return responseDto;
+        } catch (Exception e) {
+            ResponseDto<List<BookDto>> responseDto = new ResponseDto<>();
+            responseDto.setData(null);
+            responseDto.setMessage("Error searching books: " + e.getMessage());
+            responseDto.setSuccessful(false);
+            return responseDto;
+        }
+    }
+    @GetMapping("/search/author")
+    public ResponseDto<List<BookDto>> searchBooksByAuthor(@RequestParam String authorName) {
+        try {
+            ResponseDto<List<BookDto>> responseDto = new ResponseDto<>();
+            responseDto.setData(bookBl.searchBooksByAuthor(authorName)); // Asegúrate de que este método exista en tu BookBl
+            responseDto.setMessage("Books found");
+            responseDto.setSuccessful(true);
+            return responseDto;
+        } catch (Exception e) {
+            ResponseDto<List<BookDto>> responseDto = new ResponseDto<>();
+            responseDto.setData(null);
+            responseDto.setMessage("Error searching books: " + e.getMessage());
+            responseDto.setSuccessful(false);
+            return responseDto;
+        }
+    }
 }

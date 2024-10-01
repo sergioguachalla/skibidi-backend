@@ -1,6 +1,7 @@
 package com.ucb.skibidi.bl;
 
 import com.ucb.skibidi.config.exceptions.InvalidInputException;
+import com.ucb.skibidi.dao.BookAuthorsRepository;
 import com.ucb.skibidi.dao.BookRepository;
 import com.ucb.skibidi.dto.BookDto;
 import com.ucb.skibidi.dto.BookManualDto;
@@ -15,7 +16,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BookBl {
@@ -35,7 +39,8 @@ public class BookBl {
     //dao libros
     @Autowired
     BookRepository bookRepository;
-
+    @Autowired
+    private BookAuthorsRepository bookAuthorsRepository;
 
 
     public void createBookManually(BookManualDto bookDto) throws Exception {
@@ -259,4 +264,55 @@ public class BookBl {
             return bookDto;
         }
     }
+    public List<BookDto> searchBooksByTitle(String title) throws Exception {
+        log.info("Searching books by title...");
+        try {
+            List<Book> books = bookRepository.findByTitleContainingIgnoreCase(title);
+            if (books.isEmpty()) {
+                log.info("No books found with title {}", title);
+                return Collections.emptyList();
+            }
+
+            // Convertir la entidad Book a BookDto
+            List<BookDto> bookDtos = books.stream().map(book -> {
+                BookDto bookDto = new BookDto();
+                bookDto.setTitle(book.getTitle());
+                bookDto.setIsbn(book.getIsbn());
+                bookDto.setRegistrationDate(book.getRegistrationDate());
+                bookDto.setStatus(book.getStatus());
+                bookDto.setImageUrl(book.getImageUrl());
+                bookDto.setGenre(book.getGenreId().getName()); // Si Genre tiene el campo name
+                return bookDto;
+            }).collect(Collectors.toList());
+
+            return bookDtos;
+        } catch (Exception e) {
+            log.error("Error searching books: {}", e.getMessage());
+            throw e;
+        }
+    }
+    public List<BookDto> searchBooksByAuthor(String authorName) {
+        // Obtiene los IDs de los libros asociados al autor
+        List<Long> bookIds = bookAuthorsRepository.findBooksByAuthorName(authorName);
+
+        // Busca los libros por sus IDs usando findAllById
+        List<Book> books = bookRepository.findAllById(bookIds);
+
+        // Convierte a BookDto
+        return books.stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+
+    // Método para convertir Book a BookDto
+    private BookDto convertToDto(Book book) {
+        BookDto bookDto = new BookDto();
+        bookDto.setTitle(book.getTitle());
+        bookDto.setIsbn(book.getIsbn());
+        bookDto.setRegistrationDate(book.getRegistrationDate());
+        bookDto.setStatus(book.getStatus());
+        bookDto.setImageUrl(book.getImageUrl());
+        bookDto.setGenre(book.getGenreId().getName());
+        // Añade otros campos según sea necesario
+        return bookDto;
+    }
 }
+
