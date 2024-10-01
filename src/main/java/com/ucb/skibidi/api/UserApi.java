@@ -28,13 +28,13 @@ public class UserApi {
     }
 
 
-    @GetMapping("/client")
+    @GetMapping("/clients/")
     public ResponseDto<UserRegistrationDto> findUserByKcId(@RequestParam String kcId) {
         UserRegistrationDto response = userBl.findUserByKcId(kcId);
-        return new ResponseDto<UserRegistrationDto>(response, "User found successfully", true);
+        return new ResponseDto<>(response, "User found successfully", true);
     }
 
-    @PutMapping("/client")
+    @PutMapping("/clients")
     public ResponseDto<String> updateUser(@RequestBody UserRegistrationDto userDto, @RequestParam String kcId) {
         userBl.updateUserInformation(userDto, kcId);
         return new ResponseDto<String>(null,"User updated successfully", true);
