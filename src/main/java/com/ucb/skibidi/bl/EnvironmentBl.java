@@ -24,7 +24,7 @@ public class EnvironmentBl {
         Environment environment = new Environment();
         environment.setName(environmentDto.getName());
         environment.setCapacity(environmentDto.getCapacity());
-        environment.setStatus(environmentDto.getIsAvailable());
+        environment.setStatus(true);
 
         environment = environmentRepository.save(environment);
         environmentDto.setEnvironmentId(environment.getEnvironmentId());
