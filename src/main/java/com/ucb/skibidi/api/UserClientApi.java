@@ -23,4 +23,6 @@ public class UserClientApi {
         List<UserClientDto> clients = userClientBl.getAllUsers();
         return new ResponseDto<>(clients, "Users fetched successfully", true);
     }
+
+
 }

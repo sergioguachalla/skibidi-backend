@@ -63,6 +63,23 @@ public class EnvironmentUseBl {
     }
 
 
+    public List<EnvironmentReservationDto> findReservationsByClientId(String kcId){
+        log.info("Finding reservations by kcId {}", kcId);
+        List<EnvironmentUse> environmentUses = environmentUseRepository.findAllByClientIdPersonIdKcUuid(kcId);
+        return environmentUses.stream()
+                .map(environmentUse -> {
+                    EnvironmentReservationDto environmentReservationDto = new EnvironmentReservationDto();
+                    environmentReservationDto.setClientId(environmentUse.getClientId().getClientId());
+                    environmentReservationDto.setEnvironmentId(environmentUse.getEnvironmentId().getEnvironmentId());
+                    environmentReservationDto.setReservationDate(environmentUse.getReservationDate());
+                    environmentReservationDto.setClockIn(environmentUse.getClockIn());
+                    environmentReservationDto.setClockOut(environmentUse.getClockOut());
+                    environmentReservationDto.setPurpose(environmentUse.getPurpose());
+                    return environmentReservationDto;
+                })
+                .toList();
+    }
+
     private void validateEnvironmentUse(EnvironmentUse environmentUse) {
         log.info("Validating environment use...");
 
