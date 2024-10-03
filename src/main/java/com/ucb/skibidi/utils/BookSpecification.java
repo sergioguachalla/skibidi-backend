@@ -14,4 +14,13 @@ public class BookSpecification {
     public static Specification<Book> startDateBetween(Date from, Date to) {
         return (root, query, cb) -> cb.between(root.get("registrationDate"), from, to);
     }
+
+    public static Specification<Book> isAvailable() {
+        return (root, query, cb) -> cb.equal(root.get("isAvailable"), true);
+    }
+
+    public static Specification<Book> isNotAvailable() {
+        return (root, query, cb) -> cb.equal(root.get("isAvailable"), false);
+    }
+
 }
