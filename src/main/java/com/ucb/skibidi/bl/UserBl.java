@@ -100,6 +100,7 @@ public class UserBl {
         UserDto userdto = new UserDto();
         userdto.setName(user.getUsername());
         userdto.setEmail(user.getEmail());
+
         userRegistrationDto.setUserDto(userdto);
 
         return userRegistrationDto;
@@ -116,7 +117,7 @@ public class UserBl {
         newUserInformation.setEmail(userDto.getUserDto().getEmail());
         newUserInformation.setFirstName(userDto.getPersonDto().getName());
         newUserInformation.setLastName(userDto.getPersonDto().getLastName());
-        if(userDto.getUserDto().getPassword() != null){
+        if(!userDto.getUserDto().getPassword().isEmpty()){
             var credential = preparePassword(userDto.getUserDto().getPassword());
             newUserInformation.setCredentials(List.of(credential));
         }
