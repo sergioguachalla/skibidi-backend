@@ -16,11 +16,11 @@ public class BookSpecification {
     }
 
     public static Specification<Book> isAvailable() {
-        return (root, query, cb) -> cb.equal(root.get("isAvailable"), true);
+        return (root, query, cb) -> cb.equal(root.get("status"), true);
     }
 
     public static Specification<Book> isNotAvailable() {
-        return (root, query, cb) -> cb.equal(root.get("isAvailable"), false);
+        return (root, query, cb) -> cb.equal(root.get("status"), false);
     }
 
 }
