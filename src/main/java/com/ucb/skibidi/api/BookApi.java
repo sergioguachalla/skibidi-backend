@@ -4,6 +4,7 @@ import com.ucb.skibidi.bl.BookBl;
 import com.ucb.skibidi.dto.BookDto;
 import com.ucb.skibidi.dto.BookManualDto;
 import com.ucb.skibidi.dto.ResponseDto;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Sort;
 @RestController
 @RequestMapping("/api/v1/books")
 public class BookApi {
+    private static final Logger log = org.slf4j.LoggerFactory.getLogger(BookApi.class);
 
     @Autowired
     private BookBl bookBl;
@@ -87,6 +89,7 @@ public class BookApi {
         ResponseDto<Page<BookManualDto>> responseDto = new ResponseDto<>();
         try {
             Page<BookManualDto> books = bookBl.getAllBooks(pageable, genreId,from,to,isAvailable);
+            log.info("Books found {}",books.getContent().isEmpty());
             if(books.isEmpty()){
                 responseDto.setData(null);
                 responseDto.setMessage("No se encontraron libros con los filtros seleccionados");

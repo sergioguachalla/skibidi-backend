@@ -69,7 +69,7 @@ public class EnvironmentUseBl {
         return environmentUses.stream()
                 .map(environmentUse -> {
                     EnvironmentReservationDto environmentReservationDto = new EnvironmentReservationDto();
-                    environmentReservationDto.setClientId(environmentUse.getClientId().getClientId());
+                    environmentReservationDto.setClientId(environmentUse.getClientId().getPersonId().getKcUuid());
                     environmentReservationDto.setEnvironmentId(environmentUse.getEnvironmentId().getEnvironmentId());
                     environmentReservationDto.setReservationDate(environmentUse.getReservationDate());
                     environmentReservationDto.setClockIn(environmentUse.getClockIn());
