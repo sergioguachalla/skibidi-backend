@@ -27,6 +27,8 @@ public class EnvironmentUseBl {
     private EnvironmentUseRepository environmentUseRepository;
     @Autowired
     private EnvironmentRepository environmentRepository;
+    @Autowired
+    private UserClientRepository userClientRepository;
 
     // create a reservation to be approved by a librarian
     public void createEnvironmentReservation(EnvironmentReservationDto environmentReservationDto) {
@@ -42,7 +44,7 @@ public class EnvironmentUseBl {
             environmentUse.setEnvironmentId(environment);
 
             UserClient client = new UserClient();
-            client.setClientId(environmentReservationDto.getClientId());
+            client.setClientId(userClientRepository.findClientIdByKcUuid(environmentReservationDto.getClientId()));
 
             environmentUse.setClientId(client);
 
