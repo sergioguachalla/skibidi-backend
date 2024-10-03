@@ -5,9 +5,11 @@ import com.ucb.skibidi.dto.BookDto;
 import com.ucb.skibidi.dto.BookManualDto;
 import com.ucb.skibidi.dto.ResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import javax.ws.rs.PUT;
+import java.util.Date;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -76,12 +78,21 @@ public class BookApi {
     public ResponseDto<Page<BookManualDto>> getAllBooks(
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "4") Integer size,
-            @RequestParam(required = false) Integer genreId
+            @RequestParam(required = false) Integer genreId,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,
+            @RequestParam(required = false) Boolean isAvailable
     ) {
         Pageable pageable = PageRequest.of(page, size);
         ResponseDto<Page<BookManualDto>> responseDto = new ResponseDto<>();
         try {
-            Page<BookManualDto> books = bookBl.getAllBooks(pageable, genreId);
+            Page<BookManualDto> books = bookBl.getAllBooks(pageable, genreId,from,to,isAvailable);
+            if(books.isEmpty()){
+                responseDto.setData(null);
+                responseDto.setMessage("No se encontraron libros con los filtros seleccionados");
+                responseDto.setSuccessful(false);
+                return responseDto;
+            }
             responseDto.setData(books);
             responseDto.setMessage("Books found");
             responseDto.setSuccessful(true);

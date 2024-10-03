@@ -24,7 +24,7 @@ public class EnvironmentBl {
         Environment environment = new Environment();
         environment.setName(environmentDto.getName());
         environment.setCapacity(environmentDto.getCapacity());
-        environment.setIsAvailable(environmentDto.getIsAvailable());
+        environment.setStatus(true);
 
         environment = environmentRepository.save(environment);
         environmentDto.setEnvironmentId(environment.getEnvironmentId());
@@ -41,7 +41,7 @@ public class EnvironmentBl {
             environmentDto.setEnvironmentId(environment.getEnvironmentId());
             environmentDto.setName(environment.getName());
             environmentDto.setCapacity(environment.getCapacity());
-            environmentDto.setIsAvailable(environment.getIsAvailable());
+            environmentDto.setIsAvailable(environment.getStatus());
             return environmentDto;
         } else {
             log.error("Environment not found");
@@ -58,7 +58,7 @@ public class EnvironmentBl {
                     dto.setEnvironmentId(environment.getEnvironmentId());
                     dto.setName(environment.getName());
                     dto.setCapacity(environment.getCapacity());
-                    dto.setIsAvailable(environment.getIsAvailable());
+                    dto.setIsAvailable(environment.getStatus());
                     return dto;
                 })
                 .collect(Collectors.toList());
@@ -72,7 +72,7 @@ public class EnvironmentBl {
             Environment environment = environmentOptional.get();
             environment.setName(environmentDto.getName());
             environment.setCapacity(environmentDto.getCapacity());
-            environment.setIsAvailable(environmentDto.getIsAvailable());
+            environment.setStatus(environmentDto.getIsAvailable());
 
             environment = environmentRepository.save(environment);
             environmentDto.setEnvironmentId(environment.getEnvironmentId());

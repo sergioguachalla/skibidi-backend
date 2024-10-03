@@ -13,9 +13,7 @@ public class ValidationUtils {
         if (isNullOrEmpty(name)) {
             throw new InvalidInputException("Name is required");
         }
-        if (!isNameValid(name)) {
-            throw new InvalidInputException("Invalid name");
-        }
+
     }
 
     public static void validateEmail(String email) {

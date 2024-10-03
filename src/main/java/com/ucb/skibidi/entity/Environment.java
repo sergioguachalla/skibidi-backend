@@ -17,6 +17,6 @@ public class Environment {
 
     private int capacity;
 
-    private Boolean isAvailable = true;
+    private Boolean status = true;
 
 }

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -201,13 +202,26 @@ public class BookBl {
         }
     }
 
-    public Page<BookManualDto> getAllBooks(Pageable pageable, Integer genreId) throws Exception {
+    public Page<BookManualDto> getAllBooks(Pageable pageable, Integer genreId,
+                                           Date from, Date to, Boolean isAvailable) throws Exception {
         log.info("Getting all books...");
         Specification<Book> spec = Specification.where(null);
         try {
             if (genreId != null) {
                 spec = spec.and(BookSpecification.hasGenre((long) genreId));
             }
+
+            if (from != null && to != null) {
+                spec = spec.and(BookSpecification.startDateBetween(from, to));
+            }
+            if(isAvailable != null){
+                if(isAvailable){
+                    spec = spec.and(BookSpecification.isAvailable());
+                }else{
+                    spec = spec.and(BookSpecification.isNotAvailable());
+                }
+            }
+
             Page<Book> bookEntities = bookRepository.findAll(spec, pageable);
             Page<BookManualDto> booksDto = bookEntities.map(bookEntity -> {
                 BookManualDto bookDto = new BookManualDto();
