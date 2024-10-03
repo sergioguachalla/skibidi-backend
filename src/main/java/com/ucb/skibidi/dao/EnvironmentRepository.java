@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface EnvironmentRepository extends JpaRepository<Environment, Long> {
     Environment findByName(String name);
-    List<Environment> findByIsAvailable(Boolean isAvailable);
+    List<Environment> findByStatus(Boolean status);
 }

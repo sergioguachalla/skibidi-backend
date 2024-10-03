@@ -33,5 +33,8 @@ public class Person {
     @Column(name = "email")
     private String email;
 
+    @Column(name = "kc_uudi")
+    private String kcUuid;
+
 
 }

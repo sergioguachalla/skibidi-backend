@@ -1,6 +1,7 @@
 package com.ucb.skibidi.bl;
 
 import com.ucb.skibidi.dao.*;
+import com.ucb.skibidi.dto.EnvironmentDto;
 import com.ucb.skibidi.dto.EnvironmentReservationDto;
 import com.ucb.skibidi.entity.Environment;
 import com.ucb.skibidi.entity.EnvironmentUse;
@@ -12,8 +13,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.security.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class EnvironmentUseBl {
@@ -21,10 +25,15 @@ public class EnvironmentUseBl {
 
     @Autowired
     private EnvironmentUseRepository environmentUseRepository;
+    @Autowired
+    private EnvironmentRepository environmentRepository;
 
     // create a reservation to be approved by a librarian
     public void createEnvironmentReservation(EnvironmentReservationDto environmentReservationDto) {
         log.info("Creating environment reservation...");
+        System.out.println("date1: " + environmentReservationDto.getClockIn());
+        System.out.println("dat2: " + environmentReservationDto.getClockOut());
+
         try {
             Environment environment = new Environment();
             environment.setEnvironmentId(environmentReservationDto.getEnvironmentId());
@@ -42,7 +51,7 @@ public class EnvironmentUseBl {
             environmentUse.setClockOut(environmentReservationDto.getClockOut());
 
             environmentUse.setPurpose(environmentReservationDto.getPurpose());
-            validateEnvironmentUse(environmentUse);
+            //validateEnvironmentUse(environmentUse);
             environmentUseRepository.save(environmentUse);
             log.info("Environment reservation created");
         } catch (Exception e) {
@@ -51,6 +60,23 @@ public class EnvironmentUseBl {
         }
     }
 
+
+    public List<EnvironmentReservationDto> findReservationsByClientId(String kcId){
+        log.info("Finding reservations by kcId {}", kcId);
+        List<EnvironmentUse> environmentUses = environmentUseRepository.findAllByClientIdPersonIdKcUuid(kcId);
+        return environmentUses.stream()
+                .map(environmentUse -> {
+                    EnvironmentReservationDto environmentReservationDto = new EnvironmentReservationDto();
+                    environmentReservationDto.setClientId(environmentUse.getClientId().getClientId());
+                    environmentReservationDto.setEnvironmentId(environmentUse.getEnvironmentId().getEnvironmentId());
+                    environmentReservationDto.setReservationDate(environmentUse.getReservationDate());
+                    environmentReservationDto.setClockIn(environmentUse.getClockIn());
+                    environmentReservationDto.setClockOut(environmentUse.getClockOut());
+                    environmentReservationDto.setPurpose(environmentUse.getPurpose());
+                    return environmentReservationDto;
+                })
+                .toList();
+    }
 
     private void validateEnvironmentUse(EnvironmentUse environmentUse) {
         log.info("Validating environment use...");
@@ -118,7 +144,7 @@ public class EnvironmentUseBl {
             throw new RuntimeException("Purpose is required");
         }
 
-        if (!environmentUse.getEnvironmentId().getIsAvailable()) {
+        if (!environmentUse.getEnvironmentId().getStatus()) {
             throw new RuntimeException("Environment is not available");
         }
 
@@ -127,6 +153,48 @@ public class EnvironmentUseBl {
         }
 
         log.info("Environment use validated successfully");
+    }
+
+    public List<EnvironmentDto> getEnvironmentsAvailability(Date from, Date to) {
+        log.info("Fetching environments availability...");
+        System.out.println("FROM: "+from);
+        System.out.println("TO: "+to);
+        List<Environment> environments = environmentRepository.findAll();
+
+        for (Environment environment : environments) {
+            List<EnvironmentUse> environmentUses = environmentUseRepository.findReservationsBetweenDates(Math.toIntExact(environment.getEnvironmentId()), from, to);
+            if (environmentUses.isEmpty()) {
+                environment.setStatus(true);
+            } else {
+                environment.setStatus(false);
+            }
+        }
+        // Convertir la lista de ambientes a una lista de DTOs
+        List<EnvironmentDto> environmentDtos = environments.stream()
+                .map(environment -> {
+                    EnvironmentDto environmentDto = new EnvironmentDto();
+                    environmentDto.setEnvironmentId(environment.getEnvironmentId());
+                    environmentDto.setName(environment.getName());
+                    environmentDto.setCapacity(environment.getCapacity());
+                    environmentDto.setIsAvailable(environment.getStatus());
+                    return environmentDto;
+                })
+                .toList();
+
+        /*List<EnvironmentUse> environmentUses = environmentUseRepository.findByReservationDateBetween(from, to);
+        List<EnvironmentDto> environments = environmentUses.stream()
+                .map(environmentUse -> {
+                    EnvironmentDto environmentDto = new EnvironmentDto();
+                    environmentDto.setEnvironmentId(environmentUse.getEnvironmentId().getEnvironmentId());
+                    environmentDto.setName(environmentUse.getEnvironmentId().getName());
+                    environmentDto.setCapacity(environmentUse.getEnvironmentId().getCapacity());
+                    environmentDto.setIsAvailable(environmentUse.getEnvironmentId().getStatus());
+                    return environmentDto;
+                })
+                .toList();
+        return environments;
+    */
+        return environmentDtos;
     }
 
 

@@ -1,7 +1,9 @@
 package com.ucb.skibidi.api;
 
 import com.ucb.skibidi.bl.EnvironmentBl;
+import com.ucb.skibidi.bl.EnvironmentUseBl;
 import com.ucb.skibidi.dto.EnvironmentDto;
+import com.ucb.skibidi.dto.EnvironmentReservationDto;
 import com.ucb.skibidi.dto.ResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,8 @@ public class EnvironmentAPI {
 
     @Autowired
     private EnvironmentBl environmentBl;
+    @Autowired
+    private EnvironmentUseBl environmentUseBl;
 
     // Crear un nuevo ambiente
     @PostMapping("/")
@@ -93,6 +97,22 @@ public class EnvironmentAPI {
             responseDto.setSuccessful(true);
         } catch (Exception e) {
             responseDto.setMessage("Error deleting environment: " + e.getMessage());
+            responseDto.setSuccessful(false);
+        }
+        return responseDto;
+    }
+
+    @GetMapping("{kcid}/reservations")
+    public ResponseDto<List<EnvironmentReservationDto>> getEnvironmentsAvailability(@PathVariable String kcid) {
+        ResponseDto<List<EnvironmentReservationDto>> responseDto = new ResponseDto<>();
+        try {
+            List<EnvironmentReservationDto> environments = environmentUseBl.findReservationsByClientId(kcid);
+            responseDto.setData(environments);
+            responseDto.setMessage("Environments fetched successfully");
+            responseDto.setSuccessful(true);
+        } catch (Exception e) {
+            responseDto.setData(null);
+            responseDto.setMessage("Error fetching environments: " + e.getMessage());
             responseDto.setSuccessful(false);
         }
         return responseDto;
