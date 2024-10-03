@@ -26,7 +26,8 @@ public class EntityMapper {
             personDto.setName(person.getName());
             personDto.setLastName(person.getLastname());
             personDto.setAddress(person.getAddress());
-
+            personDto.setIdNumber(person.getIdNumber());
+            personDto.setExpedition(person.getExpedition());
             return personDto;
         }
 
