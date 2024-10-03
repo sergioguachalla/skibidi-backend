@@ -198,7 +198,8 @@ public class BookBl {
         }
     }
 
-    public Page<BookManualDto> getAllBooks(Pageable pageable, Integer genreId, Date from, Date to) throws Exception {
+    public Page<BookManualDto> getAllBooks(Pageable pageable, Integer genreId,
+                                           Date from, Date to, Boolean isAvailable) throws Exception {
         log.info("Getting all books...");
         Specification<Book> spec = Specification.where(null);
         try {
@@ -208,6 +209,13 @@ public class BookBl {
 
             if (from != null && to != null) {
                 spec = spec.and(BookSpecification.startDateBetween(from, to));
+            }
+            if(isAvailable != null){
+                if(isAvailable){
+                    spec = spec.and(BookSpecification.isAvailable());
+                }else{
+                    spec = spec.and(BookSpecification.isNotAvailable());
+                }
             }
 
             Page<Book> bookEntities = bookRepository.findAll(spec, pageable);
