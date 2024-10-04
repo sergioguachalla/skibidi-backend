@@ -226,6 +226,7 @@ public class BookBl {
             Page<Book> bookEntities = bookRepository.findAll(spec, pageable);
             Page<BookManualDto> booksDto = bookEntities.map(bookEntity -> {
                 BookManualDto bookDto = new BookManualDto();
+                bookDto.setBookId(bookEntity.getBookId());
                 bookDto.setTitle(bookEntity.getTitle());
                 bookDto.setIsbn(bookEntity.getIsbn());
                 bookDto.setRegistrationDate(bookEntity.getRegistrationDate());
@@ -320,6 +321,7 @@ public class BookBl {
     // Método para convertir Book a BookDto
     private BookDto convertToDto(Book book) {
         BookDto bookDto = new BookDto();
+        bookDto.setBookId(book.getBookId());
         bookDto.setTitle(book.getTitle());
         bookDto.setIsbn(book.getIsbn());
         bookDto.setRegistrationDate(book.getRegistrationDate());

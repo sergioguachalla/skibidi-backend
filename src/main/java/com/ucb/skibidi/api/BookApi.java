@@ -88,9 +88,9 @@ public class BookApi {
         Pageable pageable = PageRequest.of(page, size);
         ResponseDto<Page<BookManualDto>> responseDto = new ResponseDto<>();
         try {
-            Page<BookManualDto> books = bookBl.getAllBooks(pageable, genreId,from,to,isAvailable);
-            log.info("Books found {}",books.getContent().isEmpty());
-            if(books.isEmpty()){
+            Page<BookManualDto> books = bookBl.getAllBooks(pageable, genreId, from, to, isAvailable);
+            log.info("Books found {}", books.getContent().isEmpty());
+            if (books.isEmpty()) {
                 responseDto.setData(null);
                 responseDto.setMessage("No se encontraron libros con los filtros seleccionados");
                 responseDto.setSuccessful(false);

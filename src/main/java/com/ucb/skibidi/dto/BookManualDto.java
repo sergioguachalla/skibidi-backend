@@ -7,6 +7,7 @@ import java.util.List;
 
 @Data
 public class BookManualDto {
+    private Long bookId;
     private String title;
     private String isbn;
     private Date registrationDate;
