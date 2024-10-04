@@ -125,6 +125,13 @@ public class UserBl {
         keycloak.realm(realm).users().get(kcId).update(newUserInformation);
         log.info("keycloak user updated");
 
+        var person = personRepository.findByKcUuid(kcId);
+        person.setName(userDto.getPersonDto().getName());
+        person.setLastname(userDto.getPersonDto().getLastName());
+        person.setEmail(userDto.getUserDto().getEmail());
+        person.setAddress(userDto.getPersonDto().getAddress());
+        personRepository.save(person);
+
         var userEntity = userClientRepository.findByPersonIdKcUuid(kcId);
         userEntity.setUsername(userDto.getUserDto().getName());
         userClientRepository.save(userEntity);
