@@ -1,10 +1,9 @@
 package com.ucb.skibidi.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
+
+import java.util.Set;
 
 @Entity(name = "author")
 @Data
@@ -17,4 +16,6 @@ public class Author {
 
     private Boolean status = true;
 
+    @ManyToMany(mappedBy = "authors")
+    private Set<Book> books;
 }

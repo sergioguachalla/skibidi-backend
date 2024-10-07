@@ -83,17 +83,19 @@ public class BookApi {
             @RequestParam(required = false) Integer genreId,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,
-            @RequestParam(required = false) Boolean isAvailable
+            @RequestParam(required = false) Boolean isAvailable,
+            @RequestParam(required = false) String authorName
     ) {
         Pageable pageable = PageRequest.of(page, size);
         ResponseDto<Page<BookManualDto>> responseDto = new ResponseDto<>();
         try {
-            Page<BookManualDto> books = bookBl.getAllBooks(pageable, genreId, from, to, isAvailable);
+            Page<BookManualDto> books = bookBl.getAllBooks(pageable, genreId, from, to,
+                    isAvailable, authorName);
             log.info("Books found {}", books.getContent().isEmpty());
             if (books.isEmpty()) {
                 responseDto.setData(null);
                 responseDto.setMessage("No se encontraron libros con los filtros seleccionados");
-                responseDto.setSuccessful(false);
+                responseDto.setSuccessful(true);
                 return responseDto;
             }
             responseDto.setData(books);
