@@ -212,7 +212,7 @@ public class BookBl {
 
     public Page<BookManualDto> getAllBooks(Pageable pageable, Integer genreId,
                                            Date from, Date to, Boolean isAvailable,
-                                           String author, Long languageId) throws Exception {
+                                           String author, Long languageId, String title) throws Exception {
         log.info("Getting all books...");
         Specification<Book> spec = Specification.where(null);
         try {
@@ -235,6 +235,9 @@ public class BookBl {
             }
             if(languageId != null){
                 spec = spec.and(BookSpecification.hasLanguage(languageId));
+            }
+            if(title != null){
+                spec = spec.and(BookSpecification.hasTitle(title));
             }
 
             Page<Book> bookEntities = bookRepository.findAll(spec, pageable);

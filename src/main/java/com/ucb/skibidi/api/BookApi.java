@@ -85,13 +85,14 @@ public class BookApi {
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,
             @RequestParam(required = false) Boolean isAvailable,
             @RequestParam(required = false) String authorName,
-            @RequestParam(required = false) Long languageId
+            @RequestParam(required = false) Long languageId,
+            @RequestParam(required = false) String title
     ) {
         Pageable pageable = PageRequest.of(page, size);
         ResponseDto<Page<BookManualDto>> responseDto = new ResponseDto<>();
         try {
             Page<BookManualDto> books = bookBl.getAllBooks(pageable, genreId, from, to,
-                    isAvailable, authorName, languageId);
+                    isAvailable, authorName, languageId,title);
             log.info("Books found {}", books.getContent().isEmpty());
             if (books.isEmpty()) {
                 responseDto.setData(null);

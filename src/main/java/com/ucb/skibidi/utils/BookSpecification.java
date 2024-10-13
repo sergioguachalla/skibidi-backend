@@ -39,4 +39,7 @@ public class BookSpecification {
         };
     }
 
+    public static Specification<Book> hasTitle(String title) {
+        return (root, query, cb) -> cb.like(root.get("title"), "%" + title + "%");
+    }
 }
