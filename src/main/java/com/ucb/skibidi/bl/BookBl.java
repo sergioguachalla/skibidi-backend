@@ -123,7 +123,8 @@ public class BookBl {
             //bookEntity.setRegistrationDate(bookDto.getRegistrationDate());
             //bookEntity.setStatus(bookDto.getStatus());
             //language
-            bookEntity.setLanguage(
+            log.info("language id: {}", bookDto.getLanguageId());
+            bookEntity.setIdLanguage(
                     languageRepository.findById((long) bookDto.getLanguageId()).orElse(null)
             );
             bookEntity = bookRepository.save(bookEntity);

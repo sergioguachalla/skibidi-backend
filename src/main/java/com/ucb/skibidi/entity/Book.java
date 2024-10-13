@@ -37,7 +37,8 @@ public class Book {
     private Set<Author> authors;
 
     @ManyToOne
+
     @JoinColumn(name = "id_language")
-    private Language language;
+    private Language idLanguage;
 
 }
