@@ -2,6 +2,7 @@ package com.ucb.skibidi.utils;
 import com.ucb.skibidi.entity.Author;
 import com.ucb.skibidi.entity.Book;
 import com.ucb.skibidi.entity.Genre;
+import com.ucb.skibidi.entity.Language;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import org.springframework.data.jpa.domain.Specification;
@@ -29,6 +30,12 @@ public class BookSpecification {
         return (root, query, cb) -> {
             Join<Book, Author> join = root.join("authors", JoinType.INNER);
             return cb.equal(join.get("name"), author);
+        };
+    }
+    public static Specification<Book> hasLanguage(Long languageId) {
+        return (root, query, cb) -> {
+            Join<Book, Language> join = root.join("idLanguage", JoinType.INNER);
+            return cb.equal(join.get("languageId"), languageId);
         };
     }
 

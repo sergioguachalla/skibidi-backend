@@ -84,13 +84,14 @@ public class BookApi {
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,
             @RequestParam(required = false) Boolean isAvailable,
-            @RequestParam(required = false) String authorName
+            @RequestParam(required = false) String authorName,
+            @RequestParam(required = false) Long languageId
     ) {
         Pageable pageable = PageRequest.of(page, size);
         ResponseDto<Page<BookManualDto>> responseDto = new ResponseDto<>();
         try {
             Page<BookManualDto> books = bookBl.getAllBooks(pageable, genreId, from, to,
-                    isAvailable, authorName);
+                    isAvailable, authorName, languageId);
             log.info("Books found {}", books.getContent().isEmpty());
             if (books.isEmpty()) {
                 responseDto.setData(null);
@@ -104,7 +105,7 @@ public class BookApi {
         } catch (Exception e) {
             responseDto.setData(null);
             responseDto.setMessage("Error getting book: " + e.getMessage());
-            responseDto.setSuccessful(false);
+            responseDto.setSuccessful(true);
         }
         return responseDto;
     }

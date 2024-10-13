@@ -187,8 +187,6 @@ public class BookBl {
         }
     }
 
-
-
     public BookDto getBookByISBN(String isbn) throws Exception {
         log.info("Getting book...");
         try {
@@ -214,7 +212,7 @@ public class BookBl {
 
     public Page<BookManualDto> getAllBooks(Pageable pageable, Integer genreId,
                                            Date from, Date to, Boolean isAvailable,
-                                           String author) throws Exception {
+                                           String author, Long languageId) throws Exception {
         log.info("Getting all books...");
         Specification<Book> spec = Specification.where(null);
         try {
@@ -235,6 +233,9 @@ public class BookBl {
             if(author != null){
                 spec = spec.and(BookSpecification.hasAuthor(author));
             }
+            if(languageId != null){
+                spec = spec.and(BookSpecification.hasLanguage(languageId));
+            }
 
             Page<Book> bookEntities = bookRepository.findAll(spec, pageable);
             Page<BookManualDto> booksDto = bookEntities.map(bookEntity -> {
@@ -246,6 +247,7 @@ public class BookBl {
                 bookDto.setStatus(bookEntity.getStatus());
                 bookDto.setImageUrl(bookEntity.getImageUrl());
                 bookDto.setGenreId(Math.toIntExact(bookEntity.getGenreId().getGenreId()));
+                bookDto.setLanguageId(bookEntity.getIdLanguage().getLanguageId().intValue());
                 bookDto.setAuthors(bookAuthorsBl.getAuthorsByBook(bookEntity.getBookId()));
                 return bookDto;
             });
