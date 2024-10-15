@@ -7,10 +7,11 @@ import jakarta.persistence.Id;
 import lombok.Data;
 
 @Entity
+@Data
 public class Editorial {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long editorialId;
-    private String name;
+    private String editorial;
     private boolean status;
 }

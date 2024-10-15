@@ -15,5 +15,7 @@ public class BookDto {
     private String imageUrl;
     private String genre;
     private List<String> authors;
+    private Long editorialId;
+    private Long idLanguage;
 
 }

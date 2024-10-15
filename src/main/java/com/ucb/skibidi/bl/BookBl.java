@@ -3,12 +3,11 @@ package com.ucb.skibidi.bl;
 import com.ucb.skibidi.config.exceptions.InvalidInputException;
 import com.ucb.skibidi.dao.BookAuthorsRepository;
 import com.ucb.skibidi.dao.BookRepository;
+import com.ucb.skibidi.dao.EditorialRepository;
 import com.ucb.skibidi.dao.LanguageRepository;
 import com.ucb.skibidi.dto.BookDto;
 import com.ucb.skibidi.dto.BookManualDto;
-import com.ucb.skibidi.entity.Author;
-import com.ucb.skibidi.entity.Book;
-import com.ucb.skibidi.entity.Genre;
+import com.ucb.skibidi.entity.*;
 import com.ucb.skibidi.utils.BookSpecification;
 import com.ucb.skibidi.utils.ValidationUtils;
 import org.slf4j.Logger;
@@ -46,6 +45,8 @@ public class BookBl {
     private BookAuthorsRepository bookAuthorsRepository;
     @Autowired
     private LanguageRepository languageRepository;
+    @Autowired
+    private EditorialRepository editorialRepository;
 
 
     public void createBookManually(BookManualDto bookDto) throws Exception {
@@ -54,7 +55,8 @@ public class BookBl {
             BookDto bookInfo = new BookDto();
             bookInfo.setIsbn(bookDto.getIsbn());
             bookInfo.setTitle(bookDto.getTitle());
-
+            bookInfo.setEditorialId(bookDto.getEditorialId());
+            bookInfo.setIdLanguage(bookDto.getLanguageId());
             validateBook(bookInfo);
             saveBook(bookDto);
             log.info("Book created {}", bookDto.toString());
@@ -107,6 +109,7 @@ public class BookBl {
     //save book manually
     public void saveBook(BookManualDto bookDto) throws Exception {
         log.info("Saving book...");
+        log.info("BookDto: {}", bookDto.toString());
         try {
             //entidad libro
             Book bookEntity = new Book();
@@ -123,10 +126,12 @@ public class BookBl {
             //bookEntity.setRegistrationDate(bookDto.getRegistrationDate());
             //bookEntity.setStatus(bookDto.getStatus());
             //language
-            log.info("language id: {}", bookDto.getLanguageId());
             bookEntity.setIdLanguage(
                     languageRepository.findById((long) bookDto.getLanguageId()).orElse(null)
             );
+            bookEntity.setEditorialId(
+                    editorialRepository.findById(bookDto.getEditorialId()).orElse(null));
+
             bookEntity = bookRepository.save(bookEntity);
             saveBookAuthors(bookEntity, bookDto.getAuthors());
             log.info("Book saved {}", bookEntity.toString());
@@ -145,6 +150,12 @@ public class BookBl {
             bookEntity.setTitle(bookDto.getTitle());
             bookEntity.setIsbn(bookDto.getIsbn());
             bookEntity.setImageUrl(bookDto.getImageUrl());
+
+            Editorial editorial = this.editorialRepository.findByEditorialId(bookDto.getEditorialId());
+            bookEntity.setEditorialId(editorial);
+            Language language = this.languageRepository.findByLanguageId(bookDto.getIdLanguage());
+            bookEntity.setIdLanguage(language);
+
 
             //genero
             //bookEntity.setGenreId(genreBl.createGenre(bookDto.getGenre()));
@@ -214,6 +225,9 @@ public class BookBl {
                                            Date from, Date to, Boolean isAvailable,
                                            String author, Long languageId, String title) throws Exception {
         log.info("Getting all books...");
+        log.info("Date from: {}", from);
+        log.info("Date to: {}", to);
+
         Specification<Book> spec = Specification.where(null);
         try {
             if (genreId != null) {
@@ -240,6 +254,7 @@ public class BookBl {
                 spec = spec.and(BookSpecification.hasTitle(title));
             }
 
+
             Page<Book> bookEntities = bookRepository.findAll(spec, pageable);
             Page<BookManualDto> booksDto = bookEntities.map(bookEntity -> {
                 BookManualDto bookDto = new BookManualDto();
@@ -250,7 +265,8 @@ public class BookBl {
                 bookDto.setStatus(bookEntity.getStatus());
                 bookDto.setImageUrl(bookEntity.getImageUrl());
                 bookDto.setGenreId(Math.toIntExact(bookEntity.getGenreId().getGenreId()));
-                bookDto.setLanguageId(bookEntity.getIdLanguage().getLanguageId().intValue());
+                bookDto.setLanguageId(bookEntity.getIdLanguage().getLanguageId());
+                bookDto.setEditorialId(bookEntity.getEditorialId().getEditorialId());
                 bookDto.setAuthors(bookAuthorsBl.getAuthorsByBook(bookEntity.getBookId()));
                 return bookDto;
             });
