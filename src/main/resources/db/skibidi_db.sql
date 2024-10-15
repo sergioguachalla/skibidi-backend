@@ -1,5 +1,5 @@
 -- Created by Vertabelo (http://vertabelo.com)
--- Last modification date: 2024-10-15 02:20:09.515
+-- Last modification date: 2024-10-15 02:20:29.466
 
 -- tables
 -- Table: Author
@@ -13,6 +13,7 @@ CREATE TABLE Author (
 -- Table: Book
 CREATE TABLE Book (
     book_id serial  NOT NULL,
+    editorial_id int  NOT NULL,
     genre_id int  NOT NULL,
     id_language int  NOT NULL,
     title varchar(500)  NOT NULL,
@@ -35,7 +36,7 @@ CREATE TABLE Book_Authors (
 CREATE TABLE Editorial (
     editorial_id serial  NOT NULL,
     editorial varchar(100)  NOT NULL,
-    status int  NOT NULL,
+    status boolean  NOT NULL,
     CONSTRAINT Editorial_pk PRIMARY KEY (editorial_id)
 );
 
@@ -183,6 +184,14 @@ ALTER TABLE Book_Authors ADD CONSTRAINT Book_Authors_Author
 ALTER TABLE Book_Authors ADD CONSTRAINT Book_Authors_Book
     FOREIGN KEY (book_id)
     REFERENCES Book (book_id)  
+    NOT DEFERRABLE 
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: Book_Editorial (table: Book)
+ALTER TABLE Book ADD CONSTRAINT Book_Editorial
+    FOREIGN KEY (editorial_id)
+    REFERENCES Editorial (editorial_id)  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
