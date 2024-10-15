@@ -15,4 +15,5 @@ public class BookManualDto {
     private String imageUrl;
     private int genreId;
     private List<String> authors;
+    private int languageId;
 }

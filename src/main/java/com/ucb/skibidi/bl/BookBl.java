@@ -3,6 +3,7 @@ package com.ucb.skibidi.bl;
 import com.ucb.skibidi.config.exceptions.InvalidInputException;
 import com.ucb.skibidi.dao.BookAuthorsRepository;
 import com.ucb.skibidi.dao.BookRepository;
+import com.ucb.skibidi.dao.LanguageRepository;
 import com.ucb.skibidi.dto.BookDto;
 import com.ucb.skibidi.dto.BookManualDto;
 import com.ucb.skibidi.entity.Author;
@@ -43,6 +44,8 @@ public class BookBl {
     BookRepository bookRepository;
     @Autowired
     private BookAuthorsRepository bookAuthorsRepository;
+    @Autowired
+    private LanguageRepository languageRepository;
 
 
     public void createBookManually(BookManualDto bookDto) throws Exception {
@@ -51,6 +54,7 @@ public class BookBl {
             BookDto bookInfo = new BookDto();
             bookInfo.setIsbn(bookDto.getIsbn());
             bookInfo.setTitle(bookDto.getTitle());
+
             validateBook(bookInfo);
             saveBook(bookDto);
             log.info("Book created {}", bookDto.toString());
@@ -118,6 +122,11 @@ public class BookBl {
 
             //bookEntity.setRegistrationDate(bookDto.getRegistrationDate());
             //bookEntity.setStatus(bookDto.getStatus());
+            //language
+            log.info("language id: {}", bookDto.getLanguageId());
+            bookEntity.setIdLanguage(
+                    languageRepository.findById((long) bookDto.getLanguageId()).orElse(null)
+            );
             bookEntity = bookRepository.save(bookEntity);
             saveBookAuthors(bookEntity, bookDto.getAuthors());
             log.info("Book saved {}", bookEntity.toString());
@@ -148,7 +157,7 @@ public class BookBl {
 
             bookEntity = bookRepository.save(bookEntity);
             saveBookAuthors(bookEntity, bookDto.getAuthors());
-            log.info("Book saved {}", bookEntity.toString());
+            log.info("Book saved {}", bookEntity);
         } catch (Exception e) {
             log.error("Error saving book: {}", e.getMessage());
             throw e;
@@ -178,8 +187,6 @@ public class BookBl {
         }
     }
 
-
-
     public BookDto getBookByISBN(String isbn) throws Exception {
         log.info("Getting book...");
         try {
@@ -204,7 +211,8 @@ public class BookBl {
     }
 
     public Page<BookManualDto> getAllBooks(Pageable pageable, Integer genreId,
-                                           Date from, Date to, Boolean isAvailable) throws Exception {
+                                           Date from, Date to, Boolean isAvailable,
+                                           String author, Long languageId, String title) throws Exception {
         log.info("Getting all books...");
         Specification<Book> spec = Specification.where(null);
         try {
@@ -222,6 +230,15 @@ public class BookBl {
                     spec = spec.and(BookSpecification.isNotAvailable());
                 }
             }
+            if(author != null){
+                spec = spec.and(BookSpecification.hasAuthor(author));
+            }
+            if(languageId != null){
+                spec = spec.and(BookSpecification.hasLanguage(languageId));
+            }
+            if(title != null){
+                spec = spec.and(BookSpecification.hasTitle(title));
+            }
 
             Page<Book> bookEntities = bookRepository.findAll(spec, pageable);
             Page<BookManualDto> booksDto = bookEntities.map(bookEntity -> {
@@ -233,6 +250,7 @@ public class BookBl {
                 bookDto.setStatus(bookEntity.getStatus());
                 bookDto.setImageUrl(bookEntity.getImageUrl());
                 bookDto.setGenreId(Math.toIntExact(bookEntity.getGenreId().getGenreId()));
+                bookDto.setLanguageId(bookEntity.getIdLanguage().getLanguageId().intValue());
                 bookDto.setAuthors(bookAuthorsBl.getAuthorsByBook(bookEntity.getBookId()));
                 return bookDto;
             });
