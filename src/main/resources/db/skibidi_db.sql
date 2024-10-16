@@ -128,7 +128,7 @@ CREATE TABLE Person (
     registration_date date  NOT NULL,
     address varchar(500)  NOT NULL,
     email varchar(100)  NOT NULL,
-    kc_uudi varchar(200)  NOT NULL,
+    kc_uudi varchar(200) ,
     CONSTRAINT Person_pk PRIMARY KEY (person_id)
 );
 
@@ -175,130 +175,129 @@ CREATE TABLE User_Librarian (
 -- Reference: Book_Authors_Author (table: Book_Authors)
 ALTER TABLE Book_Authors ADD CONSTRAINT Book_Authors_Author
     FOREIGN KEY (author_id)
-    REFERENCES Author (author_id)  
-    NOT DEFERRABLE 
+    REFERENCES Author (author_id)
+    NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
 
 -- Reference: Book_Authors_Book (table: Book_Authors)
 ALTER TABLE Book_Authors ADD CONSTRAINT Book_Authors_Book
     FOREIGN KEY (book_id)
-    REFERENCES Book (book_id)  
-    NOT DEFERRABLE 
+    REFERENCES Book (book_id)
+    NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
 
 -- Reference: Book_Editorial (table: Book)
 ALTER TABLE Book ADD CONSTRAINT Book_Editorial
     FOREIGN KEY (editorial_id)
-    REFERENCES Editorial (editorial_id)  
-    NOT DEFERRABLE 
+    REFERENCES Editorial (editorial_id)
+    NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
 
 -- Reference: Book_Genre (table: Book)
 ALTER TABLE Book ADD CONSTRAINT Book_Genre
     FOREIGN KEY (genre_id)
-    REFERENCES Genre (genre_id)  
-    NOT DEFERRABLE 
+    REFERENCES Genre (genre_id)
+    NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
 
 -- Reference: Book_Language (table: Book)
 ALTER TABLE Book ADD CONSTRAINT Book_Language
     FOREIGN KEY (id_language)
-    REFERENCES Language (id_language)  
-    NOT DEFERRABLE 
+    REFERENCES Language (id_language)
+    NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
 
 -- Reference: Environment_Use_Environment (table: Environment_Use)
 ALTER TABLE Environment_Use ADD CONSTRAINT Environment_Use_Environment
     FOREIGN KEY (environment_id)
-    REFERENCES Environment (environment_id)  
-    NOT DEFERRABLE 
+    REFERENCES Environment (environment_id)
+    NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
 
 -- Reference: Environment_Use_User_Client (table: Environment_Use)
 ALTER TABLE Environment_Use ADD CONSTRAINT Environment_Use_User_Client
     FOREIGN KEY (client_id)
-    REFERENCES User_Client (client_id)  
-    NOT DEFERRABLE 
+    REFERENCES User_Client (client_id)
+    NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
 
 -- Reference: Environment_Use_User_Librarian (table: Environment_Use)
 ALTER TABLE Environment_Use ADD CONSTRAINT Environment_Use_User_Librarian
     FOREIGN KEY (librarian_id)
-    REFERENCES User_Librarian (librarian_id)  
-    NOT DEFERRABLE 
+    REFERENCES User_Librarian (librarian_id)
+    NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
 
 -- Reference: Fines_Lend_Book (table: Fines)
 ALTER TABLE Fines ADD CONSTRAINT Fines_Lend_Book
     FOREIGN KEY (lent_book_id)
-    REFERENCES Lend_Book (lent_book_id)  
-    NOT DEFERRABLE 
+    REFERENCES Lend_Book (lent_book_id)
+    NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
 
 -- Reference: Fines_Type_Fines (table: Fines)
 ALTER TABLE Fines ADD CONSTRAINT Fines_Type_Fines
     FOREIGN KEY (type_fine_id)
-    REFERENCES Type_Fines (type_fine_id)  
-    NOT DEFERRABLE 
+    REFERENCES Type_Fines (type_fine_id)
+    NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
 
 -- Reference: Lend_Book_Book (table: Lend_Book)
 ALTER TABLE Lend_Book ADD CONSTRAINT Lend_Book_Book
     FOREIGN KEY (book_id)
-    REFERENCES Book (book_id)  
-    NOT DEFERRABLE 
+    REFERENCES Book (book_id)
+    NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
 
 -- Reference: Lend_Book_User_Client (table: Lend_Book)
 ALTER TABLE Lend_Book ADD CONSTRAINT Lend_Book_User_Client
     FOREIGN KEY (client_id)
-    REFERENCES User_Client (client_id)  
-    NOT DEFERRABLE 
+    REFERENCES User_Client (client_id)
+    NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
 
 -- Reference: Lend_Book_User_Librarian (table: Lend_Book)
 ALTER TABLE Lend_Book ADD CONSTRAINT Lend_Book_User_Librarian
     FOREIGN KEY (librarian_id)
-    REFERENCES User_Librarian (librarian_id)  
-    NOT DEFERRABLE 
+    REFERENCES User_Librarian (librarian_id)
+    NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
 
 -- Reference: User_Admin_Person (table: User_Admin)
 ALTER TABLE User_Admin ADD CONSTRAINT User_Admin_Person
     FOREIGN KEY (person_id)
-    REFERENCES Person (person_id)  
-    NOT DEFERRABLE 
+    REFERENCES Person (person_id)
+    NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
 
 -- Reference: User_Client_Person (table: User_Client)
 ALTER TABLE User_Client ADD CONSTRAINT User_Client_Person
     FOREIGN KEY (person_id)
-    REFERENCES Person (person_id)  
-    NOT DEFERRABLE 
+    REFERENCES Person (person_id)
+    NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
 
 -- Reference: User_Librarian_Person (table: User_Librarian)
 ALTER TABLE User_Librarian ADD CONSTRAINT User_Librarian_Person
     FOREIGN KEY (person_id)
-    REFERENCES Person (person_id)  
-    NOT DEFERRABLE 
+    REFERENCES Person (person_id)
+    NOT DEFERRABLE
     INITIALLY IMMEDIATE
 ;
 
 -- End of file.
-

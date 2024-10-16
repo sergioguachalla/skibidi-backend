@@ -18,4 +18,6 @@ public interface EnvironmentUseRepository extends JpaRepository<EnvironmentUse, 
     List<EnvironmentUse> findReservationsBetweenDates(int environmentId, Date fromDate, Date toDate);
 
     List<EnvironmentUse> findAllByClientIdPersonIdKcUuid(String kcUuid);
+
+    EnvironmentUse findByEnvironmentUse(Long environmentUseId);
 }
