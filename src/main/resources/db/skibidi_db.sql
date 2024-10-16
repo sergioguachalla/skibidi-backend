@@ -318,3 +318,30 @@ INSERT INTO Environment (name, capacity, status) VALUES ('SALA-B3', 6, true);
 INSERT INTO Environment (name, capacity, status) VALUES ('SALA-B4', 4, true);
 INSERT INTO Environment (name, capacity, status) VALUES ('SALA-B5', 4, true);
 INSERT INTO Environment (name, capacity, status) VALUES ('SALA-B6', 12, true);
+
+-- language
+
+INSERT INTO Language (language, status) VALUES ('Mandarín', 'Activo');
+INSERT INTO Language (language, status) VALUES ('Inglés', 'Activo');
+INSERT INTO Language (language, status) VALUES ('Hindú', 'Activo');
+INSERT INTO Language (language, status) VALUES ('Español', 'Activo');
+INSERT INTO Language (language, status) VALUES ('Árabe', 'Activo');
+INSERT INTO Language (language, status) VALUES ('Bengalí', 'Activo');
+INSERT INTO Language (language, status) VALUES ('Portugués', 'Activo');
+INSERT INTO Language (language, status) VALUES ('Ruso', 'Activo');
+INSERT INTO Language (language, status) VALUES ('Japonés', 'Activo');
+INSERT INTO Language (language, status) VALUES ('Alemán', 'Activo');
+
+--Editorial
+INSERT INTO Editorial (editorial, status) VALUES ('Penguin Random House', 'Activo');
+INSERT INTO Editorial (editorial, status) VALUES ('HarperCollins', 'Activo');
+INSERT INTO Editorial (editorial, status) VALUES ('Simon & Schuster', 'Activo');
+INSERT INTO Editorial (editorial, status) VALUES ('Macmillan Publishers', 'Activo');
+INSERT INTO Editorial (editorial, status) VALUES ('Hachette Livre', 'Activo');
+INSERT INTO Editorial (editorial, status) VALUES ('Scholastic', 'Activo');
+INSERT INTO Editorial (editorial, status) VALUES ('Pearson', 'Activo');
+INSERT INTO Editorial (editorial, status) VALUES ('Bloomsbury Publishing', 'Activo');
+INSERT INTO Editorial (editorial, status) VALUES ('Wiley', 'Activo');
+INSERT INTO Editorial (editorial, status) VALUES ('Oxford University Press', 'Activo');
+
+
