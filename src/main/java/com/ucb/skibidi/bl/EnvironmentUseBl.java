@@ -62,6 +62,24 @@ public class EnvironmentUseBl {
         }
     }
 
+    public void updateEnvironmentReservation(Integer id,EnvironmentReservationDto environmentReservationDto){
+        try {
+            Environment environment = new Environment();
+            environment.setEnvironmentId(environmentReservationDto.getEnvironmentId());
+            EnvironmentUse environmentUse = environmentUseRepository.findById(Long.valueOf(id)).orElseThrow(() -> new RuntimeException("Environment use not found"));
+
+            environmentUse.setEnvironmentId(environment);
+            environmentUse.setReservationDate(environmentReservationDto.getReservationDate());
+            environmentUse.setClockIn(environmentReservationDto.getClockIn());
+            environmentUse.setClockOut(environmentReservationDto.getClockOut());
+            environmentUse.setPurpose(environmentReservationDto.getPurpose());
+            environmentUseRepository.save(environmentUse);
+        } catch (Exception e) {
+            log.error("Error updating environment use: {}", e.getMessage());
+            throw e;
+        }
+    }
+
 
     public List<EnvironmentReservationDto> findReservationsByClientId(String kcId){
         log.info("Finding reservations by kcId {}", kcId);
