@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class EnvironmentUseBl {
@@ -197,6 +198,21 @@ public class EnvironmentUseBl {
         return environments;
     */
         return environmentDtos;
+    }
+    public List<EnvironmentReservationDto> findAllReservations() {
+        List<EnvironmentUse> environmentUses = environmentUseRepository.findAll();
+        return environmentUses.stream()
+                .map(environmentUse -> {
+                    EnvironmentReservationDto environmentReservationDto = new EnvironmentReservationDto();
+                    environmentReservationDto.setClientId(environmentUse.getClientId().getPersonId().getKcUuid());
+                    environmentReservationDto.setEnvironmentId(environmentUse.getEnvironmentId().getEnvironmentId());
+                    environmentReservationDto.setReservationDate(environmentUse.getReservationDate());
+                    environmentReservationDto.setClockIn(environmentUse.getClockIn());
+                    environmentReservationDto.setClockOut(environmentUse.getClockOut());
+                    environmentReservationDto.setPurpose(environmentUse.getPurpose());
+                    return environmentReservationDto;
+                })
+                .collect(Collectors.toList());
     }
 
 
