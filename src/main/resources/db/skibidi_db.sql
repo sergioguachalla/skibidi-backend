@@ -128,7 +128,7 @@ CREATE TABLE Person (
     registration_date date  NOT NULL,
     address varchar(500)  NOT NULL,
     email varchar(100)  NOT NULL,
-    kc_uudi varchar(200)  NOT NULL,
+    kc_uudi varchar(200) ,
     CONSTRAINT Person_pk PRIMARY KEY (person_id)
 );
 
