@@ -71,10 +71,13 @@ public class EnvironmentUseBl {
                     EnvironmentReservationDto environmentReservationDto = new EnvironmentReservationDto();
                     environmentReservationDto.setClientId(environmentUse.getClientId().getPersonId().getKcUuid());
                     environmentReservationDto.setEnvironmentId(environmentUse.getEnvironmentId().getEnvironmentId());
+                    //reserva
+                    environmentReservationDto.setReservationId(environmentUse.getEnvironmentUse());
                     environmentReservationDto.setReservationDate(environmentUse.getReservationDate());
                     environmentReservationDto.setClockIn(environmentUse.getClockIn());
                     environmentReservationDto.setClockOut(environmentUse.getClockOut());
                     environmentReservationDto.setPurpose(environmentUse.getPurpose());
+                    environmentReservationDto.setStatus(environmentUse.getStatus());
                     return environmentReservationDto;
                 })
                 .toList();
@@ -203,7 +206,10 @@ public class EnvironmentUseBl {
     public void updateReservation(Long id, int status) {
         try {
             log.info("Updating reservation status...");
+            log.info("Reservation id: {}", id);
+            log.info("New status: {}", status);
             EnvironmentUse environmentUse = environmentUseRepository.findByEnvironmentUse(id);
+            log.info("Reservation found: {}", environmentUse);
             validateReservationStatusUpdate(environmentUse, status);
             environmentUse.setStatus(status);
             environmentUseRepository.save(environmentUse);
