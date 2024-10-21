@@ -71,36 +71,36 @@ public class EnvironmentAPI {
     }
 
     // Actualizar un ambiente
-    @PutMapping("/{id}")
-    public ResponseDto<EnvironmentDto> updateEnvironment(@PathVariable Long id, @RequestBody EnvironmentDto environmentDto) {
-        ResponseDto<EnvironmentDto> responseDto = new ResponseDto<>();
-        try {
-            EnvironmentDto updatedEnvironment = environmentBl.updateEnvironment(id, environmentDto);
-            responseDto.setData(updatedEnvironment);
-            responseDto.setMessage("Environment updated successfully");
-            responseDto.setSuccessful(true);
-        } catch (Exception e) {
-            responseDto.setData(null);
-            responseDto.setMessage("Error updating environment: " + e.getMessage());
-            responseDto.setSuccessful(false);
-        }
-        return responseDto;
-    }
+//    @PutMapping("/{id}")
+//    public ResponseDto<EnvironmentDto> updateEnvironment(@PathVariable Long id, @RequestBody EnvironmentDto environmentDto) {
+//        ResponseDto<EnvironmentDto> responseDto = new ResponseDto<>();
+//        try {
+//            EnvironmentDto updatedEnvironment = environmentBl.updateEnvironment(id, environmentDto);
+//            responseDto.setData(updatedEnvironment);
+//            responseDto.setMessage("Environment updated successfully");
+//            responseDto.setSuccessful(true);
+//        } catch (Exception e) {
+//            responseDto.setData(null);
+//            responseDto.setMessage("Error updating environment: " + e.getMessage());
+//            responseDto.setSuccessful(false);
+//        }
+//        return responseDto;
+//    }
 
-    // Eliminar un ambiente
-    @DeleteMapping("/{id}")
-    public ResponseDto<Void> deleteEnvironment(@PathVariable Long id) {
-        ResponseDto<Void> responseDto = new ResponseDto<>();
-        try {
-            environmentBl.deleteEnvironment(id);
-            responseDto.setMessage("Environment deleted successfully");
-            responseDto.setSuccessful(true);
-        } catch (Exception e) {
-            responseDto.setMessage("Error deleting environment: " + e.getMessage());
-            responseDto.setSuccessful(false);
-        }
-        return responseDto;
-    }
+//    // Eliminar un ambiente
+//    @DeleteMapping("/{id}")
+//    public ResponseDto<Void> deleteEnvironment(@PathVariable Long id) {
+//        ResponseDto<Void> responseDto = new ResponseDto<>();
+//        try {
+//            environmentBl.deleteEnvironment(id);
+//            responseDto.setMessage("Environment deleted successfully");
+//            responseDto.setSuccessful(true);
+//        } catch (Exception e) {
+//            responseDto.setMessage("Error deleting environment: " + e.getMessage());
+//            responseDto.setSuccessful(false);
+//        }
+//        return responseDto;
+//    }
 
     @GetMapping("{kcid}/reservations")
     public ResponseDto<List<EnvironmentReservationDto>> getEnvironmentsAvailability(@PathVariable String kcid) {
@@ -117,6 +117,21 @@ public class EnvironmentAPI {
         }
         return responseDto;
     }
+
+    // Actualizar estado de un ambiente
+    // En este momento 1 es pendiente, 2 es aceptado y 3 es rechazado
+    @PutMapping("/reservations/{id}/status/{status}")
+    public ResponseDto<EnvironmentReservationDto> updateReservationStatus(@PathVariable Long id, @PathVariable int status) {
+        ResponseDto<EnvironmentReservationDto> responseDto = new ResponseDto<>();
+        try {
+            environmentUseBl.updateReservation(id, status);
+            responseDto.setMessage("Reservation status updated successfully");
+            responseDto.setSuccessful(true);
+        } catch (Exception e) {
+            responseDto.setData(null);
+            responseDto.setMessage("Error updating reservation: " + e.getMessage());
+            responseDto.setSuccessful(false);
+        }
+        return responseDto;
+    }
 }
-
-
