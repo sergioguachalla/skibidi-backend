@@ -200,21 +200,18 @@ public class EnvironmentUseBl {
                     return environmentDto;
                 })
                 .toList();
-
-        /*List<EnvironmentUse> environmentUses = environmentUseRepository.findByReservationDateBetween(from, to);
-        List<EnvironmentDto> environments = environmentUses.stream()
-                .map(environmentUse -> {
-                    EnvironmentDto environmentDto = new EnvironmentDto();
-                    environmentDto.setEnvironmentId(environmentUse.getEnvironmentId().getEnvironmentId());
-                    environmentDto.setName(environmentUse.getEnvironmentId().getName());
-                    environmentDto.setCapacity(environmentUse.getEnvironmentId().getCapacity());
-                    environmentDto.setIsAvailable(environmentUse.getEnvironmentId().getStatus());
-                    return environmentDto;
-                })
-                .toList();
-        return environments;
-    */
         return environmentDtos;
+    }
+
+    public void cancelEnvironmentReservation(Integer id){
+        try {
+            EnvironmentUse environmentUse = environmentUseRepository.findById(Long.valueOf(id)).orElseThrow(() -> new RuntimeException("Environment use not found"));
+            environmentUse.setStatus(3);
+            environmentUseRepository.save(environmentUse);
+        } catch (Exception e) {
+            log.error("Error canceling environment use: {}", e.getMessage());
+            throw e;
+        }
     }
 
 

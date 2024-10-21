@@ -70,4 +70,20 @@ public class EnvironmentUseAPI {
             return responseDto;
         }
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseDto<String> cancelEnvironmentReservation(@PathVariable Integer id) {
+        ResponseDto<String> responseDto = new ResponseDto<>();
+        try {
+            environmentUseBl.cancelEnvironmentReservation(id);
+            responseDto.setData("Environment use deleted");
+            responseDto.setMessage("Success");
+            responseDto.setSuccessful(true);
+        } catch (Exception e) {
+            responseDto.setData(null);
+            responseDto.setMessage("Error deleting environment use: " + e.getMessage());
+            responseDto.setSuccessful(false);
+        }
+        return responseDto;
+    }
 }
