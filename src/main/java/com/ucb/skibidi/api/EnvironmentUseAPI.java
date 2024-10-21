@@ -34,6 +34,22 @@ public class EnvironmentUseAPI {
         }
     }
 
+    @PutMapping("/{id}")
+    public ResponseDto<EnvironmentReservationDto> updateEnvironmentReservation(@PathVariable Integer id, @RequestBody EnvironmentReservationDto environmentReservationDto) {
+        ResponseDto<EnvironmentReservationDto> responseDto = new ResponseDto<>();
+        try {
+            environmentUseBl.updateEnvironmentReservation(id, environmentReservationDto);
+            responseDto.setData(environmentReservationDto);
+            responseDto.setMessage("Environment use updated");
+            responseDto.setSuccessful(true);
+        } catch (Exception e) {
+            responseDto.setData(null);
+            responseDto.setMessage("Error updating environment use: " + e.getMessage());
+            responseDto.setSuccessful(false);
+        }
+        return responseDto;
+    }
+
     // disponibilidad
     @GetMapping("/availability")
     public ResponseDto<List<EnvironmentDto>> getEnvironmentsAvailability(
@@ -53,5 +69,21 @@ public class EnvironmentUseAPI {
             responseDto.setSuccessful(false);
             return responseDto;
         }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseDto<String> cancelEnvironmentReservation(@PathVariable Integer id) {
+        ResponseDto<String> responseDto = new ResponseDto<>();
+        try {
+            environmentUseBl.cancelEnvironmentReservation(id);
+            responseDto.setData("Environment use deleted");
+            responseDto.setMessage("Success");
+            responseDto.setSuccessful(true);
+        } catch (Exception e) {
+            responseDto.setData(null);
+            responseDto.setMessage("Error deleting environment use: " + e.getMessage());
+            responseDto.setSuccessful(false);
+        }
+        return responseDto;
     }
 }
