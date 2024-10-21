@@ -70,6 +70,19 @@ public class EnvironmentUseAPI {
             return responseDto;
         }
     }
-
- 
+    @GetMapping("/history-reservation")
+    public ResponseDto<List<EnvironmentReservationDto>> getAllReservations() {
+        ResponseDto<List<EnvironmentReservationDto>> responseDto = new ResponseDto<>();
+        try {
+            List<EnvironmentReservationDto> reservations = environmentUseBl.findAllReservations();
+            responseDto.setData(reservations);
+            responseDto.setMessage("All reservations fetched successfully");
+            responseDto.setSuccessful(true);
+        } catch (Exception e) {
+            responseDto.setData(null);
+            responseDto.setMessage("Error fetching reservations: " + e.getMessage());
+            responseDto.setSuccessful(false);
+        }
+        return responseDto;
+    }
 }
