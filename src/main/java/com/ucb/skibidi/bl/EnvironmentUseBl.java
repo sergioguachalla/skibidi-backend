@@ -35,7 +35,7 @@ public class EnvironmentUseBl {
         log.info("Creating environment reservation...");
         System.out.println("date1: " + environmentReservationDto.getClockIn());
         System.out.println("dat2: " + environmentReservationDto.getClockOut());
-
+        log.info("Environment reservation: {}", environmentReservationDto.getClientId());
         try {
             Environment environment = new Environment();
             environment.setEnvironmentId(environmentReservationDto.getEnvironmentId());
@@ -45,7 +45,7 @@ public class EnvironmentUseBl {
 
             UserClient client = new UserClient();
             client.setClientId(userClientRepository.findClientIdByKcUuid(environmentReservationDto.getClientId()));
-
+            log.info("Client: {}", client);
             environmentUse.setClientId(client);
 
             environmentUse.setReservationDate(environmentReservationDto.getReservationDate());
@@ -89,10 +89,13 @@ public class EnvironmentUseBl {
                     EnvironmentReservationDto environmentReservationDto = new EnvironmentReservationDto();
                     environmentReservationDto.setClientId(environmentUse.getClientId().getPersonId().getKcUuid());
                     environmentReservationDto.setEnvironmentId(environmentUse.getEnvironmentId().getEnvironmentId());
+                    //reserva
+                    environmentReservationDto.setReservationId(environmentUse.getEnvironmentUse());
                     environmentReservationDto.setReservationDate(environmentUse.getReservationDate());
                     environmentReservationDto.setClockIn(environmentUse.getClockIn());
                     environmentReservationDto.setClockOut(environmentUse.getClockOut());
                     environmentReservationDto.setPurpose(environmentUse.getPurpose());
+                    environmentReservationDto.setStatus(environmentUse.getStatus());
                     return environmentReservationDto;
                 })
                 .toList();
@@ -203,19 +206,34 @@ public class EnvironmentUseBl {
         return environmentDtos;
     }
 
-    public void cancelEnvironmentReservation(Integer id){
+    // con esto es posible modificar a cualquiera de los 3 estados de la reserva
+    public void updateReservation(Long id, int status) {
         try {
-            EnvironmentUse environmentUse = environmentUseRepository.findById(Long.valueOf(id)).orElseThrow(() -> new RuntimeException("Environment use not found"));
-            environmentUse.setStatus(3);
+            log.info("Updating reservation status...");
+            log.info("Reservation id: {}", id);
+            log.info("New status: {}", status);
+            EnvironmentUse environmentUse = environmentUseRepository.findByEnvironmentUse(id);
+            log.info("Reservation found: {}", environmentUse);
+            validateReservationStatusUpdate(environmentUse, status);
+            environmentUse.setStatus(status);
             environmentUseRepository.save(environmentUse);
         } catch (Exception e) {
-            log.error("Error canceling environment use: {}", e.getMessage());
+            log.error("Error updating reservation: {}", e.getMessage());
             throw e;
         }
     }
 
+    public void validateReservationStatusUpdate(EnvironmentUse environmentUse, int status) {
+        log.info("Validating reservation status update...");
+        if (status < 1 || status > 3) {
+            throw new RuntimeException("Invalid reservation status");
+        }
 
+        if (environmentUse.getClockIn().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("No es posible modificar una reserva cuando ya ha pasado la fecha limite");
+        }
 
-
+        log.info("Reservation status update validated successfully");
+    }
 
 }
