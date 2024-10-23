@@ -9,6 +9,12 @@ spring:
       hibernate:
         ddl-auto: none
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  mail:
+    host: localhost
+    port: 1025
+    username: skibidi-reseteo@papu.com
+    password: password
+
 server:
     port: 8091
 
