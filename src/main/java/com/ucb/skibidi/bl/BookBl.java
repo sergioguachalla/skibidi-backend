@@ -223,7 +223,7 @@ public class BookBl {
 
     public Page<BookManualDto> getAllBooks(Pageable pageable, Integer genreId,
                                            Date from, Date to, Boolean isAvailable,
-                                           String author, Long languageId, String title) throws Exception {
+                                           String author, Long languageId, String title, Long editorialId) throws Exception {
         log.info("Getting all books...");
         log.info("Date from: {}", from);
         log.info("Date to: {}", to);
@@ -252,6 +252,9 @@ public class BookBl {
             }
             if(title != null){
                 spec = spec.and(BookSpecification.hasTitle(title));
+            }
+            if(editorialId != null){
+                spec = spec.and(BookSpecification.hasEditorial(editorialId));
             }
 
 
