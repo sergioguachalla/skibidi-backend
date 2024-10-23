@@ -17,15 +17,15 @@ public class EnvironmentUse {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long environmentUse;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "environment_id")
     private Environment environmentId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id")
     private UserClient clientId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "librarian_id", nullable = true)
     private UserLibrarian librarianId = null;
 

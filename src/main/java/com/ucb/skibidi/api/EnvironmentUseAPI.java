@@ -4,13 +4,17 @@ import com.ucb.skibidi.bl.EnvironmentUseBl;
 import com.ucb.skibidi.dto.EnvironmentDto;
 import com.ucb.skibidi.dto.EnvironmentReservationDto;
 import com.ucb.skibidi.dto.ResponseDto;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
-
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/environments")
 public class EnvironmentUseAPI {
@@ -29,6 +33,24 @@ public class EnvironmentUseAPI {
         } catch (Exception e) {
             responseDto.setData(null);
             responseDto.setMessage("Error creating environment use: " + e.getMessage());
+            responseDto.setSuccessful(false);
+            return responseDto;
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseDto<EnvironmentReservationDto> getEnvironmentReservationById(@PathVariable Integer id) {
+        ResponseDto<EnvironmentReservationDto> responseDto = new ResponseDto<>();
+        log.info("Fetching environment use with id: {}", id);
+        try {
+            EnvironmentReservationDto environmentReservationDto = environmentUseBl.getEnvironmentReservationById(id);
+            responseDto.setData(environmentReservationDto);
+            responseDto.setMessage("Environment use fetched successfully");
+            responseDto.setSuccessful(true);
+            return responseDto;
+        } catch (Exception e) {
+            responseDto.setData(null);
+            responseDto.setMessage("Error fetching environment use: " + e.getMessage());
             responseDto.setSuccessful(false);
             return responseDto;
         }
@@ -71,10 +93,14 @@ public class EnvironmentUseAPI {
         }
     }
     @GetMapping("/history-reservation")
-    public ResponseDto<List<EnvironmentReservationDto>> getAllReservations() {
-        ResponseDto<List<EnvironmentReservationDto>> responseDto = new ResponseDto<>();
+    public ResponseDto<Page<EnvironmentReservationDto>> getAllReservations(
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "7") Integer size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        ResponseDto<Page<EnvironmentReservationDto>> responseDto = new ResponseDto<>();
         try {
-            List<EnvironmentReservationDto> reservations = environmentUseBl.findAllReservations();
+            Page<EnvironmentReservationDto> reservations = environmentUseBl.findAllReservations(pageable);
             responseDto.setData(reservations);
             responseDto.setMessage("All reservations fetched successfully");
             responseDto.setSuccessful(true);

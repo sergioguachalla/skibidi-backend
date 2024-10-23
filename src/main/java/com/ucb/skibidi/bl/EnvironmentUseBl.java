@@ -7,10 +7,13 @@ import com.ucb.skibidi.entity.Environment;
 import com.ucb.skibidi.entity.EnvironmentUse;
 import com.ucb.skibidi.entity.UserClient;
 import com.ucb.skibidi.entity.UserLibrarian;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.security.Timestamp;
@@ -68,7 +71,6 @@ public class EnvironmentUseBl {
             Environment environment = new Environment();
             environment.setEnvironmentId(environmentReservationDto.getEnvironmentId());
             EnvironmentUse environmentUse = environmentUseRepository.findById(Long.valueOf(id)).orElseThrow(() -> new RuntimeException("Environment use not found"));
-
             environmentUse.setEnvironmentId(environment);
             environmentUse.setReservationDate(environmentReservationDto.getReservationDate());
             environmentUse.setClockIn(environmentReservationDto.getClockIn());
@@ -79,6 +81,22 @@ public class EnvironmentUseBl {
             log.error("Error updating environment use: {}", e.getMessage());
             throw e;
         }
+    }
+
+    public EnvironmentReservationDto getEnvironmentReservationById (Integer id){
+
+        EnvironmentUse environmentUse = environmentUseRepository.findById(Long.valueOf(id)).orElseThrow(() -> new RuntimeException("Environment use not found"));
+       log.info("Environment use found: {}", environmentUse);
+        EnvironmentReservationDto environmentReservationDto = new EnvironmentReservationDto();
+        environmentReservationDto.setClientId(environmentUse.getClientId().getPersonId().getKcUuid());
+        environmentReservationDto.setEnvironmentId(environmentUse.getEnvironmentId().getEnvironmentId());
+        environmentReservationDto.setReservationId(environmentUse.getEnvironmentUse());
+        environmentReservationDto.setReservationDate(environmentUse.getReservationDate());
+        environmentReservationDto.setClockIn(environmentUse.getClockIn());
+        environmentReservationDto.setClockOut(environmentUse.getClockOut());
+        environmentReservationDto.setPurpose(environmentUse.getPurpose());
+        environmentReservationDto.setStatus(environmentUse.getStatus());
+        return environmentReservationDto;
     }
 
 
@@ -206,20 +224,22 @@ public class EnvironmentUseBl {
                 .toList();
         return environmentDtos;
     }
-    public List<EnvironmentReservationDto> findAllReservations() {
-        List<EnvironmentUse> environmentUses = environmentUseRepository.findAll();
-        return environmentUses.stream()
-                .map(environmentUse -> {
-                    EnvironmentReservationDto environmentReservationDto = new EnvironmentReservationDto();
-                    environmentReservationDto.setClientId(environmentUse.getClientId().getPersonId().getKcUuid());
-                    environmentReservationDto.setEnvironmentId(environmentUse.getEnvironmentId().getEnvironmentId());
-                    environmentReservationDto.setReservationDate(environmentUse.getReservationDate());
-                    environmentReservationDto.setClockIn(environmentUse.getClockIn());
-                    environmentReservationDto.setClockOut(environmentUse.getClockOut());
-                    environmentReservationDto.setPurpose(environmentUse.getPurpose());
-                    return environmentReservationDto;
-                })
-                .collect(Collectors.toList());
+    public Page<EnvironmentReservationDto> findAllReservations(Pageable pageable) {
+        Page<EnvironmentUse> environmentUses = environmentUseRepository.findAll(pageable);
+        Page<EnvironmentReservationDto> environmentReservationDtos = environmentUses.map(environmentUse -> {
+            EnvironmentReservationDto environmentReservationDto = new EnvironmentReservationDto();
+            environmentReservationDto.setClientId(environmentUse.getClientId().getPersonId().getName() +
+                    " "+ environmentUse.getClientId().getPersonId().getLastname());
+            environmentReservationDto.setEnvironmentId(environmentUse.getEnvironmentId().getEnvironmentId());
+            environmentReservationDto.setReservationId(environmentUse.getEnvironmentUse());
+            environmentReservationDto.setReservationDate(environmentUse.getReservationDate());
+            environmentReservationDto.setClockIn(environmentUse.getClockIn());
+            environmentReservationDto.setClockOut(environmentUse.getClockOut());
+            environmentReservationDto.setPurpose(environmentUse.getPurpose());
+            environmentReservationDto.setStatus(environmentUse.getStatus());
+            return environmentReservationDto;
+        });
+        return environmentReservationDtos;
     }
 
     // con esto es posible modificar a cualquiera de los 3 estados de la reserva
