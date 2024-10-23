@@ -37,8 +37,8 @@ public class EnvironmentUseBl {
     // create a reservation to be approved by a librarian
     public void createEnvironmentReservation(EnvironmentReservationDto environmentReservationDto) {
         log.info("Creating environment reservation...");
-        System.out.println("date1: " + environmentReservationDto.getClockIn());
-        System.out.println("dat2: " + environmentReservationDto.getClockOut());
+        log.info("date1: " + environmentReservationDto.getClockIn());
+        log.info("dat2: " + environmentReservationDto.getClockOut());
         log.info("Environment reservation: {}", environmentReservationDto.getClientId());
         try {
             Environment environment = new Environment();
@@ -199,13 +199,13 @@ public class EnvironmentUseBl {
 
     public List<EnvironmentDto> getEnvironmentsAvailability(Date from, Date to) {
         log.info("Fetching environments availability...");
-        System.out.println("FROM: "+from);
-        System.out.println("TO: "+to);
+        log.info("FROM: "+from);
+        log.info("TO: "+to);
         List<Environment> environments = environmentRepository.findAll();
 
         for (Environment environment : environments) {
             List<EnvironmentUse> environmentUses = environmentUseRepository.findReservationsBetweenDates(Math.toIntExact(environment.getEnvironmentId()), from, to);
-            if (environmentUses.isEmpty()) {
+            if (environmentUses.isEmpty() ) {
                 environment.setStatus(true);
             } else {
                 environment.setStatus(false);

@@ -11,7 +11,7 @@ import java.util.List;
 public interface EnvironmentUseRepository extends JpaRepository<EnvironmentUse, Long> {
 
     @Query(value = "SELECT * FROM Environment_Use WHERE environment_id = :environmentId " +
-            "AND status = 2 " +
+            "AND (status = 1 OR status = 2) " +
             "AND ((clock_in BETWEEN :fromDate AND :toDate) " +
             "OR (clock_out BETWEEN :fromDate AND :toDate) " +
             "OR (:fromDate BETWEEN clock_in AND clock_out) " +
