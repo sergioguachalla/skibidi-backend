@@ -9,6 +9,16 @@ x-common-keycloak-environment: &common-keycloak-environment
   ISSUER_URI: http://keycloak:8080/realms/skibidi-realm
 
 services:
+  # Testing
+  mailhog:
+    container_name: skibidi-mail
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - skibidi-network
+
   skibidi-db:
     container_name: skibidi-db
     image: postgres
@@ -18,11 +28,11 @@ services:
       - ./src/main/resources/db/skibidi_db.sql:/docker-entrypoint-initdb.d/create_database.sql.sql
       - ./src/main/resources/db/docker/data:/var/lib/postgresql/data &&  sudo chmod 0700 /var/lib/postgresql/data
     environment:
-        POSTGRES_USER: postgres
-        POSTGRES_PASSWORD: postgres
-        POSTGRES_DB: skibidi
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: skibidi
     networks:
-        - skibidi-network
+      - skibidi-network
   skibidi-keycloak:
     container_name: skibidi-keycloak
     image: quay.io/keycloak/keycloak:21.0.1
@@ -37,4 +47,3 @@ services:
       - 8080:8080
     networks:
       - skibidi-network
-
