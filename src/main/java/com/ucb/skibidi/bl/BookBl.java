@@ -1,12 +1,13 @@
 package com.ucb.skibidi.bl;
 
 import com.ucb.skibidi.config.exceptions.InvalidInputException;
+import com.ucb.skibidi.dao.BookAuthorsRepository;
 import com.ucb.skibidi.dao.BookRepository;
+import com.ucb.skibidi.dao.EditorialRepository;
+import com.ucb.skibidi.dao.LanguageRepository;
 import com.ucb.skibidi.dto.BookDto;
 import com.ucb.skibidi.dto.BookManualDto;
-import com.ucb.skibidi.entity.Author;
-import com.ucb.skibidi.entity.Book;
-import com.ucb.skibidi.entity.Genre;
+import com.ucb.skibidi.entity.*;
 import com.ucb.skibidi.utils.BookSpecification;
 import com.ucb.skibidi.utils.ValidationUtils;
 import org.slf4j.Logger;
@@ -16,8 +17,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BookBl {
@@ -37,7 +41,12 @@ public class BookBl {
     //dao libros
     @Autowired
     BookRepository bookRepository;
-
+    @Autowired
+    private BookAuthorsRepository bookAuthorsRepository;
+    @Autowired
+    private LanguageRepository languageRepository;
+    @Autowired
+    private EditorialRepository editorialRepository;
 
 
     public void createBookManually(BookManualDto bookDto) throws Exception {
@@ -46,6 +55,8 @@ public class BookBl {
             BookDto bookInfo = new BookDto();
             bookInfo.setIsbn(bookDto.getIsbn());
             bookInfo.setTitle(bookDto.getTitle());
+            bookInfo.setEditorialId(bookDto.getEditorialId());
+            bookInfo.setIdLanguage(bookDto.getLanguageId());
             validateBook(bookInfo);
             saveBook(bookDto);
             log.info("Book created {}", bookDto.toString());
@@ -98,6 +109,7 @@ public class BookBl {
     //save book manually
     public void saveBook(BookManualDto bookDto) throws Exception {
         log.info("Saving book...");
+        log.info("BookDto: {}", bookDto.toString());
         try {
             //entidad libro
             Book bookEntity = new Book();
@@ -113,6 +125,13 @@ public class BookBl {
 
             //bookEntity.setRegistrationDate(bookDto.getRegistrationDate());
             //bookEntity.setStatus(bookDto.getStatus());
+            //language
+            bookEntity.setIdLanguage(
+                    languageRepository.findById((long) bookDto.getLanguageId()).orElse(null)
+            );
+            bookEntity.setEditorialId(
+                    editorialRepository.findById(bookDto.getEditorialId()).orElse(null));
+
             bookEntity = bookRepository.save(bookEntity);
             saveBookAuthors(bookEntity, bookDto.getAuthors());
             log.info("Book saved {}", bookEntity.toString());
@@ -132,6 +151,12 @@ public class BookBl {
             bookEntity.setIsbn(bookDto.getIsbn());
             bookEntity.setImageUrl(bookDto.getImageUrl());
 
+            Editorial editorial = this.editorialRepository.findByEditorialId(bookDto.getEditorialId());
+            bookEntity.setEditorialId(editorial);
+            Language language = this.languageRepository.findByLanguageId(bookDto.getIdLanguage());
+            bookEntity.setIdLanguage(language);
+
+
             //genero
             //bookEntity.setGenreId(genreBl.createGenre(bookDto.getGenre()));
 
@@ -143,7 +168,7 @@ public class BookBl {
 
             bookEntity = bookRepository.save(bookEntity);
             saveBookAuthors(bookEntity, bookDto.getAuthors());
-            log.info("Book saved {}", bookEntity.toString());
+            log.info("Book saved {}", bookEntity);
         } catch (Exception e) {
             log.error("Error saving book: {}", e.getMessage());
             throw e;
@@ -173,8 +198,6 @@ public class BookBl {
         }
     }
 
-
-
     public BookDto getBookByISBN(String isbn) throws Exception {
         log.info("Getting book...");
         try {
@@ -198,8 +221,13 @@ public class BookBl {
         }
     }
 
-    public Page<BookManualDto> getAllBooks(Pageable pageable, Integer genreId, Date from, Date to) throws Exception {
+    public Page<BookManualDto> getAllBooks(Pageable pageable, Integer genreId,
+                                           Date from, Date to, Boolean isAvailable,
+                                           String author, Long languageId, String title) throws Exception {
         log.info("Getting all books...");
+        log.info("Date from: {}", from);
+        log.info("Date to: {}", to);
+
         Specification<Book> spec = Specification.where(null);
         try {
             if (genreId != null) {
@@ -209,16 +237,36 @@ public class BookBl {
             if (from != null && to != null) {
                 spec = spec.and(BookSpecification.startDateBetween(from, to));
             }
+            if(isAvailable != null){
+                if(isAvailable){
+                    spec = spec.and(BookSpecification.isAvailable());
+                }else{
+                    spec = spec.and(BookSpecification.isNotAvailable());
+                }
+            }
+            if(author != null){
+                spec = spec.and(BookSpecification.hasAuthor(author));
+            }
+            if(languageId != null){
+                spec = spec.and(BookSpecification.hasLanguage(languageId));
+            }
+            if(title != null){
+                spec = spec.and(BookSpecification.hasTitle(title));
+            }
+
 
             Page<Book> bookEntities = bookRepository.findAll(spec, pageable);
             Page<BookManualDto> booksDto = bookEntities.map(bookEntity -> {
                 BookManualDto bookDto = new BookManualDto();
+                bookDto.setBookId(bookEntity.getBookId());
                 bookDto.setTitle(bookEntity.getTitle());
                 bookDto.setIsbn(bookEntity.getIsbn());
                 bookDto.setRegistrationDate(bookEntity.getRegistrationDate());
                 bookDto.setStatus(bookEntity.getStatus());
                 bookDto.setImageUrl(bookEntity.getImageUrl());
                 bookDto.setGenreId(Math.toIntExact(bookEntity.getGenreId().getGenreId()));
+                bookDto.setLanguageId(bookEntity.getIdLanguage().getLanguageId());
+                bookDto.setEditorialId(bookEntity.getEditorialId().getEditorialId());
                 bookDto.setAuthors(bookAuthorsBl.getAuthorsByBook(bookEntity.getBookId()));
                 return bookDto;
             });
@@ -266,4 +314,56 @@ public class BookBl {
             return bookDto;
         }
     }
+    public List<BookDto> searchBooksByTitle(String title) throws Exception {
+        log.info("Searching books by title...");
+        try {
+            List<Book> books = bookRepository.findByTitleContainingIgnoreCase(title);
+            if (books.isEmpty()) {
+                log.info("No books found with title {}", title);
+                return Collections.emptyList();
+            }
+
+            // Convertir la entidad Book a BookDto
+            List<BookDto> bookDtos = books.stream().map(book -> {
+                BookDto bookDto = new BookDto();
+                bookDto.setTitle(book.getTitle());
+                bookDto.setIsbn(book.getIsbn());
+                bookDto.setRegistrationDate(book.getRegistrationDate());
+                bookDto.setStatus(book.getStatus());
+                bookDto.setImageUrl(book.getImageUrl());
+                bookDto.setGenre(book.getGenreId().getName()); // Si Genre tiene el campo name
+                return bookDto;
+            }).collect(Collectors.toList());
+
+            return bookDtos;
+        } catch (Exception e) {
+            log.error("Error searching books: {}", e.getMessage());
+            throw e;
+        }
+    }
+    public List<BookDto> searchBooksByAuthor(String authorName) {
+        // Obtiene los IDs de los libros asociados al autor
+        List<Long> bookIds = bookAuthorsRepository.findBooksByAuthorName(authorName);
+
+        // Busca los libros por sus IDs usando findAllById
+        List<Book> books = bookRepository.findAllById(bookIds);
+
+        // Convierte a BookDto
+        return books.stream().map(this::convertToDto).collect(Collectors.toList());
+    }
+
+    // Método para convertir Book a BookDto
+    private BookDto convertToDto(Book book) {
+        BookDto bookDto = new BookDto();
+        bookDto.setBookId(book.getBookId());
+        bookDto.setTitle(book.getTitle());
+        bookDto.setIsbn(book.getIsbn());
+        bookDto.setRegistrationDate(book.getRegistrationDate());
+        bookDto.setStatus(book.getStatus());
+        bookDto.setImageUrl(book.getImageUrl());
+        bookDto.setGenre(book.getGenreId().getName());
+        // Añade otros campos según sea necesario
+        return bookDto;
+    }
 }
+

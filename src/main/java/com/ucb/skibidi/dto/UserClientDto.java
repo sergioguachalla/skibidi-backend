@@ -6,4 +6,5 @@ import lombok.Data;
 public class UserClientDto {
     private Long clientId;
     private String username;
+    private String kcUuid;
 }

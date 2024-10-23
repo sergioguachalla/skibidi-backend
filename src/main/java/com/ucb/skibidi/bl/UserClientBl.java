@@ -20,6 +20,7 @@ public class UserClientBl {
                     UserClientDto dto = new UserClientDto();
                     dto.setClientId(user.getClientId());
                     dto.setUsername(user.getUsername());
+                    dto.setKcUuid(user.getPersonId().getKcUuid());
                     return dto;
                 })
                 .collect(Collectors.toList());

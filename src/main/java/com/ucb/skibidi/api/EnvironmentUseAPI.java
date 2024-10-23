@@ -34,6 +34,22 @@ public class EnvironmentUseAPI {
         }
     }
 
+    @PutMapping("/{id}")
+    public ResponseDto<EnvironmentReservationDto> updateEnvironmentReservation(@PathVariable Integer id, @RequestBody EnvironmentReservationDto environmentReservationDto) {
+        ResponseDto<EnvironmentReservationDto> responseDto = new ResponseDto<>();
+        try {
+            environmentUseBl.updateEnvironmentReservation(id, environmentReservationDto);
+            responseDto.setData(environmentReservationDto);
+            responseDto.setMessage("Environment use updated");
+            responseDto.setSuccessful(true);
+        } catch (Exception e) {
+            responseDto.setData(null);
+            responseDto.setMessage("Error updating environment use: " + e.getMessage());
+            responseDto.setSuccessful(false);
+        }
+        return responseDto;
+    }
+
     // disponibilidad
     @GetMapping("/availability")
     public ResponseDto<List<EnvironmentDto>> getEnvironmentsAvailability(
@@ -53,5 +69,20 @@ public class EnvironmentUseAPI {
             responseDto.setSuccessful(false);
             return responseDto;
         }
+    }
+    @GetMapping("/history-reservation")
+    public ResponseDto<List<EnvironmentReservationDto>> getAllReservations() {
+        ResponseDto<List<EnvironmentReservationDto>> responseDto = new ResponseDto<>();
+        try {
+            List<EnvironmentReservationDto> reservations = environmentUseBl.findAllReservations();
+            responseDto.setData(reservations);
+            responseDto.setMessage("All reservations fetched successfully");
+            responseDto.setSuccessful(true);
+        } catch (Exception e) {
+            responseDto.setData(null);
+            responseDto.setMessage("Error fetching reservations: " + e.getMessage());
+            responseDto.setSuccessful(false);
+        }
+        return responseDto;
     }
 }

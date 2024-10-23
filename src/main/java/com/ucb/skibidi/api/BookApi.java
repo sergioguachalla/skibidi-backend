@@ -4,6 +4,7 @@ import com.ucb.skibidi.bl.BookBl;
 import com.ucb.skibidi.dto.BookDto;
 import com.ucb.skibidi.dto.BookManualDto;
 import com.ucb.skibidi.dto.ResponseDto;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Sort;
 @RestController
 @RequestMapping("/api/v1/books")
 public class BookApi {
+    private static final Logger log = org.slf4j.LoggerFactory.getLogger(BookApi.class);
 
     @Autowired
     private BookBl bookBl;
@@ -80,19 +82,31 @@ public class BookApi {
             @RequestParam(defaultValue = "4") Integer size,
             @RequestParam(required = false) Integer genreId,
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date to
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,
+            @RequestParam(required = false) Boolean isAvailable,
+            @RequestParam(required = false) String authorName,
+            @RequestParam(required = false) Long languageId,
+            @RequestParam(required = false) String title
     ) {
         Pageable pageable = PageRequest.of(page, size);
         ResponseDto<Page<BookManualDto>> responseDto = new ResponseDto<>();
         try {
-            Page<BookManualDto> books = bookBl.getAllBooks(pageable, genreId,from,to);
+            Page<BookManualDto> books = bookBl.getAllBooks(pageable, genreId, from, to,
+                    isAvailable, authorName, languageId,title);
+            log.info("Books found {}", books.getContent().isEmpty());
+            if (books.isEmpty()) {
+                responseDto.setData(null);
+                responseDto.setMessage("No se encontraron libros con los filtros seleccionados");
+                responseDto.setSuccessful(true);
+                return responseDto;
+            }
             responseDto.setData(books);
             responseDto.setMessage("Books found");
             responseDto.setSuccessful(true);
         } catch (Exception e) {
             responseDto.setData(null);
             responseDto.setMessage("Error getting book: " + e.getMessage());
-            responseDto.setSuccessful(false);
+            responseDto.setSuccessful(true);
         }
         return responseDto;
     }
@@ -109,6 +123,46 @@ public class BookApi {
             ResponseDto<BookDto> responseDto = new ResponseDto<>();
             responseDto.setData(null);
             responseDto.setMessage("Error updating book: " + e.getMessage());
+            responseDto.setSuccessful(false);
+            return responseDto;
+        }
+    }
+    @GetMapping("/search")
+    public ResponseDto<List<BookDto>> searchBooksByTitle(@RequestParam String title) {
+        try {
+            ResponseDto<List<BookDto>> responseDto = new ResponseDto<>();
+            responseDto.setData(bookBl.searchBooksByTitle(title));
+            responseDto.setMessage("Books found");
+            responseDto.setSuccessful(true);
+            return responseDto;
+        } catch (Exception e) {
+            ResponseDto<List<BookDto>> responseDto = new ResponseDto<>();
+            responseDto.setData(null);
+            responseDto.setMessage("Error searching books: " + e.getMessage());
+            responseDto.setSuccessful(false);
+            return responseDto;
+        }
+    }
+    @GetMapping("/search/author")
+    public ResponseDto<List<BookDto>> searchBooksByAuthor(@RequestParam String authorName) {
+        try {
+            List<BookDto> response = bookBl.searchBooksByAuthor(authorName);
+            ResponseDto<List<BookDto>> responseDto = new ResponseDto<>();
+            if(response.isEmpty()){
+                responseDto.setData(null);
+                responseDto.setMessage("No se encontraron libros con los filtros seleccionados");
+                responseDto.setSuccessful(true);
+                return responseDto;
+            }
+            
+            responseDto.setData(response);
+            responseDto.setMessage("Books found");
+            responseDto.setSuccessful(true);
+            return responseDto;
+        } catch (Exception e) {
+            ResponseDto<List<BookDto>> responseDto = new ResponseDto<>();
+            responseDto.setData(null);
+            responseDto.setMessage("Error searching books: " + e.getMessage());
             responseDto.setSuccessful(false);
             return responseDto;
         }

@@ -7,6 +7,7 @@ import java.util.List;
 
 @Data
 public class BookManualDto {
+    private Long bookId;
     private String title;
     private String isbn;
     private Date registrationDate;
@@ -14,4 +15,6 @@ public class BookManualDto {
     private String imageUrl;
     private int genreId;
     private List<String> authors;
+    private Long languageId;
+    private Long editorialId;
 }

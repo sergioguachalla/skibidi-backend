@@ -8,6 +8,7 @@ import com.ucb.skibidi.dto.UserDto;
 import com.ucb.skibidi.dto.UserRegistrationDto;
 import com.ucb.skibidi.entity.Person;
 import com.ucb.skibidi.entity.UserClient;
+import com.ucb.skibidi.service.EmailService;
 import com.ucb.skibidi.utils.EntityMapper;
 import com.ucb.skibidi.utils.ValidationUtils;
 import jakarta.transaction.Transactional;
@@ -19,10 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class UserBl {
@@ -32,6 +30,8 @@ public class UserBl {
     private PersonRepository personRepository;
     @Autowired
     private UserClientRepository userClientRepository;
+    @Autowired
+    private EmailService emailService;
 
     public UserBl(@Autowired  Keycloak keycloak,
                   @Autowired PersonRepository personRepository,
@@ -100,6 +100,7 @@ public class UserBl {
         UserDto userdto = new UserDto();
         userdto.setName(user.getUsername());
         userdto.setEmail(user.getEmail());
+
         userRegistrationDto.setUserDto(userdto);
 
         return userRegistrationDto;
@@ -111,19 +112,71 @@ public class UserBl {
             throw new InvalidInputException("User not found!");
         }
         var newUserInformation = new UserRepresentation();
+
         newUserInformation.setUsername(userDto.getUserDto().getName());
         newUserInformation.setEmail(userDto.getUserDto().getEmail());
         newUserInformation.setFirstName(userDto.getPersonDto().getName());
         newUserInformation.setLastName(userDto.getPersonDto().getLastName());
+        if(!userDto.getUserDto().getPassword().isEmpty()){
+            var credential = preparePassword(userDto.getUserDto().getPassword());
+            newUserInformation.setCredentials(List.of(credential));
+        }
 
         keycloak.realm(realm).users().get(kcId).update(newUserInformation);
         log.info("keycloak user updated");
+
+        var person = personRepository.findByKcUuid(kcId);
+        person.setName(userDto.getPersonDto().getName());
+        person.setLastname(userDto.getPersonDto().getLastName());
+        person.setEmail(userDto.getUserDto().getEmail());
+        person.setAddress(userDto.getPersonDto().getAddress());
+        personRepository.save(person);
 
         var userEntity = userClientRepository.findByPersonIdKcUuid(kcId);
         userEntity.setUsername(userDto.getUserDto().getName());
         userClientRepository.save(userEntity);
         log.info("user entity updated");
 
+    }
+
+    final private TreeMap<UUID, String> passwordResetRequests = new TreeMap<>();
+    public void resetPassword(String email){
+        UUID uuid = UUID.randomUUID();
+        passwordResetRequests.put(uuid, email);
+        emailService.sendEmailMime(email,
+                "Restablecimiento de contraseña",
+                "Hola! Hemos recibido una solicitud para restablecer tu contraseña. Haz clic en el siguiente enlace para restablecer tu contraseña: \n\n" +
+                        "http://localhost:4200/update-password?id=" + uuid + "\n\n"
+                        + "Si no solicitaste restablecer tu contraseña, ignora este mensaje.");
+    }
+
+    public void changePassword(UUID passwordResetToken, String newPassword){
+        if(passwordResetRequests.containsKey(passwordResetToken)){
+            String email = passwordResetRequests.get(passwordResetToken);
+
+            passwordResetRequests.remove(passwordResetToken);
+
+            String kcId = userClientRepository.findKcUuidIdByEmail(email);
+
+            updateUserPassword(kcId, newPassword);
+
+        }else{
+            throw new IllegalArgumentException("token de restablecimiento de contraseña no valido.");
+        }
+    }
+
+    private void updateUserPassword(String kcId, String newPassword) {
+       var user = keycloak.realm(realm).users().get(kcId).toRepresentation();
+       if (user == null) {
+           log.error("Usuario no encontrado");
+           throw new InvalidInputException("Usuario no encontrado");
+       }
+
+       var credential = preparePassword(newPassword);
+
+       keycloak.realm(realm).users().get(kcId).resetPassword(credential);
+
+       log.info("Contraseña actualizada exitosamente para kcId: {}", kcId);
     }
 
     private void validateUser(UserRegistrationDto userDto) {

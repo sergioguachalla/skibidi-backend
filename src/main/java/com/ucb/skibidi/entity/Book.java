@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.Set;
 
 @Entity(name = "book")
 @Data
@@ -27,5 +28,20 @@ public class Book {
     @JoinColumn(name = "genre_id")
     private Genre genreId;
 
+    @ManyToMany
+    @JoinTable(
+            name = "book_authors",
+            joinColumns = @JoinColumn(name = "book_id"),
+            inverseJoinColumns = @JoinColumn(name = "author_id")
+    )
+    private Set<Author> authors;
+
+    @ManyToOne
+    @JoinColumn(name = "id_language")
+    private Language idLanguage;
+
+    @ManyToOne
+    @JoinColumn(name = "editorial_id")
+    private Editorial editorialId;
 
 }
