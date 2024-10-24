@@ -5,6 +5,7 @@ import com.ucb.skibidi.dao.BookAuthorsRepository;
 import com.ucb.skibidi.dao.BookRepository;
 import com.ucb.skibidi.dao.EditorialRepository;
 import com.ucb.skibidi.dao.LanguageRepository;
+import com.ucb.skibidi.dto.BookDetailsDto;
 import com.ucb.skibidi.dto.BookDto;
 import com.ucb.skibidi.dto.BookManualDto;
 import com.ucb.skibidi.entity.*;
@@ -366,22 +367,25 @@ public class BookBl {
         // Añade otros campos según sea necesario
         return bookDto;
     }
-    public BookDto getBookById(Long id) throws Exception {
+    public BookDetailsDto getBookDetailsById(Long id) throws Exception {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Book not found with ID: " + id));
-        BookDto bookDto = new BookDto();
-        bookDto.setBookId(book.getBookId());
-        bookDto.setTitle(book.getTitle());
-        bookDto.setIsbn(book.getIsbn());
-        bookDto.setRegistrationDate(book.getRegistrationDate());
-        bookDto.setStatus(book.getStatus());
-        bookDto.setImageUrl(book.getImageUrl());
-        bookDto.setGenre(book.getGenreId() != null ? book.getGenreId().getName() : null);
-        bookDto.setAuthors(bookAuthorsBl.getAuthorsByBook(book.getBookId()));
-        bookDto.setEditorialId(book.getEditorialId() != null ? book.getEditorialId().getEditorialId() : null);
-        bookDto.setIdLanguage(book.getIdLanguage() != null ? book.getIdLanguage().getLanguageId() : null);
 
-        return bookDto;
+        BookDetailsDto bookDetailsDto = new BookDetailsDto();
+        bookDetailsDto.setBookId(book.getBookId());
+        bookDetailsDto.setTitle(book.getTitle());
+        bookDetailsDto.setIsbn(book.getIsbn());
+        bookDetailsDto.setRegistrationDate(book.getRegistrationDate());
+        bookDetailsDto.setStatus(book.getStatus());
+        bookDetailsDto.setImageUrl(book.getImageUrl());
+        bookDetailsDto.setGenre(book.getGenreId() != null ? book.getGenreId().getName() : null);
+        bookDetailsDto.setAuthors(bookAuthorsBl.getAuthorsByBook(book.getBookId()));
+
+        // Asignar los nombres en lugar de los IDs
+        bookDetailsDto.setEditorialName(book.getEditorialId() != null ? book.getEditorialId().getEditorial() : null);
+        bookDetailsDto.setLanguageName(book.getIdLanguage() != null ? book.getIdLanguage().getLanguage() : null);
+
+        return bookDetailsDto;
     }
 }
 

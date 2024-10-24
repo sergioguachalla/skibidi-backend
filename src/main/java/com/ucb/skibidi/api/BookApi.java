@@ -1,6 +1,7 @@
 package com.ucb.skibidi.api;
 
 import com.ucb.skibidi.bl.BookBl;
+import com.ucb.skibidi.dto.BookDetailsDto;
 import com.ucb.skibidi.dto.BookDto;
 import com.ucb.skibidi.dto.BookManualDto;
 import com.ucb.skibidi.dto.ResponseDto;
@@ -168,11 +169,11 @@ public class BookApi {
         }
     }
     @GetMapping("/modal/{id}")
-    public ResponseDto<BookDto> getBookById(@PathVariable Long id) {
-        ResponseDto<BookDto> responseDto = new ResponseDto<>();
+    public ResponseDto<BookDetailsDto> getBookById(@PathVariable Long id) {
+        ResponseDto<BookDetailsDto> responseDto = new ResponseDto<>();
         try {
-            BookDto book = bookBl.getBookById(id);
-            responseDto.setData(book);
+            BookDetailsDto bookDetails = bookBl.getBookDetailsById(id);
+            responseDto.setData(bookDetails);
             responseDto.setMessage("Book found");
             responseDto.setSuccessful(true);
         } catch (Exception e) {
