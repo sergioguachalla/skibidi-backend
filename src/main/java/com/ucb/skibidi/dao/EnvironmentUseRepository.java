@@ -11,6 +11,7 @@ import java.util.List;
 public interface EnvironmentUseRepository extends JpaRepository<EnvironmentUse, Long> {
 
     @Query(value = "SELECT * FROM Environment_Use WHERE environment_id = :environmentId " +
+            "AND status = 2 " +
             "AND ((clock_in BETWEEN :fromDate AND :toDate) " +
             "OR (clock_out BETWEEN :fromDate AND :toDate) " +
             "OR (:fromDate BETWEEN clock_in AND clock_out) " +
@@ -18,4 +19,6 @@ public interface EnvironmentUseRepository extends JpaRepository<EnvironmentUse, 
     List<EnvironmentUse> findReservationsBetweenDates(int environmentId, Date fromDate, Date toDate);
 
     List<EnvironmentUse> findAllByClientIdPersonIdKcUuid(String kcUuid);
+
+    EnvironmentUse findByEnvironmentUse(Long environmentUseId);
 }

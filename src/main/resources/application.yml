@@ -18,3 +18,9 @@ keycloak:
     secret: ${CLIENT_SECRET:6WPxzJN2CnFPajEbo6gVpqGrLZ5hsr0U }
     realm: skibidi-realm
     resource: sk-backend
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
