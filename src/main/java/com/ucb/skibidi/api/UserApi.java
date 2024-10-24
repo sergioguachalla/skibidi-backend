@@ -56,13 +56,18 @@ public class UserApi {
     }
 
     @PutMapping("/changePassword")
-    public ResponseEntity<String> changePassword(@RequestParam String passwordResetToken, @RequestParam String newPassword){
+    public ResponseEntity<ResponseDto<String>> changePassword(@RequestParam String passwordResetToken, @RequestParam String newPassword){
+        ResponseDto<String> response = new ResponseDto<>();
         try {
             UUID parsedPasswordResetToken = UUID.fromString(passwordResetToken);
             userBl.changePassword(parsedPasswordResetToken, newPassword);
-            return ResponseEntity.ok("Contraseña actualizada exitosamente.");
+            response.setData("Contraseña actualizada exitosamente.");
+            return ResponseEntity.ok(response);
+//            return ResponseEntity.ok("Contraseña actualizada exitosamente.");
         } catch (Exception e) {
-            return ResponseEntity.ok("Algo pasó, pipipi.");
+//            return ResponseEntity.ok("Algo pasó, pipipi.");
+            response.setData("Algo pasó, pipipi.");
+            return ResponseEntity.badRequest().body(response);
         }
 
     }
