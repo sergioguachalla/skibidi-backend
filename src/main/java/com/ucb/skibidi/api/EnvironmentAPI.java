@@ -6,6 +6,9 @@ import com.ucb.skibidi.dto.EnvironmentDto;
 import com.ucb.skibidi.dto.EnvironmentReservationDto;
 import com.ucb.skibidi.dto.ResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -72,10 +75,16 @@ public class EnvironmentAPI {
 
 
     @GetMapping("{kcid}/reservations")
-    public ResponseDto<List<EnvironmentReservationDto>> getEnvironmentsAvailability(@PathVariable String kcid) {
-        ResponseDto<List<EnvironmentReservationDto>> responseDto = new ResponseDto<>();
+    public ResponseDto<Page<EnvironmentReservationDto>> getEnvironmentsAvailability(
+            @PathVariable String kcid,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "7") Integer size
+
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        ResponseDto<Page<EnvironmentReservationDto>> responseDto = new ResponseDto<>();
         try {
-            List<EnvironmentReservationDto> environments = environmentUseBl.findReservationsByClientId(kcid);
+            Page<EnvironmentReservationDto> environments = environmentUseBl.findReservationsByClientId(kcid,pageable);
             responseDto.setData(environments);
             responseDto.setMessage("Environments fetched successfully");
             responseDto.setSuccessful(true);

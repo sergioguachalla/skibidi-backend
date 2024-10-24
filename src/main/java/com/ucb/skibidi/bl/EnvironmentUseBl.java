@@ -100,25 +100,7 @@ public class EnvironmentUseBl {
     }
 
 
-    public List<EnvironmentReservationDto> findReservationsByClientId(String kcId){
-        log.info("Finding reservations by kcId {}", kcId);
-        List<EnvironmentUse> environmentUses = environmentUseRepository.findAllByClientIdPersonIdKcUuid(kcId);
-        return environmentUses.stream()
-                .map(environmentUse -> {
-                    EnvironmentReservationDto environmentReservationDto = new EnvironmentReservationDto();
-                    environmentReservationDto.setClientId(environmentUse.getClientId().getPersonId().getKcUuid());
-                    environmentReservationDto.setEnvironmentId(environmentUse.getEnvironmentId().getEnvironmentId());
-                    //reserva
-                    environmentReservationDto.setReservationId(environmentUse.getEnvironmentUse());
-                    environmentReservationDto.setReservationDate(environmentUse.getReservationDate());
-                    environmentReservationDto.setClockIn(environmentUse.getClockIn());
-                    environmentReservationDto.setClockOut(environmentUse.getClockOut());
-                    environmentReservationDto.setPurpose(environmentUse.getPurpose());
-                    environmentReservationDto.setStatus(environmentUse.getStatus());
-                    return environmentReservationDto;
-                })
-                .toList();
-    }
+
 
     private void validateEnvironmentUse(EnvironmentUse environmentUse) {
         log.info("Validating environment use...");
@@ -240,6 +222,24 @@ public class EnvironmentUseBl {
             return environmentReservationDto;
         });
         return environmentReservationDtos;
+    }
+
+    public Page<EnvironmentReservationDto> findReservationsByClientId(String kcId, Pageable pageable){
+        log.info("Finding reservations by kcId {}", kcId);
+        Page<EnvironmentUse> environmentUses = environmentUseRepository.findAllByClientIdPersonIdKcUuid(kcId,pageable);
+        return environmentUses.map(environmentUse -> {
+            EnvironmentReservationDto environmentReservationDto = new EnvironmentReservationDto();
+            environmentReservationDto.setClientId(environmentUse.getClientId().getPersonId().getKcUuid());
+            environmentReservationDto.setEnvironmentId(environmentUse.getEnvironmentId().getEnvironmentId());
+            //reserva
+            environmentReservationDto.setReservationId(environmentUse.getEnvironmentUse());
+            environmentReservationDto.setReservationDate(environmentUse.getReservationDate());
+            environmentReservationDto.setClockIn(environmentUse.getClockIn());
+            environmentReservationDto.setClockOut(environmentUse.getClockOut());
+            environmentReservationDto.setPurpose(environmentUse.getPurpose());
+            environmentReservationDto.setStatus(environmentUse.getStatus());
+            return environmentReservationDto;
+        });
     }
 
     // con esto es posible modificar a cualquiera de los 3 estados de la reserva

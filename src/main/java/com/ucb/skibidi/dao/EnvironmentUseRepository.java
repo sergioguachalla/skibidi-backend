@@ -1,6 +1,8 @@
 package com.ucb.skibidi.dao;
 
 import com.ucb.skibidi.entity.EnvironmentUse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -18,7 +20,7 @@ public interface EnvironmentUseRepository extends JpaRepository<EnvironmentUse, 
             "OR (:toDate BETWEEN clock_in AND clock_out))", nativeQuery = true)
     List<EnvironmentUse> findReservationsBetweenDates(int environmentId, Date fromDate, Date toDate);
 
-    List<EnvironmentUse> findAllByClientIdPersonIdKcUuid(String kcUuid);
+    Page<EnvironmentUse> findAllByClientIdPersonIdKcUuid(String kcUuid, Pageable pageable);
 
     EnvironmentUse findByEnvironmentUse(Long environmentUseId);
 }
