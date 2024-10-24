@@ -167,4 +167,19 @@ public class BookApi {
             return responseDto;
         }
     }
+    @GetMapping("/modal/{id}")
+    public ResponseDto<BookDto> getBookById(@PathVariable Long id) {
+        ResponseDto<BookDto> responseDto = new ResponseDto<>();
+        try {
+            BookDto book = bookBl.getBookById(id);
+            responseDto.setData(book);
+            responseDto.setMessage("Book found");
+            responseDto.setSuccessful(true);
+        } catch (Exception e) {
+            responseDto.setData(null);
+            responseDto.setMessage("Book not found: " + e.getMessage());
+            responseDto.setSuccessful(false);
+        }
+        return responseDto;
+    }
 }

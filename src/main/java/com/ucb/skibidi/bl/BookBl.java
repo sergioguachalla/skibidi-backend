@@ -10,6 +10,7 @@ import com.ucb.skibidi.dto.BookManualDto;
 import com.ucb.skibidi.entity.*;
 import com.ucb.skibidi.utils.BookSpecification;
 import com.ucb.skibidi.utils.ValidationUtils;
+import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -363,6 +364,23 @@ public class BookBl {
         bookDto.setImageUrl(book.getImageUrl());
         bookDto.setGenre(book.getGenreId().getName());
         // Añade otros campos según sea necesario
+        return bookDto;
+    }
+    public BookDto getBookById(Long id) throws Exception {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Book not found with ID: " + id));
+        BookDto bookDto = new BookDto();
+        bookDto.setBookId(book.getBookId());
+        bookDto.setTitle(book.getTitle());
+        bookDto.setIsbn(book.getIsbn());
+        bookDto.setRegistrationDate(book.getRegistrationDate());
+        bookDto.setStatus(book.getStatus());
+        bookDto.setImageUrl(book.getImageUrl());
+        bookDto.setGenre(book.getGenreId() != null ? book.getGenreId().getName() : null);
+        bookDto.setAuthors(bookAuthorsBl.getAuthorsByBook(book.getBookId()));
+        bookDto.setEditorialId(book.getEditorialId() != null ? book.getEditorialId().getEditorialId() : null);
+        bookDto.setIdLanguage(book.getIdLanguage() != null ? book.getIdLanguage().getLanguageId() : null);
+
         return bookDto;
     }
 }
