@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.security.Timestamp;
@@ -271,6 +272,20 @@ public class EnvironmentUseBl {
         }
 
         log.info("Reservation status update validated successfully");
+    }
+
+
+    @Scheduled(fixedRate = 60000)
+    public void updateEnvironmentReservationStatus(){
+        log.info("Updating environment reservation status...");
+        LocalDateTime now = LocalDateTime.now();
+        List<EnvironmentUse> environmentUses = environmentUseRepository.findPast(now);
+        for (EnvironmentUse environmentUse : environmentUses) {
+            if (environmentUse.getClockOut().isBefore(LocalDateTime.now())) {
+                environmentUse.setStatus(4);
+                environmentUseRepository.save(environmentUse);
+            }
+        }
     }
 
 }

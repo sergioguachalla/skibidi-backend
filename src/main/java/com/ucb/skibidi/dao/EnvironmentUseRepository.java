@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -23,4 +24,10 @@ public interface EnvironmentUseRepository extends JpaRepository<EnvironmentUse, 
     Page<EnvironmentUse> findAllByClientIdPersonIdKcUuidOrderByReservationDateAsc(String kcUuid, Pageable pageable);
 
     EnvironmentUse findByEnvironmentUse(Long environmentUseId);
+
+
+
+    @Query(value = "SELECT * FROM Environment_Use WHERE (status = 1 OR status = 2) " +
+            "AND clock_out < :now", nativeQuery = true)
+    List<EnvironmentUse> findPast(LocalDateTime now);
 }
