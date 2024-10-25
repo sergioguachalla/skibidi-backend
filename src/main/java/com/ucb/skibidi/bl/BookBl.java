@@ -258,6 +258,7 @@ public class BookBl {
             }
 
 
+
             Page<Book> bookEntities = bookRepository.findAll(spec, pageable);
             Page<BookManualDto> booksDto = bookEntities.map(bookEntity -> {
                 BookManualDto bookDto = new BookManualDto();
