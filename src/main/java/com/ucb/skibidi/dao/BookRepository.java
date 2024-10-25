@@ -20,4 +20,6 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
     List<Book> findByTitleContainingIgnoreCase(String title);
     @Query("SELECT ba.bookId FROM BookAuthors ba WHERE ba.authorId.name = :authorName")
     List<Long> findBooksByAuthorName(@Param("authorName") String authorName);
+    @Query("SELECT b.editorialId.editorial, b.idLanguage.language FROM book b WHERE b.BookId = :bookId")
+    Object[] findEditorialAndLanguageByBookId(@Param("bookId") Long bookId);
 }
