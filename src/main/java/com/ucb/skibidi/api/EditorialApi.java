@@ -17,7 +17,7 @@ public class EditorialApi {
     @Autowired
     private EditorialBl editorialBl;
 
-    @GetMapping("/all")
+    @GetMapping("")
     public ResponseDto<List<EditorialDto>> findAllEditorials() {
         List<EditorialDto> editorialDtos = editorialBl.findAllEditorials();
         ResponseDto<List<EditorialDto>> responseDto = new ResponseDto<>();

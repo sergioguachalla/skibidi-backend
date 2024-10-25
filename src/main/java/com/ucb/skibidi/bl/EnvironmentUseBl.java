@@ -76,6 +76,7 @@ public class EnvironmentUseBl {
             environmentUse.setClockIn(environmentReservationDto.getClockIn());
             environmentUse.setClockOut(environmentReservationDto.getClockOut());
             environmentUse.setPurpose(environmentReservationDto.getPurpose());
+            environmentUse.setStatus(environmentReservationDto.getStatus());
             environmentUseRepository.save(environmentUse);
         } catch (Exception e) {
             log.error("Error updating environment use: {}", e.getMessage());
@@ -224,9 +225,9 @@ public class EnvironmentUseBl {
         return environmentReservationDtos;
     }
 
-    public Page<EnvironmentReservationDto> findReservationsByClientId(String kcId, Pageable pageable){
+    public Page<EnvironmentReservationDto> findReservationsByClientId(String kcId, Pageable pageable) {
         log.info("Finding reservations by kcId {}", kcId);
-        Page<EnvironmentUse> environmentUses = environmentUseRepository.findAllByClientIdPersonIdKcUuid(kcId,pageable);
+        Page<EnvironmentUse> environmentUses = environmentUseRepository.findAllByClientIdPersonIdKcUuidOrderByReservationDateAsc(kcId, pageable);
         return environmentUses.map(environmentUse -> {
             EnvironmentReservationDto environmentReservationDto = new EnvironmentReservationDto();
             environmentReservationDto.setClientId(environmentUse.getClientId().getPersonId().getKcUuid());
@@ -242,8 +243,8 @@ public class EnvironmentUseBl {
         });
     }
 
-    // con esto es posible modificar a cualquiera de los 3 estados de la reserva
-    public void updateReservation(Long id, int status) {
+
+     public void updateReservation(Long id, int status) {
         try {
             log.info("Updating reservation status...");
             log.info("Reservation id: {}", id);
@@ -261,7 +262,7 @@ public class EnvironmentUseBl {
 
     public void validateReservationStatusUpdate(EnvironmentUse environmentUse, int status) {
         log.info("Validating reservation status update...");
-        if (status < 1 || status > 3) {
+        if (status < 1 || status > 4) {
             throw new RuntimeException("Invalid reservation status");
         }
 

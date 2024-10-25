@@ -20,7 +20,7 @@ public interface EnvironmentUseRepository extends JpaRepository<EnvironmentUse, 
             "OR (:toDate BETWEEN clock_in AND clock_out))", nativeQuery = true)
     List<EnvironmentUse> findReservationsBetweenDates(int environmentId, Date fromDate, Date toDate);
 
-    Page<EnvironmentUse> findAllByClientIdPersonIdKcUuid(String kcUuid, Pageable pageable);
+    Page<EnvironmentUse> findAllByClientIdPersonIdKcUuidOrderByReservationDateAsc(String kcUuid, Pageable pageable);
 
     EnvironmentUse findByEnvironmentUse(Long environmentUseId);
 }

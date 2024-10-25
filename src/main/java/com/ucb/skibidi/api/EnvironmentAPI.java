@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/environment")
+@RequestMapping("/api/v1/environments")
 public class EnvironmentAPI {
 
     @Autowired
@@ -22,8 +22,7 @@ public class EnvironmentAPI {
     @Autowired
     private EnvironmentUseBl environmentUseBl;
 
-    // Crear un nuevo ambiente
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseDto<EnvironmentDto> createEnvironment(@RequestBody EnvironmentDto environmentDto) {
         ResponseDto<EnvironmentDto> responseDto = new ResponseDto<>();
         try {
@@ -96,20 +95,5 @@ public class EnvironmentAPI {
         return responseDto;
     }
 
-    // Actualizar estado de un ambiente
-    // En este momento 1 es pendiente, 2 es aceptado y 3 es rechazado
-    @PutMapping("/reservations/{id}/status/{status}")
-    public ResponseDto<EnvironmentReservationDto> updateReservationStatus(@PathVariable Long id, @PathVariable int status) {
-        ResponseDto<EnvironmentReservationDto> responseDto = new ResponseDto<>();
-        try {
-            environmentUseBl.updateReservation(id, status);
-            responseDto.setMessage("Reservation status updated successfully");
-            responseDto.setSuccessful(true);
-        } catch (Exception e) {
-            responseDto.setData(null);
-            responseDto.setMessage("Error updating reservation: " + e.getMessage());
-            responseDto.setSuccessful(false);
-        }
-        return responseDto;
-    }
+
 }

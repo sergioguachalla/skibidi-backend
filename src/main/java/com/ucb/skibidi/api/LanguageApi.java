@@ -17,7 +17,7 @@ public class LanguageApi {
     @Autowired
     private LanguageBl languageBl;
 
-    @GetMapping("/all")
+    @GetMapping("")
     public ResponseDto<List<LanguageDto>> findAll() {
         return new ResponseDto<>(languageBl.findAll(), null, true);
     }
