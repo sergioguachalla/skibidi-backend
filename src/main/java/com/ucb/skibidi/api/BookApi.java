@@ -138,46 +138,7 @@ public class BookApi {
             return responseDto;
         }
     }
-    @GetMapping("/search")
-    public ResponseDto<List<BookDto>> searchBooksByTitle(@RequestParam String title) {
-        try {
-            ResponseDto<List<BookDto>> responseDto = new ResponseDto<>();
-            responseDto.setData(bookBl.searchBooksByTitle(title));
-            responseDto.setMessage("Books found");
-            responseDto.setSuccessful(true);
-            return responseDto;
-        } catch (Exception e) {
-            ResponseDto<List<BookDto>> responseDto = new ResponseDto<>();
-            responseDto.setData(null);
-            responseDto.setMessage("Error searching books: " + e.getMessage());
-            responseDto.setSuccessful(false);
-            return responseDto;
-        }
-    }
-    @GetMapping("/search/author")
-    public ResponseDto<List<BookDto>> searchBooksByAuthor(@RequestParam String authorName) {
-        try {
-            List<BookDto> response = bookBl.searchBooksByAuthor(authorName);
-            ResponseDto<List<BookDto>> responseDto = new ResponseDto<>();
-            if(response.isEmpty()){
-                responseDto.setData(null);
-                responseDto.setMessage("No se encontraron libros con los filtros seleccionados");
-                responseDto.setSuccessful(true);
-                return responseDto;
-            }
-            
-            responseDto.setData(response);
-            responseDto.setMessage("Books found");
-            responseDto.setSuccessful(true);
-            return responseDto;
-        } catch (Exception e) {
-            ResponseDto<List<BookDto>> responseDto = new ResponseDto<>();
-            responseDto.setData(null);
-            responseDto.setMessage("Error searching books: " + e.getMessage());
-            responseDto.setSuccessful(false);
-            return responseDto;
-        }
-    }
+
     @GetMapping("/modal/{id}")
     public ResponseDto<BookDetailsDto> getBookById(@PathVariable Long id) {
         ResponseDto<BookDetailsDto> responseDto = new ResponseDto<>();

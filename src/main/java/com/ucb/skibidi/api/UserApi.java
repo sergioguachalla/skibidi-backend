@@ -62,7 +62,7 @@ public class UserApi {
     }
 
     @PutMapping("/password/change")
-    public ResponseEntity<String> changePassword(@RequestParam String passwordResetToken, @RequestParam String newPassword){
+    public ResponseEntity<ResponseDto<String>> changePassword(@RequestParam String passwordResetToken, @RequestParam String newPassword){
         ResponseDto<String> response = new ResponseDto<>();
         try {
             UUID parsedPasswordResetToken = UUID.fromString(passwordResetToken);
