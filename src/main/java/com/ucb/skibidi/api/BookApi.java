@@ -88,9 +88,18 @@ public class BookApi {
             @RequestParam(required = false) String authorName,
             @RequestParam(required = false) Long languageId,
             @RequestParam(required = false) String title,
-            @RequestParam(required = false) Long editorialId
+            @RequestParam(required = false) Long editorialId,
+            @RequestParam(required = false, defaultValue = "asc") String titleSort
     ) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable;
+        if (titleSort.equals("desc")) {
+            pageable = PageRequest.of(page, size, Sort.by("title").descending());
+        } else {
+            pageable = PageRequest.of(page, size, Sort.by("title").ascending());
+        }
+
+
+
         ResponseDto<Page<BookManualDto>> responseDto = new ResponseDto<>();
         try {
             Page<BookManualDto> books = bookBl.getAllBooks(pageable, genreId, from, to,
