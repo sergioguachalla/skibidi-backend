@@ -88,7 +88,7 @@ public class BookApi {
             @RequestParam(required = false) Long languageId,
             @RequestParam(required = false) String title,
             @RequestParam(required = false) Long editorialId,
-            @RequestParam(required = false, defaultValue = "desc") String titleSort
+            @RequestParam(required = false, defaultValue = "asc") String titleSort
     ) {
         Pageable pageable;
         if (titleSort.equals("desc")) {
