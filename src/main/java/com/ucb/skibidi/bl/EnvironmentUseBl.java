@@ -76,6 +76,7 @@ public class EnvironmentUseBl {
             environmentUse.setClockIn(environmentReservationDto.getClockIn());
             environmentUse.setClockOut(environmentReservationDto.getClockOut());
             environmentUse.setPurpose(environmentReservationDto.getPurpose());
+            environmentUse.setStatus(environmentReservationDto.getStatus());
             environmentUseRepository.save(environmentUse);
         } catch (Exception e) {
             log.error("Error updating environment use: {}", e.getMessage());
@@ -100,25 +101,7 @@ public class EnvironmentUseBl {
     }
 
 
-    public List<EnvironmentReservationDto> findReservationsByClientId(String kcId){
-        log.info("Finding reservations by kcId {}", kcId);
-        List<EnvironmentUse> environmentUses = environmentUseRepository.findAllByClientIdPersonIdKcUuid(kcId);
-        return environmentUses.stream()
-                .map(environmentUse -> {
-                    EnvironmentReservationDto environmentReservationDto = new EnvironmentReservationDto();
-                    environmentReservationDto.setClientId(environmentUse.getClientId().getPersonId().getKcUuid());
-                    environmentReservationDto.setEnvironmentId(environmentUse.getEnvironmentId().getEnvironmentId());
-                    //reserva
-                    environmentReservationDto.setReservationId(environmentUse.getEnvironmentUse());
-                    environmentReservationDto.setReservationDate(environmentUse.getReservationDate());
-                    environmentReservationDto.setClockIn(environmentUse.getClockIn());
-                    environmentReservationDto.setClockOut(environmentUse.getClockOut());
-                    environmentReservationDto.setPurpose(environmentUse.getPurpose());
-                    environmentReservationDto.setStatus(environmentUse.getStatus());
-                    return environmentReservationDto;
-                })
-                .toList();
-    }
+
 
     private void validateEnvironmentUse(EnvironmentUse environmentUse) {
         log.info("Validating environment use...");
@@ -242,8 +225,26 @@ public class EnvironmentUseBl {
         return environmentReservationDtos;
     }
 
-    // con esto es posible modificar a cualquiera de los 3 estados de la reserva
-    public void updateReservation(Long id, int status) {
+    public Page<EnvironmentReservationDto> findReservationsByClientId(String kcId, Pageable pageable) {
+        log.info("Finding reservations by kcId {}", kcId);
+        Page<EnvironmentUse> environmentUses = environmentUseRepository.findAllByClientIdPersonIdKcUuidOrderByReservationDateAsc(kcId, pageable);
+        return environmentUses.map(environmentUse -> {
+            EnvironmentReservationDto environmentReservationDto = new EnvironmentReservationDto();
+            environmentReservationDto.setClientId(environmentUse.getClientId().getPersonId().getKcUuid());
+            environmentReservationDto.setEnvironmentId(environmentUse.getEnvironmentId().getEnvironmentId());
+            //reserva
+            environmentReservationDto.setReservationId(environmentUse.getEnvironmentUse());
+            environmentReservationDto.setReservationDate(environmentUse.getReservationDate());
+            environmentReservationDto.setClockIn(environmentUse.getClockIn());
+            environmentReservationDto.setClockOut(environmentUse.getClockOut());
+            environmentReservationDto.setPurpose(environmentUse.getPurpose());
+            environmentReservationDto.setStatus(environmentUse.getStatus());
+            return environmentReservationDto;
+        });
+    }
+
+
+     public void updateReservation(Long id, int status) {
         try {
             log.info("Updating reservation status...");
             log.info("Reservation id: {}", id);
@@ -261,7 +262,7 @@ public class EnvironmentUseBl {
 
     public void validateReservationStatusUpdate(EnvironmentUse environmentUse, int status) {
         log.info("Validating reservation status update...");
-        if (status < 1 || status > 3) {
+        if (status < 1 || status > 4) {
             throw new RuntimeException("Invalid reservation status");
         }
 

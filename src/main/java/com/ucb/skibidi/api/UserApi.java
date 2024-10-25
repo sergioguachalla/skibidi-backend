@@ -1,7 +1,9 @@
 package com.ucb.skibidi.api;
 
 import com.ucb.skibidi.bl.UserBl;
+import com.ucb.skibidi.bl.UserClientBl;
 import com.ucb.skibidi.dto.ResponseDto;
+import com.ucb.skibidi.dto.UserClientDto;
 import com.ucb.skibidi.dto.UserDto;
 import com.ucb.skibidi.dto.UserRegistrationDto;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @CrossOrigin(origins = "*")
@@ -19,7 +22,10 @@ public class UserApi {
     @Autowired
     private UserBl userBl;
 
-    @PostMapping("/client")
+    @Autowired
+    private UserClientBl userClientBl;
+
+    @PostMapping("/clients")
     public ResponseDto<String> createClient(@RequestBody UserRegistrationDto userDto) {
         userBl.createUser(userDto, "CLIENT");
         return new ResponseDto<String>(null,"User created successfully", true);
@@ -32,8 +38,8 @@ public class UserApi {
     }
 
 
-    @GetMapping("/clients/")
-    public ResponseDto<UserRegistrationDto> findUserByKcId(@RequestParam String kcId) {
+    @GetMapping("/clients/{kcId}")
+    public ResponseDto<UserRegistrationDto> findUserByKcId(@PathVariable String kcId) {
         UserRegistrationDto response = userBl.findUserByKcId(kcId);
         return new ResponseDto<>(response, "User found successfully", true);
     }
@@ -44,7 +50,7 @@ public class UserApi {
         return new ResponseDto<String>(null,"User updated successfully", true);
     }
 
-    @GetMapping("/forgotPassword")
+    @GetMapping("/password/forgot")
     public ResponseEntity<String> forgotPassword(@RequestParam String email){
         try{
             userBl.resetPassword(email);
@@ -55,8 +61,8 @@ public class UserApi {
 
     }
 
-    @PutMapping("/changePassword")
-    public ResponseEntity<ResponseDto<String>> changePassword(@RequestParam String passwordResetToken, @RequestParam String newPassword){
+    @PutMapping("/password/change")
+    public ResponseEntity<String> changePassword(@RequestParam String passwordResetToken, @RequestParam String newPassword){
         ResponseDto<String> response = new ResponseDto<>();
         try {
             UUID parsedPasswordResetToken = UUID.fromString(passwordResetToken);
@@ -72,5 +78,9 @@ public class UserApi {
 
     }
 
-
+    @GetMapping("/clients")
+    public ResponseDto<List<UserClientDto>> getAllClients() {
+        List<UserClientDto> clients = userClientBl.getAllUsers();
+        return new ResponseDto<>(clients, "Users fetched successfully", true);
+    }
 }

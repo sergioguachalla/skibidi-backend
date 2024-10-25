@@ -16,12 +16,12 @@ import java.util.Date;
 import java.util.List;
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/environments")
+@RequestMapping("/api/v1/reservations")
 public class EnvironmentUseAPI {
     @Autowired
     private EnvironmentUseBl environmentUseBl;
 
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseDto<EnvironmentReservationDto> createEnvironmentReservation(@RequestBody EnvironmentReservationDto environmentReservationDto) {
         ResponseDto<EnvironmentReservationDto> responseDto = new ResponseDto<>();
         try {
@@ -92,10 +92,11 @@ public class EnvironmentUseAPI {
             return responseDto;
         }
     }
-    @GetMapping("/history-reservation")
+    @GetMapping("")
     public ResponseDto<Page<EnvironmentReservationDto>> getAllReservations(
             @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "7") Integer size
+            @RequestParam(defaultValue = "7") Integer size,
+            @RequestParam(required = false) Integer status
     ) {
         Pageable pageable = PageRequest.of(page, size);
         ResponseDto<Page<EnvironmentReservationDto>> responseDto = new ResponseDto<>();
@@ -107,6 +108,25 @@ public class EnvironmentUseAPI {
         } catch (Exception e) {
             responseDto.setData(null);
             responseDto.setMessage("Error fetching reservations: " + e.getMessage());
+            responseDto.setSuccessful(false);
+        }
+        return responseDto;
+    }
+
+    // Actualizar estado de un ambiente
+    // En este momento 1 es pendiente, 2 es aceptado, 3 es rechazado, 4 es finalizado
+    @PutMapping("/{id}/status")
+    public ResponseDto<EnvironmentReservationDto> updateReservationStatus(
+            @PathVariable Long id,
+            @RequestParam int status) {
+        ResponseDto<EnvironmentReservationDto> responseDto = new ResponseDto<>();
+        try {
+            environmentUseBl.updateReservation(id, status);
+            responseDto.setMessage("Reservation status updated successfully");
+            responseDto.setSuccessful(true);
+        } catch (Exception e) {
+            responseDto.setData(null);
+            responseDto.setMessage("Error updating reservation: " + e.getMessage());
             responseDto.setSuccessful(false);
         }
         return responseDto;
