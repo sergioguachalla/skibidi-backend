@@ -26,7 +26,6 @@ public interface EnvironmentUseRepository extends JpaRepository<EnvironmentUse, 
     EnvironmentUse findByEnvironmentUse(Long environmentUseId);
 
 
-
     @Query(value = "SELECT * FROM Environment_Use WHERE (status = 1 OR status = 2) " +
             "AND clock_out < :now", nativeQuery = true)
     List<EnvironmentUse> findPast(LocalDateTime now);
