@@ -5,11 +5,13 @@ import com.ucb.skibidi.dao.BookAuthorsRepository;
 import com.ucb.skibidi.dao.BookRepository;
 import com.ucb.skibidi.dao.EditorialRepository;
 import com.ucb.skibidi.dao.LanguageRepository;
+import com.ucb.skibidi.dto.BookDetailsDto;
 import com.ucb.skibidi.dto.BookDto;
 import com.ucb.skibidi.dto.BookManualDto;
 import com.ucb.skibidi.entity.*;
 import com.ucb.skibidi.utils.BookSpecification;
 import com.ucb.skibidi.utils.ValidationUtils;
+import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -223,7 +225,7 @@ public class BookBl {
 
     public Page<BookManualDto> getAllBooks(Pageable pageable, Integer genreId,
                                            Date from, Date to, Boolean isAvailable,
-                                           String author, Long languageId, String title) throws Exception {
+                                           String author, Long languageId, String title, Long editorialId) throws Exception {
         log.info("Getting all books...");
         log.info("Date from: {}", from);
         log.info("Date to: {}", to);
@@ -253,6 +255,10 @@ public class BookBl {
             if(title != null){
                 spec = spec.and(BookSpecification.hasTitle(title));
             }
+            if(editorialId != null){
+                spec = spec.and(BookSpecification.hasEditorial(editorialId));
+            }
+
 
 
             Page<Book> bookEntities = bookRepository.findAll(spec, pageable);
@@ -364,6 +370,26 @@ public class BookBl {
         bookDto.setGenre(book.getGenreId().getName());
         // Añade otros campos según sea necesario
         return bookDto;
+    }
+    public BookDetailsDto getBookDetailsById(Long id) throws Exception {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Book not found with ID: " + id));
+
+        BookDetailsDto bookDetailsDto = new BookDetailsDto();
+        bookDetailsDto.setBookId(book.getBookId());
+        bookDetailsDto.setTitle(book.getTitle());
+        bookDetailsDto.setIsbn(book.getIsbn());
+        bookDetailsDto.setRegistrationDate(book.getRegistrationDate());
+        bookDetailsDto.setStatus(book.getStatus());
+        bookDetailsDto.setImageUrl(book.getImageUrl());
+        bookDetailsDto.setGenre(book.getGenreId() != null ? book.getGenreId().getName() : null);
+        bookDetailsDto.setAuthors(bookAuthorsBl.getAuthorsByBook(book.getBookId()));
+
+        // Asignar los nombres en lugar de los IDs
+        bookDetailsDto.setEditorialName(book.getEditorialId() != null ? book.getEditorialId().getEditorial() : null);
+        bookDetailsDto.setLanguageName(book.getIdLanguage() != null ? book.getIdLanguage().getLanguage() : null);
+
+        return bookDetailsDto;
     }
 }
 

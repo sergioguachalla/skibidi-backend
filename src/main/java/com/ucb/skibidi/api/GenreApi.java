@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 @RestController
-@RequestMapping("/genre")
+@RequestMapping("/api/v1/genres")
 public class GenreApi {
     @Autowired
     GenreBl genreBl;
 
-    @GetMapping("/all")
+    @GetMapping("")
     public ResponseDto<List<GenreDto>> getAllGenres() {
         try {
             ResponseDto<List<GenreDto>> responseDto = new ResponseDto<>();

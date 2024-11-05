@@ -308,7 +308,7 @@ RETURNS TRIGGER AS $$
 BEGIN
     -- Si la fecha de la reserva ya pasó y el estado es pendiente (1), cambiar el estado a 3 (rechazada/expirada)
     IF NEW.reservation_date < CURRENT_DATE AND NEW.status = 1 THEN
-        NEW.status = 3;
+        NEW.status = 4;
 END IF;
 RETURN NEW;
 END;

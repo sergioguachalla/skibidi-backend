@@ -1,6 +1,7 @@
 package com.ucb.skibidi.api;
 
 import com.ucb.skibidi.bl.BookBl;
+import com.ucb.skibidi.dto.BookDetailsDto;
 import com.ucb.skibidi.dto.BookDto;
 import com.ucb.skibidi.dto.BookManualDto;
 import com.ucb.skibidi.dto.ResponseDto;
@@ -86,13 +87,23 @@ public class BookApi {
             @RequestParam(required = false) Boolean isAvailable,
             @RequestParam(required = false) String authorName,
             @RequestParam(required = false) Long languageId,
-            @RequestParam(required = false) String title
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) Long editorialId,
+            @RequestParam(required = false, defaultValue = "asc") String titleSort
     ) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable;
+        if (titleSort.equals("desc")) {
+            pageable = PageRequest.of(page, size, Sort.by("title").descending());
+        } else {
+            pageable = PageRequest.of(page, size, Sort.by("title").ascending());
+        }
+
+
+
         ResponseDto<Page<BookManualDto>> responseDto = new ResponseDto<>();
         try {
             Page<BookManualDto> books = bookBl.getAllBooks(pageable, genreId, from, to,
-                    isAvailable, authorName, languageId,title);
+                    isAvailable, authorName, languageId,title,editorialId);
             log.info("Books found {}", books.getContent().isEmpty());
             if (books.isEmpty()) {
                 responseDto.setData(null);
@@ -127,44 +138,20 @@ public class BookApi {
             return responseDto;
         }
     }
-    @GetMapping("/search")
-    public ResponseDto<List<BookDto>> searchBooksByTitle(@RequestParam String title) {
+
+    @GetMapping("/modal/{id}")
+    public ResponseDto<BookDetailsDto> getBookById(@PathVariable Long id) {
+        ResponseDto<BookDetailsDto> responseDto = new ResponseDto<>();
         try {
-            ResponseDto<List<BookDto>> responseDto = new ResponseDto<>();
-            responseDto.setData(bookBl.searchBooksByTitle(title));
-            responseDto.setMessage("Books found");
+            BookDetailsDto bookDetails = bookBl.getBookDetailsById(id);
+            responseDto.setData(bookDetails);
+            responseDto.setMessage("Book found");
             responseDto.setSuccessful(true);
-            return responseDto;
         } catch (Exception e) {
-            ResponseDto<List<BookDto>> responseDto = new ResponseDto<>();
             responseDto.setData(null);
-            responseDto.setMessage("Error searching books: " + e.getMessage());
+            responseDto.setMessage("Book not found: " + e.getMessage());
             responseDto.setSuccessful(false);
-            return responseDto;
         }
-    }
-    @GetMapping("/search/author")
-    public ResponseDto<List<BookDto>> searchBooksByAuthor(@RequestParam String authorName) {
-        try {
-            List<BookDto> response = bookBl.searchBooksByAuthor(authorName);
-            ResponseDto<List<BookDto>> responseDto = new ResponseDto<>();
-            if(response.isEmpty()){
-                responseDto.setData(null);
-                responseDto.setMessage("No se encontraron libros con los filtros seleccionados");
-                responseDto.setSuccessful(true);
-                return responseDto;
-            }
-            
-            responseDto.setData(response);
-            responseDto.setMessage("Books found");
-            responseDto.setSuccessful(true);
-            return responseDto;
-        } catch (Exception e) {
-            ResponseDto<List<BookDto>> responseDto = new ResponseDto<>();
-            responseDto.setData(null);
-            responseDto.setMessage("Error searching books: " + e.getMessage());
-            responseDto.setSuccessful(false);
-            return responseDto;
-        }
+        return responseDto;
     }
 }
