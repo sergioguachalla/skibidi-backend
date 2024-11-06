@@ -1,11 +1,13 @@
 package com.ucb.skibidi.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.util.Date;
 
 @Entity
 @Table(name = "fines")
+@Data
 public class Fine {
 
     @Id

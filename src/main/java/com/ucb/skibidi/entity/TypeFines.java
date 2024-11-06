@@ -1,9 +1,11 @@
 package com.ucb.skibidi.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
 @Table(name = "type_fines")
+@Data
 public class TypeFines {
 
     @Id
