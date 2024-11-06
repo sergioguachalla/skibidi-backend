@@ -4,15 +4,16 @@ import com.ucb.skibidi.entity.Fine;
 import org.slf4j.Logger;
 import org.springframework.data.jpa.domain.Specification;
 
-import java.util.Date;
-
 public class FineSpecification {
     private static final Logger log = org.slf4j.LoggerFactory.getLogger(FineSpecification.class);
 
     public static Specification<Fine> hasPaidDate() {
         return (root, query, cb) -> cb.isNotNull(root.get("paidDate"));
     }
+<<<<<<< HEAD
     public static Specification<Fine> hasUserKcId(String userKcId) {
         return (root, query, cb) -> cb.equal(root.get("lendBook").get("client").get("personId").get("kcUuid"), userKcId);
     }
+=======
+>>>>>>> e333a86 (add find all fines)
 }

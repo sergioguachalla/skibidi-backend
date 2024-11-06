@@ -8,6 +8,7 @@ import java.util.Date;
 @Data
 @Entity
 @Table(name = "lend_book")
+@Data
 public class LendBook {
     @Id
     @Column(name = "lent_book_id")
