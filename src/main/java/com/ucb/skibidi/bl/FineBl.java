@@ -3,12 +3,10 @@ package com.ucb.skibidi.bl;
 import com.ucb.skibidi.dao.FineRepository;
 import com.ucb.skibidi.dao.LendBookRepository;
 import com.ucb.skibidi.dao.TypeFineRepository;
-import com.ucb.skibidi.dto.BookDetailsDto;
 import com.ucb.skibidi.dto.ClientDebtDto;
 import com.ucb.skibidi.dto.FineDetailDto;
 import com.ucb.skibidi.dto.PaidFineDto;
 import com.ucb.skibidi.entity.Fine;
-import com.ucb.skibidi.entity.LendBook;
 import com.ucb.skibidi.entity.TypeFines;
 import com.ucb.skibidi.utils.FineSpecification;
 import org.slf4j.Logger;
@@ -36,8 +34,6 @@ public class FineBl {
     private LendBookRepository lendBookRepository;
     @Autowired
     private TypeFineRepository typeFineRepository;
-    @Autowired
-    private NotificationBl notificationBl;
 
 
 
@@ -77,9 +73,6 @@ public class FineBl {
         var bookLends = lendBookRepository.findAll();
         for (var lend : bookLends) {
             if (lend.getReturnDate().before(new Date())) {
-                if (fineRepository.existsByLendBook(lend)) {
-                    continue;
-                }
                 //TODO: refactor typefines to 'typeFine'
                 TypeFines typeFine = typeFineRepository.findById(1L).get();
                 Fine fine = new Fine();
@@ -90,36 +83,9 @@ public class FineBl {
                 fine.setTypeFine(typeFine);
                 fine.setStatus(1L);
                 fineRepository.save(fine);
-                log.info("Fine created for lend: {}", lend.getClientId().getUsername());
-                Map<String, String> parameters = createFineNotif(lend);
-                notificationBl.sendNotification(parameters, lend.getClientId().getPersonId().getPhoneNumber(), 5L);
+                log.info("Fine created for lend: {}", lend.getClient().getUsername());
             }
         }
-    }
-
-    public FineDetailDto getFineDetail(Long fineId) {
-        var fine = fineRepository.findById(fineId).get();
-        FineDetailDto fineDetailDto = new FineDetailDto();
-        fineDetailDto.setFineId(fine.getFineId());
-        fineDetailDto.setOriginalAmount(fine.getTypeFine().getAmount());
-        fineDetailDto.setDueDate(fine.getEndDate());
-        fineDetailDto.setStatus(fine.getPaidDate() == null ? "Pending" : "Paid");
-        fineDetailDto.setUsername(fine.getLendBook().getClient().getUsername());
-        BookDetailsDto bookDetailsDto = new BookDetailsDto();
-        bookDetailsDto.setBookId(fine.getLendBook().getBook().getBookId());
-        bookDetailsDto.setTitle(fine.getLendBook().getBook().getTitle());
-        bookDetailsDto.setImageUrl(fine.getLendBook().getBook().getImageUrl());
-        fineDetailDto.setBook(bookDetailsDto);
-        fineDetailDto.setDelayDays((new Date().getTime() - fine.getEndDate().getTime()) / (1000 * 60 * 60 * 24));
-        fineDetailDto.setTotalAmount(calculateFine(fineDetailDto.getDelayDays(), fineDetailDto.getOriginalAmount()));
-        return fineDetailDto;
-    }
-
-
-    
-
-    private Double calculateFine(Long delayDays, Double originalAmount) {
-        return delayDays * 0.15 * originalAmount;
     }
 
 }

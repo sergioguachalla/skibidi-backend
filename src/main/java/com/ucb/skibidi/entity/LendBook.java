@@ -12,7 +12,7 @@ public class LendBook {
     @Id
     @Column(name = "lent_book_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long lentBookId;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "book_id")
