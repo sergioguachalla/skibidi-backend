@@ -20,12 +20,10 @@ public class FineApi {
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "4") Integer size,
             @RequestParam(required = false) Boolean isPaid,
-            @RequestParam(required = false) String userKcId,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate
-            ){
+            @RequestParam(required = false) String userKcId
+    ){
         Pageable pageable = Pageable.ofSize(size).withPage(page);
-        var debts = fineBl.findDebts(pageable,  isPaid, userKcId, startDate, endDate);
+        var debts = fineBl.findDebts(pageable, null, isPaid, userKcId);
         ResponseDto<Page<ClientDebtDto>> responseDto = new ResponseDto<>();
         responseDto.setData(debts);
         responseDto.setMessage(null);
