@@ -1,43 +1,41 @@
 package com.ucb.skibidi.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
 
 import java.util.Date;
 
-@Data
 @Entity
 @Table(name = "lend_book")
-@Data
 public class LendBook {
     @Id
-    @Column(name = "lent_book_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
     @JoinColumn(name = "book_id")
-    private Book bookId;
-
-    @ManyToOne
-    @JoinColumn(name = "librarian_id")
-    private UserLibrarian librarianId;
+    private Book book;
 
     @ManyToOne
     @JoinColumn(name = "client_id")
-    private UserClient clientId;
+    private UserClient client;
 
-    private Date lentDate = new Date();
+    @ManyToOne
+    @JoinColumn(name = "librarian_id")
+    private UserLibrarian librarian;
 
+    @Column(name = "lent_date")
+    private Date lendDate;
+
+    @Column(name = "return_date")
     private Date returnDate;
 
-    private int status = 1; // 1 = lent, 2 = returned, 3 = overdue
+    @Column(name = "status")
+    private Long status;
 
-    private int request_extension;
-
+    @Column(name = "notes")
     private String notes;
-  
-    private Boolean notification_check = false;
+
+
 
 
 }
