@@ -83,7 +83,7 @@ public class UserBl {
         log.info("Response status from keycloak: {}", response.getStatus());
         String userKcId = response.getLocation().getPath().replaceAll(".*/([^/]+)$", "$1");
         log.info("User created with id: {}", userKcId);
-        if(group.equals("client")) {
+        if(group.equals("CLIENT")) {
             UserClient userClient = new UserClient();
             userClient.setGroup(group);
             newPerson.setKcUuid(userKcId);
@@ -92,7 +92,7 @@ public class UserBl {
 
             this.userClientRepository.save(userClient);
         }
-        if(group.equals("librarian")) {
+        if(group.equals("LIBRARIAN")) {
             UserLibrarian userLibrarian = new UserLibrarian();
             userLibrarian.setGroup(group);
             newPerson.setKcUuid(userKcId);

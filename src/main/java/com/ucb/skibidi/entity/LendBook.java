@@ -11,6 +11,7 @@ import java.util.Date;
 public class LendBook {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "lent_book_id")
     private Long id;
 
     @ManyToOne

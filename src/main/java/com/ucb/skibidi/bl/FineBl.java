@@ -2,8 +2,10 @@ package com.ucb.skibidi.bl;
 
 import com.ucb.skibidi.dao.FineRepository;
 import com.ucb.skibidi.dao.LendBookRepository;
+import com.ucb.skibidi.dao.TypeFineRepository;
 import com.ucb.skibidi.dto.ClientDebtDto;
 import com.ucb.skibidi.entity.Fine;
+import com.ucb.skibidi.entity.TypeFines;
 import com.ucb.skibidi.utils.FineSpecification;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,8 @@ public class FineBl {
     private FineRepository fineRepository;
     @Autowired
     private LendBookRepository lendBookRepository;
+    @Autowired
+    private TypeFineRepository typeFineRepository;
 
 
 
@@ -48,8 +52,23 @@ public class FineBl {
 
     @Scheduled(fixedRate = 60000)
     public void updateFines() {
-        log.info("Updating fines...");
-        // Implementación de la lógica para actualizar multas
+        log.info("Updating fines");
+        var bookLends = lendBookRepository.findAll();
+        for (var lend : bookLends) {
+            if (lend.getReturnDate().before(new Date())) {
+                //TODO: refactor typefines to 'typeFine'
+                TypeFines typeFine = typeFineRepository.findById(1L).get();
+                Fine fine = new Fine();
+                fine.setLendBook(lend);
+                fine.setStartDate(new Date());
+                fine.setEndDate(new Date());
+                fine.setPaidDate(null);
+                fine.setTypeFine(typeFine);
+                fine.setStatus(1L);
+                fineRepository.save(fine);
+                log.info("Fine created for lend: {}", lend.getClient().getUsername());
+            }
+        }
     }
 
 }
