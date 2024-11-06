@@ -10,4 +10,7 @@ public class FineSpecification {
     public static Specification<Fine> hasPaidDate() {
         return (root, query, cb) -> cb.isNotNull(root.get("paidDate"));
     }
+    public static Specification<Fine> hasUserKcId(String userKcId) {
+        return (root, query, cb) -> cb.equal(root.get("lendBook").get("client").get("personId").get("kcUuid"), userKcId);
+    }
 }

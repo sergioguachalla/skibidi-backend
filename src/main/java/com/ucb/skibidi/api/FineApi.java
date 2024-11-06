@@ -21,10 +21,11 @@ public class FineApi {
     public ResponseDto<Page<ClientDebtDto>> getAllDebts(
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "4") Integer size,
-            @RequestParam(required = false) Boolean isPaid
+            @RequestParam(required = false) Boolean isPaid,
+            @RequestParam(required = false) String userKcId
     ){
         Pageable pageable = Pageable.ofSize(size).withPage(page);
-        var debts = fineBl.findDebts(pageable, null, null);
+        var debts = fineBl.findDebts(pageable, null, isPaid, userKcId);
         ResponseDto<Page<ClientDebtDto>> responseDto = new ResponseDto<>();
         responseDto.setData(debts);
         responseDto.setMessage(null);

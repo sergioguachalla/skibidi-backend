@@ -31,10 +31,14 @@ public class FineBl {
 
 
 
-    public Page<ClientDebtDto> findDebts(Pageable pageable, Long typeFineId, Boolean isPaid) {
+    public Page<ClientDebtDto> findDebts(Pageable pageable, Long typeFineId, Boolean isPaid,
+                                         String userKcId) {
         Specification<Fine> specification = Specification.where(null);
         if (isPaid != null) {
             specification = specification.and(FineSpecification.hasPaidDate());
+        }
+        if (userKcId != null) {
+            specification = specification.and(FineSpecification.hasUserKcId(userKcId));
         }
         Page<Fine> fines = fineRepository.findAll(specification, pageable);
         Page<ClientDebtDto> finesDto = fines.map(fine -> {
