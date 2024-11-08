@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -22,10 +23,10 @@ public class LendBookBl {
     @Autowired
     private LendBookRepository lendBookRepository;
 
-
-    public Page<LendBookDto> findLendBooksByKcUuid(int page, int size, String kcUuid, Sort sort) {
+    public Page<LendBookDto> findLendBooksByKcUuid(int page, int size, String kcUuid, String sortField, String sortOrder) {
+        Sort sort = buildSort(sortField, sortOrder);
         Pageable pageable = PageRequest.of(page, size, sort);
-        log.info("Finding lend books for kcUuid: {}", kcUuid);
+        log.info("Finding lend books for kcUuid: {} with sort: {}", kcUuid, sort);
         Page<Tuple> tuples = lendBookRepository.findLendBooksWithDetailsByKcUuid(kcUuid, pageable);
         return tuples.map(tuple -> new LendBookDto(
                 tuple.get("lendBookId", Long.class),
@@ -38,7 +39,8 @@ public class LendBookBl {
         ));
     }
 
-    public Page<LendBookLibraryDto> findLendBooksWithDetails(int page, int size, Sort sort) {
+    public Page<LendBookLibraryDto> findLendBooksWithDetails(int page, int size, String sortField, String sortOrder) {
+        Sort sort = buildSort(sortField, sortOrder);
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<Tuple> tuples = lendBookRepository.findLendBooksWithDetails(pageable);
         return tuples.map(tuple -> new LendBookLibraryDto(
@@ -53,5 +55,10 @@ public class LendBookBl {
         ));
     }
 
-
+    private Sort buildSort(String sortField, String sortOrder) {
+        if (!sortField.equals("lendDate") && !sortField.equals("returnDate")) {
+            sortField = "lendDate"; // Campo por defecto si no es válido
+        }
+        return sortOrder.equalsIgnoreCase("desc") ? Sort.by(sortField).descending() : Sort.by(sortField).ascending();
+    }
 }
