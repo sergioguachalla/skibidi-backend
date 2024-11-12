@@ -276,13 +276,20 @@ public class EnvironmentUseBl {
 
 
     @Scheduled(fixedRate = 60000)
-    public void updateEnvironmentReservationStatus(){
+    public void updateEnvironmentReservationStatus() {
         log.info("Updating environment reservation status...");
         LocalDateTime now = LocalDateTime.now();
         List<EnvironmentUse> environmentUses = environmentUseRepository.findPast(now);
+
         for (EnvironmentUse environmentUse : environmentUses) {
-            if (environmentUse.getClockOut().isBefore(LocalDateTime.now())) {
+            // Si el estado es 2 (aceptada) y la hora actual ha pasado ClockOut, se marca como finalizada (estado 4)
+            if (environmentUse.getStatus() == 2 && environmentUse.getClockOut().isBefore(now)) {
                 environmentUse.setStatus(4);
+                environmentUseRepository.save(environmentUse);
+            }
+            // Si el estado es 1 (pendiente) y la hora actual es igual o mayor a ClockIn, se marca como rechazada (estado 3)
+            else if (environmentUse.getStatus() == 1 && (environmentUse.getClockIn().isBefore(now) || environmentUse.getClockIn().isEqual(now))) {
+                environmentUse.setStatus(3);
                 environmentUseRepository.save(environmentUse);
             }
         }
