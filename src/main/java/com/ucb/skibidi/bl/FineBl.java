@@ -3,7 +3,9 @@ package com.ucb.skibidi.bl;
 import com.ucb.skibidi.dao.FineRepository;
 import com.ucb.skibidi.dao.LendBookRepository;
 import com.ucb.skibidi.dao.TypeFineRepository;
+import com.ucb.skibidi.dto.BookDetailsDto;
 import com.ucb.skibidi.dto.ClientDebtDto;
+import com.ucb.skibidi.dto.FineDetailDto;
 import com.ucb.skibidi.entity.Fine;
 import com.ucb.skibidi.entity.TypeFines;
 import com.ucb.skibidi.utils.FineSpecification;
@@ -16,6 +18,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -73,6 +76,30 @@ public class FineBl {
                 log.info("Fine created for lend: {}", lend.getClient().getUsername());
             }
         }
+    }
+
+    public FineDetailDto getFineDetail(Long fineId) {
+        var fine = fineRepository.findById(fineId).get();
+        FineDetailDto fineDetailDto = new FineDetailDto();
+        fineDetailDto.setFineId(fine.getFineId());
+        fineDetailDto.setOriginalAmount(fine.getTypeFine().getAmount());
+        fineDetailDto.setDueDate(fine.getEndDate());
+        fineDetailDto.setStatus(fine.getPaidDate() == null ? "Pending" : "Paid");
+        fineDetailDto.setUsername(fine.getLendBook().getClient().getUsername());
+        BookDetailsDto bookDetailsDto = new BookDetailsDto();
+        bookDetailsDto.setBookId(fine.getLendBook().getBook().getBookId());
+        bookDetailsDto.setTitle(fine.getLendBook().getBook().getTitle());
+        bookDetailsDto.setImageUrl(fine.getLendBook().getBook().getImageUrl());
+        fineDetailDto.setBook(bookDetailsDto);
+        fineDetailDto.setDelayDays((new Date().getTime() - fine.getEndDate().getTime()) / (1000 * 60 * 60 * 24));
+        fineDetailDto.setTotalAmount(calculateFine(fineDetailDto.getDelayDays(), fineDetailDto.getOriginalAmount()));
+        return fineDetailDto;
+
+
+    }
+
+    private Double calculateFine(Long delayDays, Double originalAmount) {
+        return delayDays * 0.15 * originalAmount;
     }
 
 }
