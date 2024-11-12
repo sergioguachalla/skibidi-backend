@@ -3,15 +3,11 @@ package com.ucb.skibidi.api;
 import com.ucb.skibidi.bl.FineBl;
 import com.ucb.skibidi.dto.ClientDebtDto;
 import com.ucb.skibidi.dto.FineDetailDto;
-import com.ucb.skibidi.dto.PaidFineDto;
 import com.ucb.skibidi.dto.ResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Date;
 
 @RestController
 @RequestMapping("/api/v1/fines")
@@ -45,37 +41,5 @@ public class FineApi {
         responseDto.setMessage(null);
         responseDto.setSuccessful(true);
         return responseDto;
-    }
-
-    @GetMapping("/paid")
-    public ResponseDto<Page<PaidFineDto>> getPaidFines(
-            @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "4") Integer size,
-            @RequestParam(required = false) String username
-    ){
-        Pageable pageable = Pageable.ofSize(size).withPage(page);
-        var paidFines = fineBl.findPaidFines(pageable, username);
-        ResponseDto<Page<PaidFineDto>> responseDto = new ResponseDto<>();
-        responseDto.setData(paidFines);
-        responseDto.setMessage(null);
-        responseDto.setSuccessful(true);
-        return responseDto;
-    }
-
-    @PutMapping("/pay/{fineId}")
-    public ResponseDto<String> payFine(@PathVariable Long fineId){
-        if(fineBl.payFine(fineId)){
-            ResponseDto<String> responseDto = new ResponseDto<>();
-            responseDto.setData("Fine paid successfully");
-            responseDto.setMessage(null);
-            responseDto.setSuccessful(true);
-            return responseDto;}
-        else{
-            ResponseDto<String> responseDto = new ResponseDto<>();
-            responseDto.setData("Fine already paid");
-            responseDto.setMessage(null);
-            responseDto.setSuccessful(false);
-            return responseDto;
-        }
     }
 }
