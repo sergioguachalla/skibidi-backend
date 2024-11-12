@@ -6,7 +6,6 @@ import com.ucb.skibidi.dao.TypeFineRepository;
 import com.ucb.skibidi.dto.BookDetailsDto;
 import com.ucb.skibidi.dto.ClientDebtDto;
 import com.ucb.skibidi.dto.FineDetailDto;
-import com.ucb.skibidi.dto.PaidFineDto;
 import com.ucb.skibidi.entity.Fine;
 import com.ucb.skibidi.entity.LendBook;
 import com.ucb.skibidi.entity.TypeFines;
@@ -22,8 +21,6 @@ import org.springframework.stereotype.Service;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -105,62 +102,21 @@ public class FineBl {
         fineDetailDto.setOriginalAmount(fine.getTypeFine().getAmount());
         fineDetailDto.setDueDate(fine.getEndDate());
         fineDetailDto.setStatus(fine.getPaidDate() == null ? "Pending" : "Paid");
-        fineDetailDto.setUsername(fine.getLendBook().getClientId().getUsername());
+        fineDetailDto.setUsername(fine.getLendBook().getClient().getUsername());
         BookDetailsDto bookDetailsDto = new BookDetailsDto();
-        bookDetailsDto.setBookId(fine.getLendBook().getBookId().getBookId());
-        bookDetailsDto.setTitle(fine.getLendBook().getBookId().getTitle());
-        bookDetailsDto.setImageUrl(fine.getLendBook().getBookId().getImageUrl());
+        bookDetailsDto.setBookId(fine.getLendBook().getBook().getBookId());
+        bookDetailsDto.setTitle(fine.getLendBook().getBook().getTitle());
+        bookDetailsDto.setImageUrl(fine.getLendBook().getBook().getImageUrl());
         fineDetailDto.setBook(bookDetailsDto);
         fineDetailDto.setDelayDays((new Date().getTime() - fine.getEndDate().getTime()) / (1000 * 60 * 60 * 24));
         fineDetailDto.setTotalAmount(calculateFine(fineDetailDto.getDelayDays(), fineDetailDto.getOriginalAmount()));
         return fineDetailDto;
 
-    }
 
-    public Page<PaidFineDto> findPaidFines(Pageable pageable, String username) {
-        Specification<Fine> specification = Specification.where(null);
-        if (username != null) {
-            specification = specification.and(FineSpecification.hasUsername(username));
-        }
-        specification = specification.and(FineSpecification.hasPaidDate());
-        Page<Fine> fines = fineRepository.findAll(specification, pageable);
-        return fines.map(fine -> {
-            PaidFineDto paidFineDto = new PaidFineDto();
-            paidFineDto.setFineId(fine.getFineId());
-            paidFineDto.setAmount(fine.getTypeFine().getAmount());
-            paidFineDto.setPaidDate(fine.getPaidDate());
-            paidFineDto.setOverdue(fine.getEndDate().before(fine.getPaidDate()));
-            paidFineDto.setTypeFine(fine.getTypeFine().getDescription());
-            paidFineDto.setBookTitle(fine.getLendBook().getBookId().getTitle());
-            paidFineDto.setUsername(fine.getLendBook().getClientId().getUsername());
-            return paidFineDto;
-        });
     }
 
     private Double calculateFine(Long delayDays, Double originalAmount) {
-        return (delayDays * 0.15 ) +  originalAmount ;
+        return delayDays * 0.15 * originalAmount;
     }
 
-
-    private Map<String, String> createFineNotif(LendBook lendBook) {
-        Map<String, String> parameters = new HashMap<>();
-        parameters.put("1", lendBook.getClientId().getPersonId().getName());
-        parameters.put("2", lendBook.getBookId().getTitle());
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        parameters.put("3", dateFormat.format(lendBook.getReturnDate()));
-        parameters.put("4", dateFormat.format(new Date()));
-        parameters.put("5", "El motivo de la multa es por devolución tardía del libro indicado anteriormente, por lo que la" +
-                " multa inicial será de 10 BS, sumando cada día el 15% adicional al monto inicial en caso de la no devolución. Para ver el estado de su deuda, ingrese a la plataforma.");
-        return parameters;
-    }
-
-    public Boolean payFine(Long fineId) {
-        var fine = fineRepository.findById(fineId).get();
-        if (fine.getPaidDate() != null) {
-            return false;
-        }
-        fine.setPaidDate(new Date());
-        fineRepository.save(fine);
-        return true;
-    }
 }
