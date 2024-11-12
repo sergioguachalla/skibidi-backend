@@ -54,7 +54,7 @@ public class FineBl {
         return finesDto;
     }
 
-    @Scheduled(fixedRate = 60000)
+    //@Scheduled(fixedRate = 60000)
     public void updateFines() {
         log.info("Updating fines");
         var bookLends = lendBookRepository.findAll();
