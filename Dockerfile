@@ -10,12 +10,12 @@ COPY ${DEPENDENCY}/BOOT-INF/lib /app/lib
 COPY ${DEPENDENCY}/META-INF /app/META-INF
 COPY ${DEPENDENCY}/BOOT-INF/classes /app
 
-ENV POSTGRES_URL "jdbc:postgresql://localhost:5433/skibidi"
+ENV POSTGRES_URL "jdbc:postgresql://skibidi-db:5433/skibidi"
 ENV POSTGRES_USERNAME "postgres"
 ENV POSTGRES_PASSWORD "postgres"
 
 
-ENV KEYCLOAK_AUTH_SERVER_URL "http://localhost:8080"
+ENV KEYCLOAK_AUTH_SERVER_URL "http://skibidi-keycloak:8080"
 ENV KEYCLOAK_CLIENT_SECRET "6WPxzJN2CnFPajEbo6gVpqGrLZ5hsr0U"
 ENV KEYCLOAK_REALM "skibidi-realm"
 ENV KEYCLOAK_RESOURCE "sk-backend"
