@@ -1,9 +1,15 @@
 package com.ucb.skibidi.bl;
 
 import com.ucb.skibidi.dao.LendBookRepository;
+import com.ucb.skibidi.dao.UserClientRepository;
 import com.ucb.skibidi.dto.LendBookDto;
 import com.ucb.skibidi.dto.LendBookLibraryDto;
 import com.ucb.skibidi.entity.LendBook;
+import com.ucb.skibidi.dto.LendBookResponseDto;
+import com.ucb.skibidi.entity.Book;
+import com.ucb.skibidi.entity.LendBook;
+import com.ucb.skibidi.entity.UserClient;
+import com.ucb.skibidi.entity.UserLibrarian;
 import jakarta.persistence.Tuple;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,13 +17,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class LendBookBl {
@@ -25,6 +30,12 @@ public class LendBookBl {
 
     @Autowired
     private LendBookRepository lendBookRepository;
+
+    @Autowired
+    private UserClientRepository userClientRepository;
+
+    @Autowired
+    private NotificationBl notificationBl;
 
     public Page<LendBookDto> findLendBooksByKcUuid(int page, int size, String kcUuid, String sortField, String sortOrder) {
         Sort sort = buildSort(sortField, sortOrder);
@@ -68,22 +79,59 @@ public class LendBookBl {
         Optional<LendBook> optionalLendBook = lendBookRepository.findById(lendBookId);
         if (optionalLendBook.isPresent()) {
             LendBook lendBook = optionalLendBook.get();
-            lendBook.setReturnDate(newReturnDate);  // Aquí se actualiza el returnDate
-            lendBookRepository.save(lendBook);  // Guardamos el objeto actualizado
+            lendBook.setReturnDate(newReturnDate);  
+            lendBookRepository.save(lendBook);  
         } else {
             throw new Exception("El préstamo con ID " + lendBookId + " no existe.");
         }
     }
 
-    // Cambia el estado del libro a "devuelto" (ej. status = 2)
     public void updateStatusToReturned(Long lendBookId) throws Exception {
         Optional<LendBook> optionalLendBook = lendBookRepository.findById(lendBookId);
         if (optionalLendBook.isPresent()) {
             LendBook lendBook = optionalLendBook.get();
-            lendBook.setStatus(2);  // 2 = Devuelto
+            lendBook.setStatus(2);  
             lendBookRepository.save(lendBook);
         } else {
             throw new Exception("El préstamo con ID " + lendBookId + " no existe.");
         }
     }
+
+    public void saveLendBook(LendBookResponseDto lendBookResponseDto){
+        LendBook lendBook = new LendBook();
+        Book book = new Book();
+        UserLibrarian userLibrarian =new UserLibrarian();
+        UserClient userClient = userClientRepository.findByPersonIdKcUuid(lendBookResponseDto.getClientKcId());
+        userLibrarian.setLibrarianId(1l);
+        book.setBookId(Long.valueOf(lendBookResponseDto.getBookId()));
+        lendBook.setBookId(book);
+        lendBook.setLibrarianId(userLibrarian);
+        lendBook.setClientId(userClient);
+        lendBook.setNotes(lendBookResponseDto.getNote());
+        lendBook.setStatus(1);
+        lendBook.setLentDate(new Date());
+        lendBook.setReturnDate(lendBookResponseDto.getReturnDate());
+        lendBook.setNotification_check(false);
+        lendBookRepository.saveAndFlush(lendBook);
+    }
+
+    @Scheduled(fixedRate = 60000)
+    public void checkDueLendBooks() {
+        List<LendBook> dueLendBooks = lendBookRepository.findBooksDueIn24Hours(new Date(), new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000));
+        log.info("Checking due lend books: {}", dueLendBooks.size());
+        for (LendBook lendBook : dueLendBooks) {
+            log.info("Due lend book: {}", lendBook);
+            Map<String, String> parameters = createLendNotification(lendBook);
+            notificationBl.sendNotification(parameters, lendBook.getClientId().getPersonId().getPhoneNumber(), 4L);
+        }
+    }
+
+    private Map<String, String> createLendNotification(LendBook lendBook) {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("1", lendBook.getClientId().getPersonId().getName());
+        parameters.put("2", lendBook.getBookId().getTitle());
+        parameters.put("3", lendBook.getReturnDate().toString());
+        return parameters;
+    }
+
 }

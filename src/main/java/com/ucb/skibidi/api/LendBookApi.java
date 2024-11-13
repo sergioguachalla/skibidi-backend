@@ -4,6 +4,7 @@ import com.ucb.skibidi.bl.LendBookBl;
 import com.ucb.skibidi.dto.LendBookDto;
 import com.ucb.skibidi.dto.LendBookLibraryDto;
 import com.ucb.skibidi.dto.ResponseDto;
+import com.ucb.skibidi.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
@@ -39,6 +40,7 @@ public class LendBookApi {
 
         return lendBookBl.findLendBooksByKcUuid(page, size, kcUuid, sortField, sortOrder);
     }
+
     @PutMapping("/{id}/return-date")
     public ResponseDto<?> updateReturnDate(@PathVariable Long id, @RequestBody Date newReturnDate) {
         ResponseDto<?> responseDto = new ResponseDto<>();
@@ -54,9 +56,6 @@ public class LendBookApi {
         return responseDto;
     }
 
-
-
-    // Endpoint para actualizar el estado a devuelto
     @PutMapping("/{id}/status")
     public ResponseDto<?> updateStatusToReturned(@PathVariable Long id) {
         ResponseDto<?> responseDto = new ResponseDto<>();
@@ -67,6 +66,18 @@ public class LendBookApi {
         } catch (Exception e) {
             responseDto.setData(null);
             responseDto.setMessage("Error updating book status: " + e.getMessage());
+
+    @PostMapping("")
+    public ResponseDto<String> saveLendBook(@RequestBody LendBookResponseDto lendBookDto){
+        ResponseDto<String> responseDto = new ResponseDto<>();
+        try {
+            lendBookBl.saveLendBook(lendBookDto);
+            responseDto.setData(null);
+            responseDto.setMessage("LendBook saved");
+            responseDto.setSuccessful(true);
+        } catch (Exception e) {
+            responseDto.setData(null);
+            responseDto.setMessage("Error creating lendBook: " + e.getMessage());
             responseDto.setSuccessful(false);
         }
         return responseDto;
