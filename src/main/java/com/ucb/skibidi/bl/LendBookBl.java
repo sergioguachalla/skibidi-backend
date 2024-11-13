@@ -4,6 +4,7 @@ import com.ucb.skibidi.dao.LendBookRepository;
 import com.ucb.skibidi.dao.UserClientRepository;
 import com.ucb.skibidi.dto.LendBookDto;
 import com.ucb.skibidi.dto.LendBookLibraryDto;
+import com.ucb.skibidi.entity.LendBook;
 import com.ucb.skibidi.dto.LendBookResponseDto;
 import com.ucb.skibidi.entity.Book;
 import com.ucb.skibidi.entity.LendBook;
@@ -18,6 +19,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import java.util.Optional;
+
 
 import java.util.*;
 
@@ -72,6 +75,27 @@ public class LendBookBl {
         }
         return sortOrder.equalsIgnoreCase("desc") ? Sort.by(sortField).descending() : Sort.by(sortField).ascending();
     }
+    public void updateReturnDate(Long lendBookId, Date newReturnDate) throws Exception {
+        Optional<LendBook> optionalLendBook = lendBookRepository.findById(lendBookId);
+        if (optionalLendBook.isPresent()) {
+            LendBook lendBook = optionalLendBook.get();
+            lendBook.setReturnDate(newReturnDate);  
+            lendBookRepository.save(lendBook);  
+        } else {
+            throw new Exception("El préstamo con ID " + lendBookId + " no existe.");
+        }
+    }
+
+    public void updateStatusToReturned(Long lendBookId) throws Exception {
+        Optional<LendBook> optionalLendBook = lendBookRepository.findById(lendBookId);
+        if (optionalLendBook.isPresent()) {
+            LendBook lendBook = optionalLendBook.get();
+            lendBook.setStatus(2);  
+            lendBookRepository.save(lendBook);
+        } else {
+            throw new Exception("El préstamo con ID " + lendBookId + " no existe.");
+        }
+    }
 
     public void saveLendBook(LendBookResponseDto lendBookResponseDto){
         LendBook lendBook = new LendBook();
@@ -109,4 +133,5 @@ public class LendBookBl {
         parameters.put("3", lendBook.getReturnDate().toString());
         return parameters;
     }
+
 }
