@@ -5,8 +5,9 @@ import lombok.Data;
 
 import java.util.Set;
 
-@Entity(name = "author")
+@Entity
 @Data
+@Table(name = "author")
 public class Author {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

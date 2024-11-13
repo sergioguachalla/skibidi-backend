@@ -115,6 +115,7 @@ CREATE TABLE Lend_Book (
                            return_date date  NOT NULL,
                            status int  NOT NULL,
                            notes text  NULL,
+                           notification_check boolean  NOT NULL,
                            CONSTRAINT Lend_Book_pk PRIMARY KEY (lent_book_id)
 );
 
@@ -125,6 +126,7 @@ CREATE TABLE Person (
                         lastname varchar(200)  NOT NULL,
                         id_number int  NOT NULL,
                         expedition varchar(4)  NOT NULL,
+                        phone_number varchar(20)  NOT NULL,
                         registration_date date  NOT NULL,
                         address varchar(500)  NOT NULL,
                         email varchar(100)  NOT NULL,
@@ -161,6 +163,15 @@ CREATE TABLE User_Client (
 );
 
 -- Table: User_Librarian
+ALTER TABLE User_Librarian ADD CONSTRAINT User_Librarian_Person
+    FOREIGN KEY (person_id)
+        REFERENCES Person (person_id)
+        NOT DEFERRABLE
+            INITIALLY IMMEDIATE
+;
+
+-- foreign keys
+-- Reference: Book_Authors_Author (table: Book_Authors)
 CREATE TABLE User_Librarian (
                                 librarian_id serial  NOT NULL,
                                 person_id int  NOT NULL,
@@ -169,6 +180,33 @@ CREATE TABLE User_Librarian (
                                 user_group varchar(20)  NOT NULL,
                                 status boolean  NOT NULL,
                                 CONSTRAINT User_Librarian_pk PRIMARY KEY (librarian_id)
+);
+
+CREATE TABLE notification (
+                              notification_id serial  NOT NULL,
+                              message text  NOT NULL,
+                              date timestamp  NOT NULL,
+                              status int  NOT NULL,
+                              user_id int  NOT NULL,
+                              CONSTRAINT notification_pk PRIMARY KEY (notification_id)
+);
+
+-- Table: parameter
+CREATE TABLE parameter (
+                           parameter_id serial  NOT NULL,
+                           name varchar(100)  NOT NULL,
+                           value text  NOT NULL,
+                           CONSTRAINT parameter_pk PRIMARY KEY (parameter_id)
+);
+
+-- Table: template
+CREATE TABLE template (
+                          template_id serial  NOT NULL,
+                          name varchar(100)  NOT NULL,
+                          json_body text  NOT NULL,
+                          status boolean  NOT NULL,
+                          meta_content text NOT NULL,
+                          CONSTRAINT template_pk PRIMARY KEY (template_id)
 );
 
 -- foreign keys
@@ -180,7 +218,7 @@ ALTER TABLE Book_Authors ADD CONSTRAINT Book_Authors_Author
             INITIALLY IMMEDIATE
 ;
 
--- Reference: Book_Authors_Book (table: Book_Authors)
+-- Reference: Book_Editorial (table: Book)
 ALTER TABLE Book_Authors ADD CONSTRAINT Book_Authors_Book
     FOREIGN KEY (book_id)
         REFERENCES Book (book_id)
@@ -188,7 +226,7 @@ ALTER TABLE Book_Authors ADD CONSTRAINT Book_Authors_Book
             INITIALLY IMMEDIATE
 ;
 
--- Reference: Book_Editorial (table: Book)
+-- Reference: Book_Genre (table: Book)
 ALTER TABLE Book ADD CONSTRAINT Book_Editorial
     FOREIGN KEY (editorial_id)
         REFERENCES Editorial (editorial_id)
@@ -196,7 +234,7 @@ ALTER TABLE Book ADD CONSTRAINT Book_Editorial
             INITIALLY IMMEDIATE
 ;
 
--- Reference: Book_Genre (table: Book)
+-- Reference: Book_Language (table: Book)
 ALTER TABLE Book ADD CONSTRAINT Book_Genre
     FOREIGN KEY (genre_id)
         REFERENCES Genre (genre_id)
@@ -204,7 +242,7 @@ ALTER TABLE Book ADD CONSTRAINT Book_Genre
             INITIALLY IMMEDIATE
 ;
 
--- Reference: Book_Language (table: Book)
+-- Reference: Environment_Use_Environment (table: Environment_Use)
 ALTER TABLE Book ADD CONSTRAINT Book_Language
     FOREIGN KEY (id_language)
         REFERENCES Language (id_language)
@@ -212,7 +250,7 @@ ALTER TABLE Book ADD CONSTRAINT Book_Language
             INITIALLY IMMEDIATE
 ;
 
--- Reference: Environment_Use_Environment (table: Environment_Use)
+-- Reference: Environment_Use_User_Client (table: Environment_Use)
 ALTER TABLE Environment_Use ADD CONSTRAINT Environment_Use_Environment
     FOREIGN KEY (environment_id)
         REFERENCES Environment (environment_id)
@@ -220,7 +258,7 @@ ALTER TABLE Environment_Use ADD CONSTRAINT Environment_Use_Environment
             INITIALLY IMMEDIATE
 ;
 
--- Reference: Environment_Use_User_Client (table: Environment_Use)
+-- Reference: Environment_Use_User_Librarian (table: Environment_Use)
 ALTER TABLE Environment_Use ADD CONSTRAINT Environment_Use_User_Client
     FOREIGN KEY (client_id)
         REFERENCES User_Client (client_id)
@@ -228,7 +266,7 @@ ALTER TABLE Environment_Use ADD CONSTRAINT Environment_Use_User_Client
             INITIALLY IMMEDIATE
 ;
 
--- Reference: Environment_Use_User_Librarian (table: Environment_Use)
+-- Reference: Fines_Lend_Book (table: Fines)
 ALTER TABLE Environment_Use ADD CONSTRAINT Environment_Use_User_Librarian
     FOREIGN KEY (librarian_id)
         REFERENCES User_Librarian (librarian_id)
@@ -236,7 +274,7 @@ ALTER TABLE Environment_Use ADD CONSTRAINT Environment_Use_User_Librarian
             INITIALLY IMMEDIATE
 ;
 
--- Reference: Fines_Lend_Book (table: Fines)
+-- Reference: Fines_Type_Fines (table: Fines)
 ALTER TABLE Fines ADD CONSTRAINT Fines_Lend_Book
     FOREIGN KEY (lent_book_id)
         REFERENCES Lend_Book (lent_book_id)
@@ -244,7 +282,7 @@ ALTER TABLE Fines ADD CONSTRAINT Fines_Lend_Book
             INITIALLY IMMEDIATE
 ;
 
--- Reference: Fines_Type_Fines (table: Fines)
+-- Reference: Lend_Book_Book (table: Lend_Book)
 ALTER TABLE Fines ADD CONSTRAINT Fines_Type_Fines
     FOREIGN KEY (type_fine_id)
         REFERENCES Type_Fines (type_fine_id)
@@ -252,7 +290,7 @@ ALTER TABLE Fines ADD CONSTRAINT Fines_Type_Fines
             INITIALLY IMMEDIATE
 ;
 
--- Reference: Lend_Book_Book (table: Lend_Book)
+-- Reference: Lend_Book_User_Client (table: Lend_Book)
 ALTER TABLE Lend_Book ADD CONSTRAINT Lend_Book_Book
     FOREIGN KEY (book_id)
         REFERENCES Book (book_id)
@@ -260,7 +298,7 @@ ALTER TABLE Lend_Book ADD CONSTRAINT Lend_Book_Book
             INITIALLY IMMEDIATE
 ;
 
--- Reference: Lend_Book_User_Client (table: Lend_Book)
+-- Reference: Lend_Book_User_Librarian (table: Lend_Book)
 ALTER TABLE Lend_Book ADD CONSTRAINT Lend_Book_User_Client
     FOREIGN KEY (client_id)
         REFERENCES User_Client (client_id)
@@ -268,7 +306,7 @@ ALTER TABLE Lend_Book ADD CONSTRAINT Lend_Book_User_Client
             INITIALLY IMMEDIATE
 ;
 
--- Reference: Lend_Book_User_Librarian (table: Lend_Book)
+-- Reference: User_Admin_Person (table: User_Admin)
 ALTER TABLE Lend_Book ADD CONSTRAINT Lend_Book_User_Librarian
     FOREIGN KEY (librarian_id)
         REFERENCES User_Librarian (librarian_id)
@@ -276,7 +314,7 @@ ALTER TABLE Lend_Book ADD CONSTRAINT Lend_Book_User_Librarian
             INITIALLY IMMEDIATE
 ;
 
--- Reference: User_Admin_Person (table: User_Admin)
+-- Reference: User_Client_Person (table: User_Client)
 ALTER TABLE User_Admin ADD CONSTRAINT User_Admin_Person
     FOREIGN KEY (person_id)
         REFERENCES Person (person_id)
@@ -284,16 +322,8 @@ ALTER TABLE User_Admin ADD CONSTRAINT User_Admin_Person
             INITIALLY IMMEDIATE
 ;
 
--- Reference: User_Client_Person (table: User_Client)
-ALTER TABLE User_Client ADD CONSTRAINT User_Client_Person
-    FOREIGN KEY (person_id)
-        REFERENCES Person (person_id)
-        NOT DEFERRABLE
-            INITIALLY IMMEDIATE
-;
-
 -- Reference: User_Librarian_Person (table: User_Librarian)
-ALTER TABLE User_Librarian ADD CONSTRAINT User_Librarian_Person
+ALTER TABLE User_Client ADD CONSTRAINT User_Client_Person
     FOREIGN KEY (person_id)
         REFERENCES Person (person_id)
         NOT DEFERRABLE
@@ -3372,3 +3402,195 @@ insert into Book_Authors (book_id, author_id) values (997, 186);
 insert into Book_Authors (book_id, author_id) values (998, 120);
 insert into Book_Authors (book_id, author_id) values (999, 340);
 insert into Book_Authors (book_id, author_id) values (1000, 386);
+
+insert into parameter (name, value) VALUES ('whatsapp', 'EAALp1sLIddsBO7znGRDvZBYqMchVZAEhN5LovgegF7vl5RSWqrMCfN9dWxrMctJf7ulCbdGFpDWxPS1uRAvKset99YM0JI1A3P3tJzet915YhEUjkG1lro3OxcYqQLV6CSM8g8sZBYpZANjt9ZC2zRMyHRqZB9UktVPoW0JHbpDyYyjLvqmkCMOyZBk8nJ99x6uK9N2U6f9YXrU2JFCh6JsAZAfXaqiB');
+INSERT INTO template (name, json_body, status, meta_content) VALUES ('library_update', '{
+    "messaging_product": "whatsapp",
+    "to": "{{PHONE_NUMBER}}",
+    "type": "template",
+    "template": {
+        "name": "{{NAME_TEMPLATE}}",
+        "language": {
+            "code": "ES"
+        },
+        "components": [
+            {
+                "type": "body",
+                "parameters": [
+                    {
+                        "type": "text",
+                        "text": "{{1}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{2}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{3}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{4}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{5}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{6}}"
+                    }
+                ]
+            }
+        ]
+    }
+}', true,'Estimado/a {{1}}:
+
+Le informamos que su reserva del ambiente de estudio ha sido modificada. A continuación, le detallamos la información actualizada:
+
+* Fecha: {{2}}
+* Hora de entrada: {{3}}
+* Hora de salida: {{4}}
+* Ambiente: {{5}}
+* Proposito: {{6}}
+
+Para cualquier pregunta o ajuste adicional, no dude en ponerse en contacto con nosotros. Apreciamos su comprensión y estamos aquí para ayudarle a planificar su tiempo de estudio de la mejor manera posible.
+
+Gracias por su confianza.');
+
+
+INSERT INTO template (name, json_body, status, meta_content) VALUES ('ambiente_aceptado', '{
+    "messaging_product": "whatsapp",
+    "to": "{{PHONE_NUMBER}}",
+    "type": "template",
+    "template": {
+        "name": "{{NAME_TEMPLATE}}",
+        "language": {
+            "code": "ES"
+        },
+        "components": [
+            {
+                "type": "body",
+                "parameters": [
+                    {
+                        "type": "text",
+                        "text": "{{1}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{2}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{3}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{4}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{5}}"
+                    }
+                ]
+            }
+        ]
+    }
+}', true,'Estimado/a {{1}},
+
+Nos complace informarle que su reserva del ambiente de estudio ha sido *aceptada* y ha sido procesada exitosamente. A continuación, le brindamos los detalles de su reserva:
+
+* Fecha: {{2}}
+* Hora de entrada: {{3}}
+* Hora de salida: {{4}}
+* Ambiente: {{5}}
+
+Estamos a su disposición para cualquier pregunta o asistencia adicional que pueda necesitar. Agradecemos su confianza en nuestros servicios y esperamos que su experiencia de estudio sea satisfactoria.');
+
+
+INSERT INTO template (name, json_body, status, meta_content) VALUES ('plantilla_cancelada', '{
+    "messaging_product": "whatsapp",
+    "to": "{{PHONE_NUMBER}}",
+    "type": "template",
+    "template": {
+        "name": "{{NAME_TEMPLATE}}",
+        "language": {
+            "code": "ES"
+        },
+        "components": [
+            {
+                "type": "body",
+                "parameters": [
+                    {
+                        "type": "text",
+                        "text": "{{1}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{2}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{3}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{4}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{5}}"
+                    }
+                ]
+            }
+        ]
+    }
+}', true, 'Estimado/a {{1}},
+
+Lamentamos informarle que su solicitud de reserva para el ambiente de estudio ha sido cancelada. A continuación, le proporcionamos los detalles de la solicitud:
+* Fecha: {{2}}
+* Hora de entrada: {{3}}
+* Hora de salida: {{4}}
+* Ambiente: {{5}}
+Si desea realizar una nueva solicitud o tiene alguna consulta, no dude en contactarnos. Estamos aquí para ayudarle a encontrar una solución que se adapte a sus necesidades de estudio.
+
+Gracias por su comprensión.');
+
+INSERT INTO template (name, json_body, status, meta_content) VALUES ('devolucion_libro', '{
+    "messaging_product": "whatsapp",
+    "to": "{{PHONE_NUMBER}}",
+    "type": "template",
+    "template": {
+        "name": "{{NAME_TEMPLATE}}",
+        "language": {
+            "code": "ES"
+        },
+        "components": [
+            {
+                "type": "body",
+                "parameters": [
+                    {
+                        "type": "text",
+                        "text": "{{1}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{2}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{3}}"
+                    }
+                ]
+            }
+        ]
+    }
+}', true, 'Estimado/a {{1}},
+
+Le recordamos que se acerca la fecha de devolución del libro que ha tomado en préstamo de nuestra biblioteca. A continuación, le detallamos la información:
+
+Título del Libro: {{2}}
+Fecha de Devolución: {{3}}
+
+Le recomendamos devolver el libro a tiempo para evitar posibles multas. Gracias por su atención y por ser parte de nuestra comunidad,');

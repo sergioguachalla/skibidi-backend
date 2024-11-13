@@ -27,18 +27,20 @@ public class LendBook {
     private UserLibrarian librarian;
 
     @Column(name = "lent_date")
-    private Date lendDate;
+    private Date lendDate = new Date();
 
     @Column(name = "return_date")
     private Date returnDate;
 
     @Column(name = "status")
-    private Long status;
+    private Long status = 1;
 
     @Column(name = "notes")
     private String notes;
 
+    private Boolean notification_check = false; // ?
 
 
 
 }
+
