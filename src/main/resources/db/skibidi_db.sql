@@ -115,7 +115,6 @@ CREATE TABLE Lend_Book (
                            return_date date  NOT NULL,
                            status int  NOT NULL,
                            notes text  NULL,
-                           notification_check boolean  NOT NULL,
                            CONSTRAINT Lend_Book_pk PRIMARY KEY (lent_book_id)
 );
 
@@ -163,15 +162,6 @@ CREATE TABLE User_Client (
 );
 
 -- Table: User_Librarian
-ALTER TABLE User_Librarian ADD CONSTRAINT User_Librarian_Person
-    FOREIGN KEY (person_id)
-        REFERENCES Person (person_id)
-        NOT DEFERRABLE
-            INITIALLY IMMEDIATE
-;
-
--- foreign keys
--- Reference: Book_Authors_Author (table: Book_Authors)
 CREATE TABLE User_Librarian (
                                 librarian_id serial  NOT NULL,
                                 person_id int  NOT NULL,
@@ -218,7 +208,7 @@ ALTER TABLE Book_Authors ADD CONSTRAINT Book_Authors_Author
             INITIALLY IMMEDIATE
 ;
 
--- Reference: Book_Editorial (table: Book)
+-- Reference: Book_Authors_Book (table: Book_Authors)
 ALTER TABLE Book_Authors ADD CONSTRAINT Book_Authors_Book
     FOREIGN KEY (book_id)
         REFERENCES Book (book_id)
@@ -226,7 +216,7 @@ ALTER TABLE Book_Authors ADD CONSTRAINT Book_Authors_Book
             INITIALLY IMMEDIATE
 ;
 
--- Reference: Book_Genre (table: Book)
+-- Reference: Book_Editorial (table: Book)
 ALTER TABLE Book ADD CONSTRAINT Book_Editorial
     FOREIGN KEY (editorial_id)
         REFERENCES Editorial (editorial_id)
@@ -234,7 +224,7 @@ ALTER TABLE Book ADD CONSTRAINT Book_Editorial
             INITIALLY IMMEDIATE
 ;
 
--- Reference: Book_Language (table: Book)
+-- Reference: Book_Genre (table: Book)
 ALTER TABLE Book ADD CONSTRAINT Book_Genre
     FOREIGN KEY (genre_id)
         REFERENCES Genre (genre_id)
@@ -242,7 +232,7 @@ ALTER TABLE Book ADD CONSTRAINT Book_Genre
             INITIALLY IMMEDIATE
 ;
 
--- Reference: Environment_Use_Environment (table: Environment_Use)
+-- Reference: Book_Language (table: Book)
 ALTER TABLE Book ADD CONSTRAINT Book_Language
     FOREIGN KEY (id_language)
         REFERENCES Language (id_language)
@@ -250,7 +240,7 @@ ALTER TABLE Book ADD CONSTRAINT Book_Language
             INITIALLY IMMEDIATE
 ;
 
--- Reference: Environment_Use_User_Client (table: Environment_Use)
+-- Reference: Environment_Use_Environment (table: Environment_Use)
 ALTER TABLE Environment_Use ADD CONSTRAINT Environment_Use_Environment
     FOREIGN KEY (environment_id)
         REFERENCES Environment (environment_id)
@@ -258,7 +248,7 @@ ALTER TABLE Environment_Use ADD CONSTRAINT Environment_Use_Environment
             INITIALLY IMMEDIATE
 ;
 
--- Reference: Environment_Use_User_Librarian (table: Environment_Use)
+-- Reference: Environment_Use_User_Client (table: Environment_Use)
 ALTER TABLE Environment_Use ADD CONSTRAINT Environment_Use_User_Client
     FOREIGN KEY (client_id)
         REFERENCES User_Client (client_id)
@@ -266,7 +256,7 @@ ALTER TABLE Environment_Use ADD CONSTRAINT Environment_Use_User_Client
             INITIALLY IMMEDIATE
 ;
 
--- Reference: Fines_Lend_Book (table: Fines)
+-- Reference: Environment_Use_User_Librarian (table: Environment_Use)
 ALTER TABLE Environment_Use ADD CONSTRAINT Environment_Use_User_Librarian
     FOREIGN KEY (librarian_id)
         REFERENCES User_Librarian (librarian_id)
@@ -274,7 +264,7 @@ ALTER TABLE Environment_Use ADD CONSTRAINT Environment_Use_User_Librarian
             INITIALLY IMMEDIATE
 ;
 
--- Reference: Fines_Type_Fines (table: Fines)
+-- Reference: Fines_Lend_Book (table: Fines)
 ALTER TABLE Fines ADD CONSTRAINT Fines_Lend_Book
     FOREIGN KEY (lent_book_id)
         REFERENCES Lend_Book (lent_book_id)
@@ -282,7 +272,7 @@ ALTER TABLE Fines ADD CONSTRAINT Fines_Lend_Book
             INITIALLY IMMEDIATE
 ;
 
--- Reference: Lend_Book_Book (table: Lend_Book)
+-- Reference: Fines_Type_Fines (table: Fines)
 ALTER TABLE Fines ADD CONSTRAINT Fines_Type_Fines
     FOREIGN KEY (type_fine_id)
         REFERENCES Type_Fines (type_fine_id)
@@ -290,7 +280,7 @@ ALTER TABLE Fines ADD CONSTRAINT Fines_Type_Fines
             INITIALLY IMMEDIATE
 ;
 
--- Reference: Lend_Book_User_Client (table: Lend_Book)
+-- Reference: Lend_Book_Book (table: Lend_Book)
 ALTER TABLE Lend_Book ADD CONSTRAINT Lend_Book_Book
     FOREIGN KEY (book_id)
         REFERENCES Book (book_id)
@@ -298,7 +288,7 @@ ALTER TABLE Lend_Book ADD CONSTRAINT Lend_Book_Book
             INITIALLY IMMEDIATE
 ;
 
--- Reference: Lend_Book_User_Librarian (table: Lend_Book)
+-- Reference: Lend_Book_User_Client (table: Lend_Book)
 ALTER TABLE Lend_Book ADD CONSTRAINT Lend_Book_User_Client
     FOREIGN KEY (client_id)
         REFERENCES User_Client (client_id)
@@ -306,7 +296,7 @@ ALTER TABLE Lend_Book ADD CONSTRAINT Lend_Book_User_Client
             INITIALLY IMMEDIATE
 ;
 
--- Reference: User_Admin_Person (table: User_Admin)
+-- Reference: Lend_Book_User_Librarian (table: Lend_Book)
 ALTER TABLE Lend_Book ADD CONSTRAINT Lend_Book_User_Librarian
     FOREIGN KEY (librarian_id)
         REFERENCES User_Librarian (librarian_id)
@@ -314,7 +304,7 @@ ALTER TABLE Lend_Book ADD CONSTRAINT Lend_Book_User_Librarian
             INITIALLY IMMEDIATE
 ;
 
--- Reference: User_Client_Person (table: User_Client)
+-- Reference: User_Admin_Person (table: User_Admin)
 ALTER TABLE User_Admin ADD CONSTRAINT User_Admin_Person
     FOREIGN KEY (person_id)
         REFERENCES Person (person_id)
@@ -322,8 +312,16 @@ ALTER TABLE User_Admin ADD CONSTRAINT User_Admin_Person
             INITIALLY IMMEDIATE
 ;
 
--- Reference: User_Librarian_Person (table: User_Librarian)
+-- Reference: User_Client_Person (table: User_Client)
 ALTER TABLE User_Client ADD CONSTRAINT User_Client_Person
+    FOREIGN KEY (person_id)
+        REFERENCES Person (person_id)
+        NOT DEFERRABLE
+            INITIALLY IMMEDIATE
+;
+
+-- Reference: User_Librarian_Person (table: User_Librarian)
+ALTER TABLE User_Librarian ADD CONSTRAINT User_Librarian_Person
     FOREIGN KEY (person_id)
         REFERENCES Person (person_id)
         NOT DEFERRABLE
