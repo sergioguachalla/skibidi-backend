@@ -96,9 +96,10 @@ public class LendBookBl {
         List<LendBook> dueLendBooks = lendBookRepository.findBooksDueIn24Hours(new Date(), new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000));
         log.info("Checking due lend books: {}", dueLendBooks.size());
         for (LendBook lendBook : dueLendBooks) {
-            log.info("Due lend book: {}", lendBook);
             Map<String, String> parameters = createLendNotification(lendBook);
             notificationBl.sendNotification(parameters, lendBook.getClientId().getPersonId().getPhoneNumber(), 4L);
+            lendBook.setNotification_check(true);
+            lendBookRepository.save(lendBook);
         }
     }
 
