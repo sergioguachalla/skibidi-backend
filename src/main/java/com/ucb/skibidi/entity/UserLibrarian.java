@@ -21,6 +21,7 @@ public class UserLibrarian {
 
     private Boolean isBlocked = false;
 
+    @Column(name = "user_group")
     private String group;
 
     private Boolean status = true;

@@ -1,3 +1,9 @@
+
+
+@Repository
+public interface LendBookRepository extends JpaRepository<LendBook, Long> {
+}
+
 package com.ucb.skibidi.dao;
 
 import com.ucb.skibidi.dto.LendBookDto;
@@ -37,3 +43,4 @@ public interface LendBookRepository extends JpaRepository<LendBook, Long> {
 
 
 }
+

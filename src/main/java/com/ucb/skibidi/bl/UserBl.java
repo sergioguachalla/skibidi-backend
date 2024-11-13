@@ -3,11 +3,13 @@ package com.ucb.skibidi.bl;
 import com.ucb.skibidi.config.exceptions.InvalidInputException;
 import com.ucb.skibidi.dao.PersonRepository;
 import com.ucb.skibidi.dao.UserClientRepository;
+import com.ucb.skibidi.dao.UserLibrarianRepository;
 import com.ucb.skibidi.dto.PersonDto;
 import com.ucb.skibidi.dto.UserDto;
 import com.ucb.skibidi.dto.UserRegistrationDto;
 import com.ucb.skibidi.entity.Person;
 import com.ucb.skibidi.entity.UserClient;
+import com.ucb.skibidi.entity.UserLibrarian;
 import com.ucb.skibidi.service.EmailService;
 import com.ucb.skibidi.utils.EntityMapper;
 import com.ucb.skibidi.utils.ValidationUtils;
@@ -31,14 +33,18 @@ public class UserBl {
     @Autowired
     private UserClientRepository userClientRepository;
     @Autowired
+    UserLibrarianRepository userLibrarianRepository;
+    @Autowired
     private EmailService emailService;
 
     public UserBl(@Autowired  Keycloak keycloak,
                   @Autowired PersonRepository personRepository,
-                  @Autowired UserClientRepository userClientRepository) {
+                  @Autowired UserClientRepository userClientRepository,
+                  @Autowired UserLibrarianRepository userLibrarianRepository) {
         this.keycloak = keycloak;
         this.personRepository = personRepository;
         this.userClientRepository = userClientRepository;
+        this.userLibrarianRepository = userLibrarianRepository;
     }
 
     private static final Logger log = org.slf4j.LoggerFactory.getLogger(UserBl.class);
@@ -77,13 +83,24 @@ public class UserBl {
         log.info("Response status from keycloak: {}", response.getStatus());
         String userKcId = response.getLocation().getPath().replaceAll(".*/([^/]+)$", "$1");
         log.info("User created with id: {}", userKcId);
-        UserClient userClient = new UserClient();
-        userClient.setGroup(group);
-        newPerson.setKcUuid(userKcId);
-        userClient.setPersonId(newPerson);
-        userClient.setUsername(userDto.getUserDto().getName());
+        if(group.equals("CLIENT")) {
+            UserClient userClient = new UserClient();
+            userClient.setGroup(group);
+            newPerson.setKcUuid(userKcId);
+            userClient.setPersonId(newPerson);
+            userClient.setUsername(userDto.getUserDto().getName());
 
-        this.userClientRepository.save(userClient);
+            this.userClientRepository.save(userClient);
+        }
+        if(group.equals("LIBRARIAN")) {
+            UserLibrarian userLibrarian = new UserLibrarian();
+            userLibrarian.setGroup(group);
+            newPerson.setKcUuid(userKcId);
+            userLibrarian.setPersonId(newPerson);
+            userLibrarian.setUsername(userDto.getUserDto().getName());
+            this.userLibrarianRepository.save(userLibrarian);
+
+        }
     }
 
     public UserRegistrationDto findUserByKcId(String kcId) {
