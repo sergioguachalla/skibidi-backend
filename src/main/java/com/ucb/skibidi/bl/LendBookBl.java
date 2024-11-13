@@ -1,8 +1,14 @@
 package com.ucb.skibidi.bl;
 
 import com.ucb.skibidi.dao.LendBookRepository;
+import com.ucb.skibidi.dao.UserClientRepository;
 import com.ucb.skibidi.dto.LendBookDto;
 import com.ucb.skibidi.dto.LendBookLibraryDto;
+import com.ucb.skibidi.dto.LendBookResponseDto;
+import com.ucb.skibidi.entity.Book;
+import com.ucb.skibidi.entity.LendBook;
+import com.ucb.skibidi.entity.UserClient;
+import com.ucb.skibidi.entity.UserLibrarian;
 import jakarta.persistence.Tuple;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +28,9 @@ public class LendBookBl {
 
     @Autowired
     private LendBookRepository lendBookRepository;
+
+    @Autowired
+    private UserClientRepository userClientRepository;
 
     public Page<LendBookDto> findLendBooksByKcUuid(int page, int size, String kcUuid, String sortField, String sortOrder) {
         Sort sort = buildSort(sortField, sortOrder);
@@ -62,5 +71,21 @@ public class LendBookBl {
         return sortOrder.equalsIgnoreCase("desc") ? Sort.by(sortField).descending() : Sort.by(sortField).ascending();
     }
 
-
+    public void saveLendBook(LendBookResponseDto lendBookResponseDto){
+        LendBook lendBook = new LendBook();
+        Book book = new Book();
+        UserLibrarian userLibrarian =new UserLibrarian();
+        UserClient userClient = userClientRepository.findByPersonIdKcUuid(lendBookResponseDto.getClientKcId());
+        userLibrarian.setLibrarianId(1l);
+        book.setBookId(Long.valueOf(lendBookResponseDto.getBookId()));
+        lendBook.setBookId(book);
+        lendBook.setLibrarianId(userLibrarian);
+        lendBook.setClientId(userClient);
+        lendBook.setNotes(lendBookResponseDto.getNote());
+        lendBook.setStatus(1);
+        lendBook.setLentDate(new Date());
+        lendBook.setReturnDate(lendBookResponseDto.getReturnDate());
+        lendBook.setNotification_check(false);
+        lendBookRepository.saveAndFlush(lendBook);
+    }
 }
