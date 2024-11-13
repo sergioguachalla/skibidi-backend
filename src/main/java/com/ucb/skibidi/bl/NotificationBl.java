@@ -10,10 +10,14 @@ import com.ucb.skibidi.entity.Template;
 import com.ucb.skibidi.service.EmailService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,6 +41,21 @@ public class NotificationBl {
     @Value("${meta.path}")
     private String metaPath;
 
+
+    public void sendNotification(Map<String,String> parameters, String phoneNumber, Long templateId) {
+        try{
+            String token = parameterRepository.findValueByParameterId(1);
+            Map<String, Object> headerMap = crearHeaderMap(token);
+            String body = buildBody(parameters, phoneNumber, templateId);
+            String responseWhatsApp = enviarWhatsApp(headerMap, body);
+            String messageId = whatsAppResponse(responseWhatsApp);
+            log.info("responseWhatsApp: " + responseWhatsApp);
+            sendEmail(personRepository.findByPhoneNumber(phoneNumber).getEmail(),buildMetaBody(parameters, templateId));
+        }catch(Exception e){
+            log.info("Error registrando envio de mensajería");
+            throw new RuntimeException(e);
+        }
+    }
 
     private Map<String, Object> crearHeaderMap(String token) {
         Map<String, Object> headerMap = new HashMap<>();
@@ -69,5 +88,40 @@ public class NotificationBl {
         } catch (IOException e) {
             throw new RuntimeException("No se pudo obtener el mensajeID");
         }
+    }
+
+    public String enviarWhatsApp(Map<String, Object> headerMap, String body) {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", (String) headerMap.get("Authorization"));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
+
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(
+                    metaPath,
+                    HttpMethod.POST,
+                    requestEntity,
+                    String.class
+            );
+            return response.getBody();
+        } catch (Exception e) {
+            log.error("Error al enviar el mensaje a WhatsApp", e);
+            throw new RuntimeException("Error al enviar el mensaje a WhatsApp: " + e.getMessage());
+        }
+    }
+
+    public void sendEmail(String email,String body){
+        emailService.sendEmailMime(email,
+                "SKIBIDI LIBROS", body );
+    }
+
+    private String buildMetaBody(Map<String,String> parameters, Long templateId) {
+        Optional<Template> plantillaJson = templateRepository.findById(templateId);
+        String body = plantillaJson.get().getMetaContent();
+        for (Map.Entry<String, String> entry : parameters.entrySet()) {
+            body = body.replace("{{" + entry.getKey() + "}}", entry.getValue());
+        }
+        return body;
     }
 }
