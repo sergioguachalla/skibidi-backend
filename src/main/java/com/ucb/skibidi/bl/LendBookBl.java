@@ -10,6 +10,7 @@ import com.ucb.skibidi.entity.LendBook;
 import com.ucb.skibidi.entity.UserClient;
 import com.ucb.skibidi.entity.UserLibrarian;
 import jakarta.persistence.Tuple;
+import java.text.SimpleDateFormat;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -107,7 +108,8 @@ public class LendBookBl {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("1", lendBook.getClientId().getPersonId().getName());
         parameters.put("2", lendBook.getBookId().getTitle());
-        parameters.put("3", lendBook.getReturnDate().toString());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        parameters.put("3", dateFormat.format(lendBook.getReturnDate()));
         return parameters;
     }
 }
