@@ -16,11 +16,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class LendBookBl {
@@ -31,6 +30,9 @@ public class LendBookBl {
 
     @Autowired
     private UserClientRepository userClientRepository;
+
+    @Autowired
+    private NotificationBl notificationBl;
 
     public Page<LendBookDto> findLendBooksByKcUuid(int page, int size, String kcUuid, String sortField, String sortOrder) {
         Sort sort = buildSort(sortField, sortOrder);
@@ -87,5 +89,24 @@ public class LendBookBl {
         lendBook.setReturnDate(lendBookResponseDto.getReturnDate());
         lendBook.setNotification_check(false);
         lendBookRepository.saveAndFlush(lendBook);
+    }
+
+    @Scheduled(fixedRate = 60000)
+    public void checkDueLendBooks() {
+        List<LendBook> dueLendBooks = lendBookRepository.findBooksDueIn24Hours(new Date(), new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000));
+        log.info("Checking due lend books: {}", dueLendBooks.size());
+        for (LendBook lendBook : dueLendBooks) {
+            log.info("Due lend book: {}", lendBook);
+            Map<String, String> parameters = createLendNotification(lendBook);
+            notificationBl.sendNotification(parameters, lendBook.getClientId().getPersonId().getPhoneNumber(), 4L);
+        }
+    }
+
+    private Map<String, String> createLendNotification(LendBook lendBook) {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("1", lendBook.getClientId().getPersonId().getName());
+        parameters.put("2", lendBook.getBookId().getTitle());
+        parameters.put("3", lendBook.getReturnDate().toString());
+        return parameters;
     }
 }
