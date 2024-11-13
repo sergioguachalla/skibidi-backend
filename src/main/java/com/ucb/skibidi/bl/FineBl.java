@@ -46,7 +46,7 @@ public class FineBl {
             clientDebtDto.setFineId(fine.getFineId());
             clientDebtDto.setAmount(fine.getTypeFine().getAmount());
             clientDebtDto.setTypeFine(fine.getTypeFine().getDescription());
-            clientDebtDto.setUsername(fine.getLendBook().getClient().getUsername());
+            clientDebtDto.setUsername(fine.getLendBook().getClientId().getUsername());
             clientDebtDto.setStatus(fine.getPaidDate() == null ? "Pending" : "Paid");
             clientDebtDto.setPaidDate(Optional.ofNullable(fine.getPaidDate() == null ? "N/A" : fine.getPaidDate().toString()));
             return clientDebtDto;
@@ -70,7 +70,7 @@ public class FineBl {
                 fine.setTypeFine(typeFine);
                 fine.setStatus(1L);
                 fineRepository.save(fine);
-                log.info("Fine created for lend: {}", lend.getClient().getUsername());
+                log.info("Fine created for lend: {}", lend.getClientId().getUsername());
             }
         }
     }

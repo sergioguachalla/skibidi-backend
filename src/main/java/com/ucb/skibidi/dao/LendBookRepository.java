@@ -1,12 +1,5 @@
-
-
-@Repository
-public interface LendBookRepository extends JpaRepository<LendBook, Long> {
-}
-
 package com.ucb.skibidi.dao;
 
-import com.ucb.skibidi.dto.LendBookDto;
 import com.ucb.skibidi.entity.LendBook;
 import jakarta.persistence.Tuple;
 import org.springframework.data.domain.Page;
@@ -43,4 +36,3 @@ public interface LendBookRepository extends JpaRepository<LendBook, Long> {
 
 
 }
-
