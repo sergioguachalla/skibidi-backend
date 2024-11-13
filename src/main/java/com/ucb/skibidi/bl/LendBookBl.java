@@ -3,6 +3,7 @@ package com.ucb.skibidi.bl;
 import com.ucb.skibidi.dao.LendBookRepository;
 import com.ucb.skibidi.dto.LendBookDto;
 import com.ucb.skibidi.dto.LendBookLibraryDto;
+import com.ucb.skibidi.entity.LendBook;
 import jakarta.persistence.Tuple;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import java.util.Optional;
+
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -60,5 +63,27 @@ public class LendBookBl {
             sortField = "lendDate"; // Campo por defecto si no es válido
         }
         return sortOrder.equalsIgnoreCase("desc") ? Sort.by(sortField).descending() : Sort.by(sortField).ascending();
+    }
+    public void updateReturnDate(Long lendBookId, Date newReturnDate) throws Exception {
+        Optional<LendBook> optionalLendBook = lendBookRepository.findById(lendBookId);
+        if (optionalLendBook.isPresent()) {
+            LendBook lendBook = optionalLendBook.get();
+            lendBook.setReturnDate(newReturnDate);  // Aquí se actualiza el returnDate
+            lendBookRepository.save(lendBook);  // Guardamos el objeto actualizado
+        } else {
+            throw new Exception("El préstamo con ID " + lendBookId + " no existe.");
+        }
+    }
+
+    // Cambia el estado del libro a "devuelto" (ej. status = 2)
+    public void updateStatusToReturned(Long lendBookId) throws Exception {
+        Optional<LendBook> optionalLendBook = lendBookRepository.findById(lendBookId);
+        if (optionalLendBook.isPresent()) {
+            LendBook lendBook = optionalLendBook.get();
+            lendBook.setStatus(2);  // 2 = Devuelto
+            lendBookRepository.save(lendBook);
+        } else {
+            throw new Exception("El préstamo con ID " + lendBookId + " no existe.");
+        }
     }
 }
