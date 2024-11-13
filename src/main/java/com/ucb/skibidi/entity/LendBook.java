@@ -5,42 +5,36 @@ import lombok.Data;
 
 import java.util.Date;
 
+@Data
 @Entity
 @Table(name = "lend_book")
-@Data
 public class LendBook {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "lent_book_id")
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long lentBookId;
 
     @ManyToOne
     @JoinColumn(name = "book_id")
-    private Book book;
-
-    @ManyToOne
-    @JoinColumn(name = "client_id")
-    private UserClient client;
+    private Book bookId;
 
     @ManyToOne
     @JoinColumn(name = "librarian_id")
-    private UserLibrarian librarian;
+    private UserLibrarian librarianId;
 
-    @Column(name = "lent_date")
-    private Date lendDate = new Date();
+    @ManyToOne
+    @JoinColumn(name = "client_id")
+    private UserClient clientId;
 
-    @Column(name = "return_date")
+    private Date lentDate = new Date();
+
     private Date returnDate;
 
-    @Column(name = "status")
-    private Long status = 1;
+    private int status = 1; // 1 = lent, 2 = returned, 3 = overdue
 
-    @Column(name = "notes")
     private String notes;
 
     private Boolean notification_check = false; // ?
 
 
-
 }
-
