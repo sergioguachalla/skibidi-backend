@@ -65,7 +65,7 @@ public class FineBl {
             clientDebtDto.setUsername(fine.getLendBook().getClientId().getUsername());
             clientDebtDto.setUserKcId(fine.getLendBook().getClientId().getPersonId().getKcUuid());
 
-            clientDebtDto.setUsername(fine.getLendBook().getClient().getUsername());
+            clientDebtDto.setUsername(fine.getLendBook().getClientId().getUsername());
             clientDebtDto.setStatus(fine.getPaidDate() == null ? "Pendiente" : "Pagada");
             clientDebtDto.setDueDate(fine.getEndDate());
             clientDebtDto.setPaidDate(Optional.ofNullable(fine.getPaidDate() == null ? "N/A" : fine.getPaidDate().toString()));

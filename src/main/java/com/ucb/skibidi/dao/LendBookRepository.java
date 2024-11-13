@@ -1,3 +1,4 @@
+
 package com.ucb.skibidi.dao;
 
 import com.ucb.skibidi.entity.LendBook;
@@ -8,9 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.Date;
-import java.util.List;
 
+@Repository
 public interface LendBookRepository extends JpaRepository<LendBook, Long> {
     @Query("SELECT l.lentBookId AS lendBookId, l.lentDate AS lendDate, l.returnDate AS returnDate, " +
             "l.notes AS notes, b.title AS title, string_agg(a.name, ', ') AS authors, l.status AS status, " +
