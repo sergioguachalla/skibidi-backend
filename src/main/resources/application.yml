@@ -2,7 +2,7 @@ spring:
   application:
     name: skibidi-backend
   datasource:
-    url: jdbc:postgresql://localhost:5433/skibidi
+    url: ${POSTGRES_URL:jdbc:postgresql://localhost:5433/skibidi}
     username: ${POSTGRES_USER:postgres}
     password: ${POSTGRES_PASSWORD:postgres}
     jpa:
@@ -16,14 +16,14 @@ spring:
     password: password
 
 server:
-    port: 8091
+  port: 8091
 
 keycloak:
-  auth-server-url: ${AUTH_SERVER_URL:http://localhost:8080}
+  auth-server-url: ${KEYCLOAK_AUTH_SERVER_URL:http://localhost:8080}
   credentials:
-    secret: ${CLIENT_SECRET:6WPxzJN2CnFPajEbo6gVpqGrLZ5hsr0U }
-    realm: skibidi-realm
-    resource: sk-backend
+    secret: ${KEYCLOAK_CLIENT_SECRET:6WPxzJN2CnFPajEbo6gVpqGrLZ5hsr0U}
+    realm: ${KEYCLOAK_REALM:skibidi-realm}
+    resource: ${KEYCLOAK_RESOURCE:sk-backend}
 
 springdoc:
   api-docs:
