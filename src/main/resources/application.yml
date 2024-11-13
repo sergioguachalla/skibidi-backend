@@ -30,3 +30,6 @@ springdoc:
     path: /api-docs
   swagger-ui:
     path: /swagger-ui.html
+
+meta:
+  path: ${META_PATH:https://graph.facebook.com/v20.0/407827362419812/messages}
