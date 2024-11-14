@@ -1,5 +1,6 @@
 package com.ucb.skibidi.bl;
 
+import com.ucb.skibidi.dao.BookRepository;
 import com.ucb.skibidi.dao.LendBookRepository;
 import com.ucb.skibidi.dto.LendBookDto;
 import com.ucb.skibidi.dto.LendBookLibraryDto;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
+import com.ucb.skibidi.entity.Book;
 
 
 import java.util.ArrayList;
@@ -25,6 +27,9 @@ public class LendBookBl {
 
     @Autowired
     private LendBookRepository lendBookRepository;
+    @Autowired
+    private BookRepository bookRepository;
+
 
     public Page<LendBookDto> findLendBooksByKcUuid(int page, int size, String kcUuid, String sortField, String sortOrder) {
         Sort sort = buildSort(sortField, sortOrder);
@@ -60,7 +65,7 @@ public class LendBookBl {
 
     private Sort buildSort(String sortField, String sortOrder) {
         if (!sortField.equals("lendDate") && !sortField.equals("returnDate")) {
-            sortField = "lendDate"; // Campo por defecto si no es válido
+            sortField = "lendDate";
         }
         return sortOrder.equalsIgnoreCase("desc") ? Sort.by(sortField).descending() : Sort.by(sortField).ascending();
     }
@@ -68,19 +73,24 @@ public class LendBookBl {
         Optional<LendBook> optionalLendBook = lendBookRepository.findById(lendBookId);
         if (optionalLendBook.isPresent()) {
             LendBook lendBook = optionalLendBook.get();
-            lendBook.setReturnDate(newReturnDate);  // Aquí se actualiza el returnDate
-            lendBookRepository.save(lendBook);  // Guardamos el objeto actualizado
+            lendBook.setReturnDate(newReturnDate);
+            lendBookRepository.save(lendBook);
         } else {
             throw new Exception("El préstamo con ID " + lendBookId + " no existe.");
         }
     }
-
-    // Cambia el estado del libro a "devuelto" (ej. status = 2)
     public void updateStatusToReturned(Long lendBookId) throws Exception {
         Optional<LendBook> optionalLendBook = lendBookRepository.findById(lendBookId);
         if (optionalLendBook.isPresent()) {
             LendBook lendBook = optionalLendBook.get();
-            lendBook.setStatus(2);  // 2 = Devuelto
+            lendBook.setStatus(2);
+            Book book = lendBook.getBookId();
+            if (book != null) {
+                book.setStatus(true);
+                bookRepository.save(book);
+            } else {
+                throw new Exception("El libro asociado al préstamo no existe.");
+            }
             lendBookRepository.save(lendBook);
         } else {
             throw new Exception("El préstamo con ID " + lendBookId + " no existe.");
