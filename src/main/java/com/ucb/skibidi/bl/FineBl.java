@@ -50,7 +50,8 @@ public class FineBl {
             clientDebtDto.setAmount(fine.getTypeFine().getAmount());
             clientDebtDto.setTypeFine(fine.getTypeFine().getDescription());
             clientDebtDto.setUsername(fine.getLendBook().getClient().getUsername());
-            clientDebtDto.setStatus(fine.getPaidDate() == null ? "Pending" : "Paid");
+            clientDebtDto.setStatus(fine.getPaidDate() == null ? "Pendiente" : "Pagada");
+            clientDebtDto.setDueDate(fine.getEndDate());
             clientDebtDto.setPaidDate(Optional.ofNullable(fine.getPaidDate() == null ? "N/A" : fine.getPaidDate().toString()));
             return clientDebtDto;
         });
