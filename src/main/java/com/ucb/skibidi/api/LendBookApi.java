@@ -66,6 +66,10 @@ public class LendBookApi {
         } catch (Exception e) {
             responseDto.setData(null);
             responseDto.setMessage("Error updating book status: " + e.getMessage());
+            responseDto.setSuccessful(false);
+        }
+        return responseDto;
+    }
 
     @PostMapping("")
     public ResponseDto<String> saveLendBook(@RequestBody LendBookResponseDto lendBookDto){
