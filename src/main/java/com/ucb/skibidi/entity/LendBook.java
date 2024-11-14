@@ -34,7 +34,7 @@ public class LendBook {
 
     private String notes;
 
-    //private Boolean notification_check = false; // ?
+    private Boolean notification_check = false;
 
 
 }

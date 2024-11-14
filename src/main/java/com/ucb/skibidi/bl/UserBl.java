@@ -69,6 +69,8 @@ public class UserBl {
         person.setExpedition(personDto.getExpedition());
         person.setRegistrationDate(new Date());
         person.setEmail(userDto.getUserDto().getEmail());
+        person.setPhoneNumber(personDto.getPhoneNumber());
+
         Person newPerson = personRepository.save(person);
 
 

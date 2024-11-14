@@ -8,6 +8,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Date;
+import java.util.List;
+
 public interface LendBookRepository extends JpaRepository<LendBook, Long> {
     @Query("SELECT l.lentBookId AS lendBookId, l.lentDate AS lendDate, l.returnDate AS returnDate, " +
             "l.notes AS notes, b.title AS title, string_agg(a.name, ', ') AS authors, l.status AS status, " +
@@ -33,6 +36,8 @@ public interface LendBookRepository extends JpaRepository<LendBook, Long> {
             "GROUP BY l.lentBookId, b.title, l.lentDate, l.returnDate, l.notes, l.status")
     Page<Tuple> findLendBooksWithDetailsByKcUuid(@Param("kcUuid") String kcUuid, Pageable pageable);
 
-
+    @Query("SELECT lb FROM LendBook lb WHERE lb.status = 1 AND lb.notification_check = false " +
+            "AND lb.returnDate BETWEEN :now AND :next24Hours")
+    List<LendBook> findBooksDueIn24Hours(Date now, Date next24Hours);
 
 }

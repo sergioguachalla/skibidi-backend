@@ -12,4 +12,6 @@ public class PersonDto {
     private String expedition;
     private Date registrationDate;
     private String address;
+    private String phoneNumber;
+
 }
