@@ -60,7 +60,7 @@ public class FineBl {
         return finesDto;
     }
 
-    //@Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 60000)
     public void updateFines() {
         log.info("Updating fines");
         var bookLends = lendBookRepository.findAll();
@@ -78,7 +78,7 @@ public class FineBl {
                 fineRepository.save(fine);
                 log.info("Fine created for lend: {}", lend.getClientId().getUsername());
                 Map<String, String> parameters = createFineNotif(lend);
-                notificationBl.sendNotification(parameters, lend.getClientId().getPersonId().getPhoneNumber(), 7L);
+                notificationBl.sendNotification(parameters, lend.getClientId().getPersonId().getPhoneNumber(), 5L);
             }
         }
     }
