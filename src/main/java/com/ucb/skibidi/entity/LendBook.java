@@ -33,8 +33,8 @@ public class LendBook {
     private int status = 1; // 1 = lent, 2 = returned, 3 = overdue
 
     private String notes;
-
-    private Boolean notification_check = false; // ?
+  
+    private Boolean notification_check = false;
 
 
 }
