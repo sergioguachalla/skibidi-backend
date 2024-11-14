@@ -4,12 +4,14 @@ import com.ucb.skibidi.dao.LendBookRepository;
 import com.ucb.skibidi.dao.UserClientRepository;
 import com.ucb.skibidi.dto.LendBookDto;
 import com.ucb.skibidi.dto.LendBookLibraryDto;
+import com.ucb.skibidi.entity.LendBook;
 import com.ucb.skibidi.dto.LendBookResponseDto;
 import com.ucb.skibidi.entity.Book;
 import com.ucb.skibidi.entity.LendBook;
 import com.ucb.skibidi.entity.UserClient;
 import com.ucb.skibidi.entity.UserLibrarian;
 import jakarta.persistence.Tuple;
+import java.text.SimpleDateFormat;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,6 +20,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import java.util.Optional;
+
 
 import java.util.*;
 
@@ -72,6 +76,27 @@ public class LendBookBl {
         }
         return sortOrder.equalsIgnoreCase("desc") ? Sort.by(sortField).descending() : Sort.by(sortField).ascending();
     }
+    public void updateReturnDate(Long lendBookId, Date newReturnDate) throws Exception {
+        Optional<LendBook> optionalLendBook = lendBookRepository.findById(lendBookId);
+        if (optionalLendBook.isPresent()) {
+            LendBook lendBook = optionalLendBook.get();
+            lendBook.setReturnDate(newReturnDate);  
+            lendBookRepository.save(lendBook);  
+        } else {
+            throw new Exception("El préstamo con ID " + lendBookId + " no existe.");
+        }
+    }
+
+    public void updateStatusToReturned(Long lendBookId) throws Exception {
+        Optional<LendBook> optionalLendBook = lendBookRepository.findById(lendBookId);
+        if (optionalLendBook.isPresent()) {
+            LendBook lendBook = optionalLendBook.get();
+            lendBook.setStatus(2);  
+            lendBookRepository.save(lendBook);
+        } else {
+            throw new Exception("El préstamo con ID " + lendBookId + " no existe.");
+        }
+    }
 
     public void saveLendBook(LendBookResponseDto lendBookResponseDto){
         LendBook lendBook = new LendBook();
@@ -96,9 +121,10 @@ public class LendBookBl {
         List<LendBook> dueLendBooks = lendBookRepository.findBooksDueIn24Hours(new Date(), new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000));
         log.info("Checking due lend books: {}", dueLendBooks.size());
         for (LendBook lendBook : dueLendBooks) {
-            log.info("Due lend book: {}", lendBook);
             Map<String, String> parameters = createLendNotification(lendBook);
             notificationBl.sendNotification(parameters, lendBook.getClientId().getPersonId().getPhoneNumber(), 4L);
+            lendBook.setNotification_check(true);
+            lendBookRepository.save(lendBook);
         }
     }
 
@@ -106,7 +132,9 @@ public class LendBookBl {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("1", lendBook.getClientId().getPersonId().getName());
         parameters.put("2", lendBook.getBookId().getTitle());
-        parameters.put("3", lendBook.getReturnDate().toString());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        parameters.put("3", dateFormat.format(lendBook.getReturnDate()));
         return parameters;
     }
+
 }
