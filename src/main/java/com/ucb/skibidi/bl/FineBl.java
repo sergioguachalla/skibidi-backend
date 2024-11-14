@@ -5,6 +5,7 @@ import com.ucb.skibidi.dao.LendBookRepository;
 import com.ucb.skibidi.dao.TypeFineRepository;
 import com.ucb.skibidi.dto.ClientDebtDto;
 import com.ucb.skibidi.entity.Fine;
+import com.ucb.skibidi.entity.LendBook;
 import com.ucb.skibidi.entity.TypeFines;
 import com.ucb.skibidi.utils.FineSpecification;
 import org.slf4j.Logger;
@@ -15,7 +16,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -28,7 +32,8 @@ public class FineBl {
     private LendBookRepository lendBookRepository;
     @Autowired
     private TypeFineRepository typeFineRepository;
-
+    @Autowired
+    private NotificationBl notificationBl;
 
 
     public Page<ClientDebtDto> findDebts(Pageable pageable, Long typeFineId, Boolean isPaid,
@@ -71,8 +76,18 @@ public class FineBl {
                 fine.setStatus(1L);
                 fineRepository.save(fine);
                 log.info("Fine created for lend: {}", lend.getClientId().getUsername());
+                Map<String, String> parameters = createLendNotification(fine);
             }
         }
+    }
+
+    private Map<String, String> createLendNotification(Fine fine) {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("1", fine.getLendBook().getClientId().getPersonId().getName());
+        parameters.put("2", fine.getLendBook().getBookId().getTitle());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        parameters.put("3", dateFormat.format(fine.getLendBook().getReturnDate()));
+        return parameters;
     }
 
 }
