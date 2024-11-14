@@ -3593,3 +3593,58 @@ Título del Libro: {{2}}
 Fecha de Devolución: {{3}}
 
 Le recomendamos devolver el libro a tiempo para evitar posibles multas. Gracias por su atención y por ser parte de nuestra comunidad,');
+
+INSERT INTO template (name, json_body, status, meta_content) VALUES ('fine', '{
+    "messaging_product": "whatsapp",
+    "to": "{{PHONE_NUMBER}}",
+    "type": "template",
+    "template": {
+        "name": "{{NAME_TEMPLATE}}",
+        "language": {
+            "code": "ES"
+        },
+        "components": [
+            {
+                "type": "body",
+                "parameters": [
+                    {
+                        "type": "text",
+                        "text": "{{1}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{2}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{3}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{4}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{5}}"
+                    }
+                ]
+            }
+        ]
+    }
+}', true, 'Estimado/a {{1}},
+Le informamos que ha pasado la fecha límite de devolución del libro que tomó en préstamo de nuestra biblioteca. A continuación, le proporcionamos los detalles:
+
+Título del Libro: {{2}}
+Fecha de Devolución Original: {{3}}
+Fecha de Notificación: {{4}}
+Detalle: {{5}}
+
+Lamentablemente, debido al retraso, se ha generado una multa por demora. Por favor, diríjase a la biblioteca para ser atendido por un bibliotecario y evitar más cargos.
+
+Gracias por su comprensión y atención.');
+
+INSERT INTO Type_Fines (description, amount)
+VALUES
+    ('Multa por retraso en la devolución', 10.00),
+    ('Multa por daño al libro', 15.00),
+    ('Multa por pérdida de libro', 30.00);
