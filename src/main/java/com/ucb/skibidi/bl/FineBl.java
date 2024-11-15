@@ -59,7 +59,7 @@ public class FineBl {
             clientDebtDto.setAmountPlusInterest(calculateFine(delayedDays, fine.getTypeFine().getAmount()));
             clientDebtDto.setAmount(fine.getTypeFine().getAmount());
             clientDebtDto.setTypeFine(fine.getTypeFine().getDescription());
-            clientDebtDto.setUsername(fine.getLendBook().getClient().getUsername());
+            clientDebtDto.setUsername(fine.getLendBook().getClientId().getUsername());
             clientDebtDto.setStatus(fine.getPaidDate() == null ? "Pendiente" : "Pagada");
             clientDebtDto.setDueDate(fine.getEndDate());
             clientDebtDto.setPaidDate(Optional.ofNullable(fine.getPaidDate() == null ? "N/A" : fine.getPaidDate().toString()));
@@ -101,11 +101,11 @@ public class FineBl {
         fineDetailDto.setOriginalAmount(fine.getTypeFine().getAmount());
         fineDetailDto.setDueDate(fine.getEndDate());
         fineDetailDto.setStatus(fine.getPaidDate() == null ? "Pending" : "Paid");
-        fineDetailDto.setUsername(fine.getLendBook().getClient().getUsername());
+        fineDetailDto.setUsername(fine.getLendBook().getClientId().getUsername());
         BookDetailsDto bookDetailsDto = new BookDetailsDto();
-        bookDetailsDto.setBookId(fine.getLendBook().getBook().getBookId());
-        bookDetailsDto.setTitle(fine.getLendBook().getBook().getTitle());
-        bookDetailsDto.setImageUrl(fine.getLendBook().getBook().getImageUrl());
+        bookDetailsDto.setBookId(fine.getLendBook().getBookId().getBookId());
+        bookDetailsDto.setTitle(fine.getLendBook().getBookId().getTitle());
+        bookDetailsDto.setImageUrl(fine.getLendBook().getBookId().getImageUrl());
         fineDetailDto.setBook(bookDetailsDto);
         fineDetailDto.setDelayDays((new Date().getTime() - fine.getEndDate().getTime()) / (1000 * 60 * 60 * 24));
         fineDetailDto.setTotalAmount(calculateFine(fineDetailDto.getDelayDays(), fineDetailDto.getOriginalAmount()));
