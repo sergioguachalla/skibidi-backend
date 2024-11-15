@@ -2,14 +2,12 @@ package com.ucb.skibidi.api;
 
 import com.ucb.skibidi.bl.FineBl;
 import com.ucb.skibidi.dto.ClientDebtDto;
+import com.ucb.skibidi.dto.FineDetailDto;
 import com.ucb.skibidi.dto.ResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/fines")
@@ -28,6 +26,16 @@ public class FineApi {
         var debts = fineBl.findDebts(pageable, null, isPaid, userKcId);
         ResponseDto<Page<ClientDebtDto>> responseDto = new ResponseDto<>();
         responseDto.setData(debts);
+        responseDto.setMessage(null);
+        responseDto.setSuccessful(true);
+        return responseDto;
+    }
+
+    @GetMapping("/details/{fineId}")
+    public ResponseDto<FineDetailDto> getDebtDetails(@PathVariable Long fineId){
+        var debt = fineBl.getFineDetail(fineId);
+        ResponseDto<FineDetailDto> responseDto = new ResponseDto<>();
+        responseDto.setData(debt);
         responseDto.setMessage(null);
         responseDto.setSuccessful(true);
         return responseDto;
