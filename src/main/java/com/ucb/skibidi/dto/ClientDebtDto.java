@@ -11,7 +11,9 @@ public class ClientDebtDto {
     private String typeFine;
     private Date dueDate;
     private Double amount;
+    private Double amountPlusInterest;
     private String status;
     private String username;
+    private String userKcId;
     private Optional<?> paidDate;
 }
