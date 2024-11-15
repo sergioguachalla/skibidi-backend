@@ -60,6 +60,7 @@ public class FineBl {
             clientDebtDto.setAmount(fine.getTypeFine().getAmount());
             clientDebtDto.setTypeFine(fine.getTypeFine().getDescription());
             clientDebtDto.setUsername(fine.getLendBook().getClientId().getUsername());
+            clientDebtDto.setUserKcId(fine.getLendBook().getClientId().getPersonId().getKcUuid());
             clientDebtDto.setStatus(fine.getPaidDate() == null ? "Pendiente" : "Pagada");
             clientDebtDto.setDueDate(fine.getEndDate());
             clientDebtDto.setPaidDate(Optional.ofNullable(fine.getPaidDate() == null ? "N/A" : fine.getPaidDate().toString()));
@@ -115,7 +116,7 @@ public class FineBl {
     }
 
     private Double calculateFine(Long delayDays, Double originalAmount) {
-        return delayDays * 0.15 * originalAmount;
+        return (delayDays * 0.15 ) +  originalAmount ;
     }
 
 }
