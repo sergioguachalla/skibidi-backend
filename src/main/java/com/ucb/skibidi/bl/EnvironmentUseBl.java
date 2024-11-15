@@ -3,10 +3,7 @@ package com.ucb.skibidi.bl;
 import com.ucb.skibidi.dao.*;
 import com.ucb.skibidi.dto.EnvironmentDto;
 import com.ucb.skibidi.dto.EnvironmentReservationDto;
-import com.ucb.skibidi.entity.Environment;
-import com.ucb.skibidi.entity.EnvironmentUse;
-import com.ucb.skibidi.entity.UserClient;
-import com.ucb.skibidi.entity.UserLibrarian;
+import com.ucb.skibidi.entity.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.User;
 import org.slf4j.Logger;
@@ -20,8 +17,11 @@ import org.springframework.stereotype.Service;
 import java.security.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,6 +34,10 @@ public class EnvironmentUseBl {
     private EnvironmentRepository environmentRepository;
     @Autowired
     private UserClientRepository userClientRepository;
+    @Autowired
+    private PersonRepository personRepository;
+    @Autowired
+    private NotificationBl notificationBl;
 
     // create a reservation to be approved by a librarian
     public void createEnvironmentReservation(EnvironmentReservationDto environmentReservationDto) {
@@ -79,16 +83,36 @@ public class EnvironmentUseBl {
             environmentUse.setPurpose(environmentReservationDto.getPurpose());
             environmentUse.setStatus(environmentReservationDto.getStatus());
             environmentUseRepository.save(environmentUse);
+            Map<String,String> parameters = createEditNotification(environmentReservationDto);
+            notificationBl.sendNotification(parameters, personRepository.findByKcUuid(environmentReservationDto.getClientId()).getPhoneNumber(), 1L);
+
         } catch (Exception e) {
             log.error("Error updating environment use: {}", e.getMessage());
             throw e;
         }
     }
 
+    private Map<String, String> createEditNotification(EnvironmentReservationDto environmentReservationDto) {
+        Person person = personRepository.findByKcUuid(environmentReservationDto.getClientId());
+        Map<String, String> parameters = new HashMap<>();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        String formattedDate = environmentReservationDto.getReservationDate().format(dateFormatter);
+        String formattedClockIn = environmentReservationDto.getClockIn().format(timeFormatter);
+        String formattedClockOut = environmentReservationDto.getClockOut().format(timeFormatter);
+        parameters.put("1", person.getName() + " " + person.getLastname());
+        parameters.put("2", formattedDate);
+        parameters.put("3", formattedClockIn);
+        parameters.put("4", formattedClockOut);
+        parameters.put("5", "SALA B-" + environmentReservationDto.getEnvironmentId().toString());
+        parameters.put("6", environmentReservationDto.getPurpose());
+        return parameters;
+    }
+
     public EnvironmentReservationDto getEnvironmentReservationById (Integer id){
 
         EnvironmentUse environmentUse = environmentUseRepository.findById(Long.valueOf(id)).orElseThrow(() -> new RuntimeException("Environment use not found"));
-       log.info("Environment use found: {}", environmentUse);
+        log.info("Environment use found: {}", environmentUse);
         EnvironmentReservationDto environmentReservationDto = new EnvironmentReservationDto();
         environmentReservationDto.setClientId(environmentUse.getClientId().getPersonId().getKcUuid());
         environmentReservationDto.setEnvironmentId(environmentUse.getEnvironmentId().getEnvironmentId());
@@ -245,7 +269,7 @@ public class EnvironmentUseBl {
     }
 
 
-     public void updateReservation(Long id, int status) {
+    public void updateReservation(Long id, int status) {
         try {
             log.info("Updating reservation status...");
             log.info("Reservation id: {}", id);
@@ -255,10 +279,29 @@ public class EnvironmentUseBl {
             validateReservationStatusUpdate(environmentUse, status);
             environmentUse.setStatus(status);
             environmentUseRepository.save(environmentUse);
+            Map<String,String> parameters = createStatusNotification(environmentUse);
+            notificationBl.sendNotification(parameters, environmentUse.getClientId().getPersonId().getPhoneNumber(), (long) status);
+
         } catch (Exception e) {
             log.error("Error updating reservation: {}", e.getMessage());
             throw e;
         }
+    }
+
+    private Map<String, String> createStatusNotification(EnvironmentUse environmentUse) {
+        Person person = personRepository.findByKcUuid(environmentUse.getClientId().getPersonId().getKcUuid());
+        Map<String, String> parameters = new HashMap<>();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        String formattedDate = environmentUse.getReservationDate().format(dateFormatter);
+        String formattedClockIn = environmentUse.getClockIn().format(timeFormatter);
+        String formattedClockOut = environmentUse.getClockOut().format(timeFormatter);
+        parameters.put("1", person.getName() + " " + person.getLastname());
+        parameters.put("2", formattedDate);
+        parameters.put("3", formattedClockIn);
+        parameters.put("4", formattedClockOut);
+        parameters.put("5", "SALA B-" + environmentUse.getEnvironmentId().getEnvironmentId().toString());
+        return parameters;
     }
 
     public void validateReservationStatusUpdate(EnvironmentUse environmentUse, int status) {
@@ -274,15 +317,21 @@ public class EnvironmentUseBl {
         log.info("Reservation status update validated successfully");
     }
 
-
     @Scheduled(fixedRate = 60000)
-    public void updateEnvironmentReservationStatus(){
+    public void updateEnvironmentReservationStatus() {
         log.info("Updating environment reservation status...");
         LocalDateTime now = LocalDateTime.now();
         List<EnvironmentUse> environmentUses = environmentUseRepository.findPast(now);
+
         for (EnvironmentUse environmentUse : environmentUses) {
-            if (environmentUse.getClockOut().isBefore(LocalDateTime.now())) {
+            // Si el estado es 2 (aceptada) y la hora actual ha pasado ClockOut, se marca como finalizada (estado 4)
+            if (environmentUse.getStatus() == 2 && environmentUse.getClockOut().isBefore(now)) {
                 environmentUse.setStatus(4);
+                environmentUseRepository.save(environmentUse);
+            }
+            // Si el estado es 1 (pendiente) y la hora actual es igual o mayor a ClockIn, se marca como rechazada (estado 3)
+            else if (environmentUse.getStatus() == 1 && (environmentUse.getClockIn().isBefore(now) || environmentUse.getClockIn().isEqual(now))) {
+                environmentUse.setStatus(3);
                 environmentUseRepository.save(environmentUse);
             }
         }

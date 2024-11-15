@@ -115,6 +115,7 @@ CREATE TABLE Lend_Book (
                            return_date date  NOT NULL,
                            status int  NOT NULL,
                            notes text  NULL,
+                           notification_check boolean  NOT NULL,
                            CONSTRAINT Lend_Book_pk PRIMARY KEY (lent_book_id)
 );
 
@@ -125,6 +126,7 @@ CREATE TABLE Person (
                         lastname varchar(200)  NOT NULL,
                         id_number int  NOT NULL,
                         expedition varchar(4)  NOT NULL,
+                        phone_number varchar(20)  NOT NULL,
                         registration_date date  NOT NULL,
                         address varchar(500)  NOT NULL,
                         email varchar(100)  NOT NULL,
@@ -169,6 +171,33 @@ CREATE TABLE User_Librarian (
                                 user_group varchar(20)  NOT NULL,
                                 status boolean  NOT NULL,
                                 CONSTRAINT User_Librarian_pk PRIMARY KEY (librarian_id)
+);
+
+CREATE TABLE notification (
+                              notification_id serial  NOT NULL,
+                              message text  NOT NULL,
+                              date timestamp  NOT NULL,
+                              status int  NOT NULL,
+                              user_id int  NOT NULL,
+                              CONSTRAINT notification_pk PRIMARY KEY (notification_id)
+);
+
+-- Table: parameter
+CREATE TABLE parameter (
+                           parameter_id serial  NOT NULL,
+                           name varchar(100)  NOT NULL,
+                           value text  NOT NULL,
+                           CONSTRAINT parameter_pk PRIMARY KEY (parameter_id)
+);
+
+-- Table: template
+CREATE TABLE template (
+                          template_id serial  NOT NULL,
+                          name varchar(100)  NOT NULL,
+                          json_body text  NOT NULL,
+                          status boolean  NOT NULL,
+                          meta_content text NOT NULL,
+                          CONSTRAINT template_pk PRIMARY KEY (template_id)
 );
 
 -- foreign keys
@@ -3372,3 +3401,250 @@ insert into Book_Authors (book_id, author_id) values (997, 186);
 insert into Book_Authors (book_id, author_id) values (998, 120);
 insert into Book_Authors (book_id, author_id) values (999, 340);
 insert into Book_Authors (book_id, author_id) values (1000, 386);
+
+insert into parameter (name, value) VALUES ('whatsapp', 'EAALp1sLIddsBO7znGRDvZBYqMchVZAEhN5LovgegF7vl5RSWqrMCfN9dWxrMctJf7ulCbdGFpDWxPS1uRAvKset99YM0JI1A3P3tJzet915YhEUjkG1lro3OxcYqQLV6CSM8g8sZBYpZANjt9ZC2zRMyHRqZB9UktVPoW0JHbpDyYyjLvqmkCMOyZBk8nJ99x6uK9N2U6f9YXrU2JFCh6JsAZAfXaqiB');
+INSERT INTO template (name, json_body, status, meta_content) VALUES ('library_update', '{
+    "messaging_product": "whatsapp",
+    "to": "{{PHONE_NUMBER}}",
+    "type": "template",
+    "template": {
+        "name": "{{NAME_TEMPLATE}}",
+        "language": {
+            "code": "ES"
+        },
+        "components": [
+            {
+                "type": "body",
+                "parameters": [
+                    {
+                        "type": "text",
+                        "text": "{{1}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{2}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{3}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{4}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{5}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{6}}"
+                    }
+                ]
+            }
+        ]
+    }
+}', true,'Estimado/a {{1}}:
+
+Le informamos que su reserva del ambiente de estudio ha sido modificada. A continuación, le detallamos la información actualizada:
+
+* Fecha: {{2}}
+* Hora de entrada: {{3}}
+* Hora de salida: {{4}}
+* Ambiente: {{5}}
+* Proposito: {{6}}
+
+Para cualquier pregunta o ajuste adicional, no dude en ponerse en contacto con nosotros. Apreciamos su comprensión y estamos aquí para ayudarle a planificar su tiempo de estudio de la mejor manera posible.
+
+Gracias por su confianza.');
+
+
+INSERT INTO template (name, json_body, status, meta_content) VALUES ('ambiente_aceptado', '{
+    "messaging_product": "whatsapp",
+    "to": "{{PHONE_NUMBER}}",
+    "type": "template",
+    "template": {
+        "name": "{{NAME_TEMPLATE}}",
+        "language": {
+            "code": "ES"
+        },
+        "components": [
+            {
+                "type": "body",
+                "parameters": [
+                    {
+                        "type": "text",
+                        "text": "{{1}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{2}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{3}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{4}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{5}}"
+                    }
+                ]
+            }
+        ]
+    }
+}', true,'Estimado/a {{1}},
+
+Nos complace informarle que su reserva del ambiente de estudio ha sido *aceptada* y ha sido procesada exitosamente. A continuación, le brindamos los detalles de su reserva:
+
+* Fecha: {{2}}
+* Hora de entrada: {{3}}
+* Hora de salida: {{4}}
+* Ambiente: {{5}}
+
+Estamos a su disposición para cualquier pregunta o asistencia adicional que pueda necesitar. Agradecemos su confianza en nuestros servicios y esperamos que su experiencia de estudio sea satisfactoria.');
+
+
+INSERT INTO template (name, json_body, status, meta_content) VALUES ('plantilla_cancelada', '{
+    "messaging_product": "whatsapp",
+    "to": "{{PHONE_NUMBER}}",
+    "type": "template",
+    "template": {
+        "name": "{{NAME_TEMPLATE}}",
+        "language": {
+            "code": "ES"
+        },
+        "components": [
+            {
+                "type": "body",
+                "parameters": [
+                    {
+                        "type": "text",
+                        "text": "{{1}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{2}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{3}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{4}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{5}}"
+                    }
+                ]
+            }
+        ]
+    }
+}', true, 'Estimado/a {{1}},
+
+Lamentamos informarle que su solicitud de reserva para el ambiente de estudio ha sido cancelada. A continuación, le proporcionamos los detalles de la solicitud:
+* Fecha: {{2}}
+* Hora de entrada: {{3}}
+* Hora de salida: {{4}}
+* Ambiente: {{5}}
+Si desea realizar una nueva solicitud o tiene alguna consulta, no dude en contactarnos. Estamos aquí para ayudarle a encontrar una solución que se adapte a sus necesidades de estudio.
+
+Gracias por su comprensión.');
+
+INSERT INTO template (name, json_body, status, meta_content) VALUES ('devolucion_libro', '{
+    "messaging_product": "whatsapp",
+    "to": "{{PHONE_NUMBER}}",
+    "type": "template",
+    "template": {
+        "name": "{{NAME_TEMPLATE}}",
+        "language": {
+            "code": "ES"
+        },
+        "components": [
+            {
+                "type": "body",
+                "parameters": [
+                    {
+                        "type": "text",
+                        "text": "{{1}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{2}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{3}}"
+                    }
+                ]
+            }
+        ]
+    }
+}', true, 'Estimado/a {{1}},
+
+Le recordamos que se acerca la fecha de devolución del libro que ha tomado en préstamo de nuestra biblioteca. A continuación, le detallamos la información:
+
+Título del Libro: {{2}}
+Fecha de Devolución: {{3}}
+
+Le recomendamos devolver el libro a tiempo para evitar posibles multas. Gracias por su atención y por ser parte de nuestra comunidad,');
+
+INSERT INTO template (name, json_body, status, meta_content) VALUES ('fine', '{
+    "messaging_product": "whatsapp",
+    "to": "{{PHONE_NUMBER}}",
+    "type": "template",
+    "template": {
+        "name": "{{NAME_TEMPLATE}}",
+        "language": {
+            "code": "ES"
+        },
+        "components": [
+            {
+                "type": "body",
+                "parameters": [
+                    {
+                        "type": "text",
+                        "text": "{{1}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{2}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{3}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{4}}"
+                    },
+                    {
+                        "type": "text",
+                        "text": "{{5}}"
+                    }
+                ]
+            }
+        ]
+    }
+}', true, 'Estimado/a {{1}},
+Le informamos que ha pasado la fecha límite de devolución del libro que tomó en préstamo de nuestra biblioteca. A continuación, le proporcionamos los detalles:
+
+Título del Libro: {{2}}
+Fecha de Devolución Original: {{3}}
+Fecha de Notificación: {{4}}
+Detalle: {{5}}
+
+Lamentablemente, debido al retraso, se ha generado una multa por demora. Por favor, diríjase a la biblioteca para ser atendido por un bibliotecario y evitar más cargos.
+
+Gracias por su comprensión y atención.');
+
+INSERT INTO Type_Fines (description, amount)
+VALUES
+    ('Multa por retraso en la devolución', 10.00),
+    ('Multa por daño al libro', 15.00),
+    ('Multa por pérdida de libro', 30.00);

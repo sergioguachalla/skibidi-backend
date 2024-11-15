@@ -36,5 +36,6 @@ public class Person {
     @Column(name = "kc_uudi")
     private String kcUuid;
 
-
+    @Column(name = "phone_number")
+    private String phoneNumber;
 }
