@@ -22,6 +22,24 @@ public class EnvironmentAPI {
     @Autowired
     private EnvironmentUseBl environmentUseBl;
 
+    @GetMapping("")
+    public ResponseDto<List<EnvironmentReservationDto>> listEnvironments(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ){
+        Pageable pageable = PageRequest.of(page,size);
+        Page<EnvironmentReservationDto> reservationsPage = environmentUseBl.findAllReservations(pageable);
+
+        List<EnvironmentReservationDto> reservationsList = reservationsPage.getContent();
+
+        ResponseDto<List<EnvironmentReservationDto>> responseDto  = new ResponseDto<>();
+        responseDto.setData(reservationsList);
+        responseDto.setMessage("Reservations fetched succesfully");
+        responseDto.setSuccessful(true);
+
+        return responseDto;
+    }
+
     @PostMapping("")
     public ResponseDto<EnvironmentDto> createEnvironment(@RequestBody EnvironmentDto environmentDto) {
         ResponseDto<EnvironmentDto> responseDto = new ResponseDto<>();
