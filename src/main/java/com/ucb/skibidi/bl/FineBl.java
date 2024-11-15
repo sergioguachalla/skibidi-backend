@@ -3,9 +3,7 @@ package com.ucb.skibidi.bl;
 import com.ucb.skibidi.dao.FineRepository;
 import com.ucb.skibidi.dao.LendBookRepository;
 import com.ucb.skibidi.dao.TypeFineRepository;
-import com.ucb.skibidi.dto.BookDetailsDto;
 import com.ucb.skibidi.dto.ClientDebtDto;
-import com.ucb.skibidi.dto.FineDetailDto;
 import com.ucb.skibidi.entity.Fine;
 import com.ucb.skibidi.entity.LendBook;
 import com.ucb.skibidi.entity.TypeFines;
@@ -20,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -53,15 +50,10 @@ public class FineBl {
         Page<ClientDebtDto> finesDto = fines.map(fine -> {
             ClientDebtDto clientDebtDto = new ClientDebtDto();
             clientDebtDto.setFineId(fine.getFineId());
-            var delayedDays = (new Date().getTime() - fine.getEndDate().getTime()) / (1000 * 60 * 60 * 24);
-            log.info("Delayed days: {}", delayedDays);
-            clientDebtDto.setAmountPlusInterest(calculateFine(delayedDays, fine.getTypeFine().getAmount()));
             clientDebtDto.setAmount(fine.getTypeFine().getAmount());
             clientDebtDto.setTypeFine(fine.getTypeFine().getDescription());
             clientDebtDto.setUsername(fine.getLendBook().getClientId().getUsername());
-            clientDebtDto.setUserKcId(fine.getLendBook().getClientId().getPersonId().getKcUuid());
-            clientDebtDto.setStatus(fine.getPaidDate() == null ? "Pendiente" : "Pagada");
-            clientDebtDto.setDueDate(fine.getEndDate());
+            clientDebtDto.setStatus(fine.getPaidDate() == null ? "Pending" : "Paid");
             clientDebtDto.setPaidDate(Optional.ofNullable(fine.getPaidDate() == null ? "N/A" : fine.getPaidDate().toString()));
             return clientDebtDto;
         });
@@ -74,9 +66,6 @@ public class FineBl {
         var bookLends = lendBookRepository.findAll();
         for (var lend : bookLends) {
             if (lend.getReturnDate().before(new Date())) {
-                if (fineRepository.existsByLendBook(lend)) {
-                    continue;
-                }
                 //TODO: refactor typefines to 'typeFine'
                 TypeFines typeFine = typeFineRepository.findById(1L).get();
                 Fine fine = new Fine();
@@ -93,31 +82,6 @@ public class FineBl {
             }
         }
     }
-
-    public FineDetailDto getFineDetail(Long fineId) {
-        var fine = fineRepository.findById(fineId).get();
-        FineDetailDto fineDetailDto = new FineDetailDto();
-        fineDetailDto.setFineId(fine.getFineId());
-        fineDetailDto.setOriginalAmount(fine.getTypeFine().getAmount());
-        fineDetailDto.setDueDate(fine.getEndDate());
-        fineDetailDto.setStatus(fine.getPaidDate() == null ? "Pending" : "Paid");
-        fineDetailDto.setUsername(fine.getLendBook().getClientId().getUsername());
-        BookDetailsDto bookDetailsDto = new BookDetailsDto();
-        bookDetailsDto.setBookId(fine.getLendBook().getBookId().getBookId());
-        bookDetailsDto.setTitle(fine.getLendBook().getBookId().getTitle());
-        bookDetailsDto.setImageUrl(fine.getLendBook().getBookId().getImageUrl());
-        fineDetailDto.setBook(bookDetailsDto);
-        fineDetailDto.setDelayDays((new Date().getTime() - fine.getEndDate().getTime()) / (1000 * 60 * 60 * 24));
-        fineDetailDto.setTotalAmount(calculateFine(fineDetailDto.getDelayDays(), fineDetailDto.getOriginalAmount()));
-        return fineDetailDto;
-
-
-    }
-
-    private Double calculateFine(Long delayDays, Double originalAmount) {
-        return (delayDays * 0.15 ) +  originalAmount ;
-    }
-
 
     private Map<String, String> createFineNotif(LendBook lendBook) {
         Map<String, String> parameters = new HashMap<>();
