@@ -14,6 +14,7 @@ import java.util.List;
 public interface LendBookRepository extends JpaRepository<LendBook, Long> {
     @Query("SELECT l.lentBookId AS lendBookId, l.lentDate AS lendDate, l.returnDate AS returnDate, " +
             "l.notes AS notes, b.title AS title, string_agg(a.name, ', ') AS authors, l.status AS status, " +
+            "l.request_extension AS request_extension, " +
             "CONCAT(p.name, ' ', p.lastname) AS clientName " +
             "FROM LendBook l " +
             "JOIN l.bookId b " +
@@ -21,7 +22,7 @@ public interface LendBookRepository extends JpaRepository<LendBook, Long> {
             "JOIN Author a ON a.authorId = ba.authorId.authorId " +
             "JOIN UserClient uc ON uc.clientId = l.clientId.clientId " +
             "JOIN Person p ON p.personId = uc.personId.personId " +
-            "GROUP BY l.lentBookId, b.title, l.lentDate, l.returnDate, l.notes, l.status, p.name, p.lastname")
+            "GROUP BY l.lentBookId, b.title, l.lentDate, l.returnDate, l.notes, l.status, l.request_extension, p.name, p.lastname")
     Page<Tuple> findLendBooksWithDetails(Pageable pageable);
 
     @Query("SELECT l.lentBookId AS lendBookId, l.lentDate AS lendDate, l.returnDate AS returnDate, " +

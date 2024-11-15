@@ -114,6 +114,7 @@ CREATE TABLE Lend_Book (
                            lent_date date  NOT NULL,
                            return_date date  NOT NULL,
                            status int  NOT NULL,
+                           request_extension int NOT NULL,
                            notes text  NULL,
                            notification_check boolean  NOT NULL,
                            CONSTRAINT Lend_Book_pk PRIMARY KEY (lent_book_id)
