@@ -41,6 +41,20 @@ public class LendBookApi {
         return lendBookBl.findLendBooksByKcUuid(page, size, kcUuid, sortField, sortOrder);
     }
 
+    @PutMapping("/{id}/request-extension")
+    public ResponseDto<?> requestExtension(@PathVariable Long id) {
+        ResponseDto<?> responseDto = new ResponseDto<>();
+        try {
+            lendBookBl.requestExtension(id);
+            responseDto.setMessage("Extension request submitted successfully");
+            responseDto.setSuccessful(true);
+        } catch (Exception e) {
+            responseDto.setData(null);
+            responseDto.setMessage("Error submitting extension request: " + e.getMessage());
+            responseDto.setSuccessful(false);
+        }
+        return responseDto;
+    }
     @PutMapping("/{id}/return-date")
     public ResponseDto<?> updateReturnDate(@PathVariable Long id, @RequestBody Date newReturnDate) {
         ResponseDto<?> responseDto = new ResponseDto<>();
