@@ -71,7 +71,8 @@ public class LendBookBl {
                 tuple.get("notes", String.class),
                 tuple.get("title", String.class),
                 tuple.get("authors", String.class),
-                tuple.get("status", Integer.class)
+                tuple.get("status", Integer.class),
+                tuple.get("request_extension", Integer.class)
         ));
     }
 
@@ -81,12 +82,29 @@ public class LendBookBl {
         }
         return sortOrder.equalsIgnoreCase("desc") ? Sort.by(sortField).descending() : Sort.by(sortField).ascending();
     }
-    public void updateReturnDate(Long lendBookId, Date newReturnDate) throws Exception {
+    public String requestExtension(Long lendBookId) throws Exception {
         Optional<LendBook> optionalLendBook = lendBookRepository.findById(lendBookId);
         if (optionalLendBook.isPresent()) {
             LendBook lendBook = optionalLendBook.get();
-            lendBook.setReturnDate(newReturnDate);
+            lendBook.setRequest_extension(1);
             lendBookRepository.save(lendBook);
+            return "Solicitud de extensión enviada";
+        } else {
+            throw new Exception("El préstamo con ID " + lendBookId + " no existe.");
+        }
+    }
+    public String updateReturnDate(Long lendBookId, Date newReturnDate) throws Exception {
+        Optional<LendBook> optionalLendBook = lendBookRepository.findById(lendBookId);
+        if (optionalLendBook.isPresent()) {
+            LendBook lendBook = optionalLendBook.get();
+            if (lendBook.getRequest_extension() == 1) {
+                lendBook.setReturnDate(newReturnDate);
+                lendBook.setRequest_extension(0);
+                lendBookRepository.save(lendBook);
+                return "Fecha de retorno actualizada";
+            } else {
+                throw new Exception("No se ha solicitado una extensión para este préstamo.");
+            }
         } else {
             throw new Exception("El préstamo con ID " + lendBookId + " no existe.");
         }

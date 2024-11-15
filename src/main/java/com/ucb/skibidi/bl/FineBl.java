@@ -90,7 +90,8 @@ public class FineBl {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         parameters.put("3", dateFormat.format(lendBook.getReturnDate()));
         parameters.put("4", dateFormat.format(new Date()));
-        parameters.put("5", "El motivo de la multa es por devolución tardía del libro indicado anteriormente, por lo que la multa será de 10 BS");
+        parameters.put("5", "El motivo de la multa es por devolución tardía del libro indicado anteriormente, por lo que la" +
+                " multa inicial será de 10 BS, sumando cada día el 15% adicional al monto inicial en caso de la no devolución. Para ver el estado de su deuda, ingrese a la plataforma.");
         return parameters;
     }
 }

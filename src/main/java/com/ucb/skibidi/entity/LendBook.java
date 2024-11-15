@@ -32,6 +32,8 @@ public class LendBook {
 
     private int status = 1; // 1 = lent, 2 = returned, 3 = overdue
 
+    private int request_extension;
+
     private String notes;
   
     private Boolean notification_check = false;

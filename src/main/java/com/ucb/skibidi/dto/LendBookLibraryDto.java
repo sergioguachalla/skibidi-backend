@@ -15,9 +15,10 @@ public class LendBookLibraryDto {
     private String title;
     private String authors;  // Cambiado a String
     private int status;
+    private int request_extension;
 
 
-    public LendBookLibraryDto(String clientName, Long lendBookId, Date lendDate, Date returnDate, String notes, String title, String authors, int status) {
+    public LendBookLibraryDto(String clientName, Long lendBookId, Date lendDate, Date returnDate, String notes, String title, String authors, int status, int request_extension) {
         this.clientName = clientName;
         this.lendBookId = lendBookId;
         this.lendDate = lendDate;
@@ -26,5 +27,6 @@ public class LendBookLibraryDto {
         this.title = title;
         this.authors = authors;
         this.status = status;
+        this.request_extension = request_extension;
     }
 }
