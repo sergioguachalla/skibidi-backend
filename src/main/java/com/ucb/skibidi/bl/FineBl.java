@@ -6,6 +6,7 @@ import com.ucb.skibidi.dao.TypeFineRepository;
 import com.ucb.skibidi.dto.BookDetailsDto;
 import com.ucb.skibidi.dto.ClientDebtDto;
 import com.ucb.skibidi.dto.FineDetailDto;
+import com.ucb.skibidi.dto.PaidFineDto;
 import com.ucb.skibidi.entity.Fine;
 import com.ucb.skibidi.entity.LendBook;
 import com.ucb.skibidi.entity.TypeFines;
@@ -112,7 +113,25 @@ public class FineBl {
         fineDetailDto.setTotalAmount(calculateFine(fineDetailDto.getDelayDays(), fineDetailDto.getOriginalAmount()));
         return fineDetailDto;
 
+    }
 
+    public Page<PaidFineDto> findPaidFines(Pageable pageable, String userKcId) {
+        Specification<Fine> specification = Specification.where(null);
+        if (userKcId != null) {
+            specification = specification.and(FineSpecification.hasUserKcId(userKcId));
+        }
+        specification = specification.and(FineSpecification.hasPaidDate());
+        Page<Fine> fines = fineRepository.findAll(specification, pageable);
+        return fines.map(fine -> {
+            PaidFineDto paidFineDto = new PaidFineDto();
+            paidFineDto.setFineId(fine.getFineId());
+            paidFineDto.setAmount(fine.getTypeFine().getAmount());
+            paidFineDto.setPaidDate(fine.getPaidDate());
+            paidFineDto.setOverdue(fine.getEndDate().before(fine.getPaidDate()));
+            paidFineDto.setTypeFine(fine.getTypeFine().getDescription());
+            paidFineDto.setUsername(fine.getLendBook().getClientId().getUsername());
+            return paidFineDto;
+        });
     }
 
     private Double calculateFine(Long delayDays, Double originalAmount) {
