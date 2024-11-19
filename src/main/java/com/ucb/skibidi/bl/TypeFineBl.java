@@ -27,4 +27,18 @@ public class TypeFineBl {
         }
         return typeFineDtoList;
     }
+
+    public void saveTypeFine(TypeFineDto typeFineDto){
+        TypeFines typeFine = new TypeFines();
+        typeFine.setDescription(typeFineDto.getDescription());
+        typeFine.setAmount(typeFineDto.getAmount());
+        typeFineRepository.save(typeFine);
+    }
+
+    public void updateTypeFine(TypeFineDto typeFineDto){
+        TypeFines typeFine = new TypeFines();
+        typeFine.setDescription(typeFineDto.getDescription());
+        typeFine.setAmount(typeFineDto.getAmount());
+        typeFineRepository.save(typeFine);
+    }
 }
