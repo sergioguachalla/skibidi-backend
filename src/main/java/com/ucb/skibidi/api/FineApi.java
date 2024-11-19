@@ -3,6 +3,7 @@ package com.ucb.skibidi.api;
 import com.ucb.skibidi.bl.FineBl;
 import com.ucb.skibidi.dto.ClientDebtDto;
 import com.ucb.skibidi.dto.FineDetailDto;
+import com.ucb.skibidi.dto.PaidFineDto;
 import com.ucb.skibidi.dto.ResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -36,6 +37,21 @@ public class FineApi {
         var debt = fineBl.getFineDetail(fineId);
         ResponseDto<FineDetailDto> responseDto = new ResponseDto<>();
         responseDto.setData(debt);
+        responseDto.setMessage(null);
+        responseDto.setSuccessful(true);
+        return responseDto;
+    }
+
+    @GetMapping("/paid")
+    public ResponseDto<Page<PaidFineDto>> getPaidFines(
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "4") Integer size,
+            @RequestParam(required = false) String username
+    ){
+        Pageable pageable = Pageable.ofSize(size).withPage(page);
+        var paidFines = fineBl.findPaidFines(pageable, username);
+        ResponseDto<Page<PaidFineDto>> responseDto = new ResponseDto<>();
+        responseDto.setData(paidFines);
         responseDto.setMessage(null);
         responseDto.setSuccessful(true);
         return responseDto;
