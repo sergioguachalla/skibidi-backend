@@ -117,7 +117,7 @@ public class FineBl {
     public Page<PaidFineDto> findPaidFines(Pageable pageable, String username) {
         Specification<Fine> specification = Specification.where(null);
         if (username != null) {
-            specification = specification.and(FineSpecification.hasUserKcId(username));
+            specification = specification.and(FineSpecification.hasUsername(username));
         }
         specification = specification.and(FineSpecification.hasPaidDate());
         Page<Fine> fines = fineRepository.findAll(specification, pageable);
@@ -128,6 +128,7 @@ public class FineBl {
             paidFineDto.setPaidDate(fine.getPaidDate());
             paidFineDto.setOverdue(fine.getEndDate().before(fine.getPaidDate()));
             paidFineDto.setTypeFine(fine.getTypeFine().getDescription());
+            paidFineDto.setBookTitle(fine.getLendBook().getBookId().getTitle());
             paidFineDto.setUsername(fine.getLendBook().getClientId().getUsername());
             return paidFineDto;
         });

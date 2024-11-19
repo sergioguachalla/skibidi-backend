@@ -14,7 +14,7 @@ public class FineSpecification {
         return (root, query, cb) -> cb.equal(root.get("lendBook").get("clientId").get("personId").get("kcUuid"), userKcId);
     }
     public static Specification<Fine> hasUsername(String username) {
-        return (root, query, cb) -> cb.like(root.get("lendBook").get("clientId").get("username"), username);
+        return (root, query, cb) -> cb.like(root.get("lendBook").get("clientId").get("personId").get("name"), "%" + username + "%");
     }
 
 }
