@@ -114,10 +114,10 @@ public class FineBl {
 
     }
 
-    public Page<PaidFineDto> findPaidFines(Pageable pageable, String userKcId) {
+    public Page<PaidFineDto> findPaidFines(Pageable pageable, String username) {
         Specification<Fine> specification = Specification.where(null);
-        if (userKcId != null) {
-            specification = specification.and(FineSpecification.hasUserKcId(userKcId));
+        if (username != null) {
+            specification = specification.and(FineSpecification.hasUserKcId(username));
         }
         specification = specification.and(FineSpecification.hasPaidDate());
         Page<Fine> fines = fineRepository.findAll(specification, pageable);
