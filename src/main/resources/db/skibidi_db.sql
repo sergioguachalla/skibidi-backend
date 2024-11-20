@@ -160,6 +160,7 @@ CREATE TABLE User_Client (
                              user_group varchar(20)  NOT NULL,
                              status boolean  NOT NULL,
                              infraction_count int  NOT NULL,
+                             can_use_studyroom boolean  NOT NULL DEFAULT TRUE,
                              CONSTRAINT User_Client_pk PRIMARY KEY (client_id)
 );
 
