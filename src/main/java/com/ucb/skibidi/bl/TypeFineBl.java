@@ -36,9 +36,13 @@ public class TypeFineBl {
     }
 
     public void updateTypeFine(TypeFineDto typeFineDto){
-        TypeFines typeFine = new TypeFines();
-        typeFine.setDescription(typeFineDto.getDescription());
-        typeFine.setAmount(typeFineDto.getAmount());
-        typeFineRepository.save(typeFine);
+        var typeFine = typeFineRepository.findById(typeFineDto.getId());
+        if(typeFine.isPresent()){
+            TypeFines typeFineToUpdate = typeFine.get();
+            typeFineToUpdate.setDescription(typeFineDto.getDescription());
+            typeFineToUpdate.setAmount(typeFineDto.getAmount());
+            typeFineRepository.save(typeFineToUpdate);
+        }
+
     }
 }
