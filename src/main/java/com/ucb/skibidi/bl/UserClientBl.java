@@ -3,7 +3,6 @@ package com.ucb.skibidi.bl;
 import com.ucb.skibidi.dao.UserClientRepository;
 import com.ucb.skibidi.dto.UserClientDto;
 import com.ucb.skibidi.entity.UserClient;
-import com.ucb.skibidi.service.EmailService;
 import com.ucb.skibidi.utils.ClientSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
