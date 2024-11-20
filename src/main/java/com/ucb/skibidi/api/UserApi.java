@@ -79,8 +79,10 @@ public class UserApi {
     }
 
     @GetMapping("/clients")
-    public ResponseDto<List<UserClientDto>> getAllClients() {
-        List<UserClientDto> clients = userClientBl.getAllUsers();
+    public ResponseDto<List<UserClientDto>> getAllClients(
+            @RequestParam(required = false) String username
+    ) {
+        List<UserClientDto> clients = userClientBl.getAllUsers(username);
         return new ResponseDto<>(clients, "Users fetched successfully", true);
     }
 }
