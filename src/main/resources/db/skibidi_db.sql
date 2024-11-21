@@ -3644,6 +3644,55 @@ Lamentablemente, debido al retraso, se ha generado una multa por demora. Por fav
 
 Gracias por su comprensión y atención.');
 
+INSERT INTO template (name, json_body, status, meta_content)
+VALUES (
+           'loan_extension',
+           '{
+               "messaging_product": "whatsapp",
+               "to": "{{PHONE_NUMBER}}",
+               "type": "template",
+               "template": {
+                   "name": "{{NAME_TEMPLATE}}",
+                   "language": {
+                       "code": "ES"
+                   },
+                   "components": [
+                       {
+                           "type": "body",
+                           "parameters": [
+                               {
+                                   "type": "text",
+                                   "text": "{{1}}"
+                               },
+                               {
+                                   "type": "text",
+                                   "text": "{{2}}"
+                               },
+                               {
+                                   "type": "text",
+                                   "text": "{{3}}"
+                               },
+                               {
+                                   "type": "text",
+                                   "text": "{{4}}"
+                               }
+                           ]
+                       }
+                   ]
+               }
+           }',
+           true,
+           'Estimado/a {{1}},
+       Nos complace informarle que su solicitud de extensión de préstamo del libro ha sido aprobada. Aquí están los detalles:
+
+       Título del Libro: {{2}}
+       Nueva Fecha de Devolución: {{3}}
+       Fecha de Notificación: {{4}}
+
+       Gracias por confiar en nuestra biblioteca. Si tiene alguna pregunta, no dude en contactarnos.'
+       );
+
+
 INSERT INTO Type_Fines (description, amount)
 VALUES
     ('Multa por retraso en la devolución', 10.00),

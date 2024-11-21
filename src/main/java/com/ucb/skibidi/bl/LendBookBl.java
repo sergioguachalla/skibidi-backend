@@ -109,6 +109,8 @@ public class LendBookBl {
             throw new Exception("El préstamo con ID " + lendBookId + " no existe.");
         }
     }
+
+    //1: prestado, 2: devuelto 3: solicitud pendiente
     public void updateStatusToReturned(Long lendBookId) throws Exception {
         Optional<LendBook> optionalLendBook = lendBookRepository.findById(lendBookId);
         if (optionalLendBook.isPresent()) {
