@@ -101,6 +101,7 @@ public class LendBookBl {
                 lendBook.setReturnDate(newReturnDate);
                 lendBook.setRequest_extension(0);
                 lendBookRepository.save(lendBook);
+                log.info("Updating return date for lend book: {}", lendBookId);
                 return "Fecha de retorno actualizada";
             } else {
                 throw new Exception("No se ha solicitado una extensión para este préstamo.");
@@ -165,7 +166,14 @@ public class LendBookBl {
         parameters.put("2", lendBook.getBookId().getTitle());
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         parameters.put("3", dateFormat.format(lendBook.getReturnDate()));
+        parameters.put("4", dateFormat.format(new Date()));
+        log.info("Parameters created: {}", parameters);
         return parameters;
     }
+
+
+
+
+
 
 }
