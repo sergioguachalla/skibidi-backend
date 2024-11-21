@@ -41,14 +41,17 @@ public class FineBl {
 
 
 
-    public Page<ClientDebtDto> findDebts(Pageable pageable, Long typeFineId, Boolean isPaid,
-                                         String userKcId) {
+    public Page<ClientDebtDto> findDebts(Pageable pageable, Boolean isPaid,
+                                         String userKcId, Date startDate, Date endDate) {
         Specification<Fine> specification = Specification.where(null);
         if (isPaid != null) {
             specification = specification.and(FineSpecification.hasPaidDate());
         }
         if (userKcId != null) {
             specification = specification.and(FineSpecification.hasUserKcId(userKcId));
+        }
+        if (startDate != null || endDate != null) {
+            specification = specification.and(FineSpecification.isBetweenDates(startDate, endDate));
         }
         Page<Fine> fines = fineRepository.findAll(specification, pageable);
         Page<ClientDebtDto> finesDto = fines.map(fine -> {
