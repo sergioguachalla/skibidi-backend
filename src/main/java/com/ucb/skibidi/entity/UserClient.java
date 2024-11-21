@@ -29,4 +29,7 @@ public class UserClient {
 
     private Integer infractionCount = 0;
 
+    @Column(name = "can_use_studyroom")
+    private Boolean canUseStudyRoom = true;
+
 }
