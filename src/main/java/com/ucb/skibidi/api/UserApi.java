@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.UUID;
 
@@ -84,5 +86,41 @@ public class UserApi {
     ) {
         List<UserClientDto> clients = userClientBl.getAllUsers(username);
         return new ResponseDto<>(clients, "Users fetched successfully", true);
+    }
+
+    @GetMapping("{kcId}/studyroom/status")
+    public ResponseEntity<ResponseDto<Boolean>> getStudyRoomStatus(
+            @PathVariable String kcId
+    ) {
+        ResponseDto<Boolean> response = new ResponseDto<>();
+        try {
+            boolean status = userClientBl.getStudyRoomStatus(kcId);
+            response.setData(status);
+            response.setMessage("Study Room status fetched successfully.");
+            response.setSuccessful(true);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.setMessage(e.getMessage());
+            response.setSuccessful(false);
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    @PostMapping("{kcId}/studyroom/status")
+    public ResponseEntity<ResponseDto<Boolean>> toggleStudyRoomStatus(
+            @PathVariable String kcId
+    ){
+        ResponseDto<Boolean> response = new ResponseDto<>();
+        try{
+            boolean currentStatus = userClientBl.toggleStudyRoomStatus(kcId);
+            response.setSuccessful(true);
+            response.setData(currentStatus);
+            response.setMessage("Study Room status updated successfully.");
+            return ResponseEntity.ok(response);
+        } catch(Exception e) {
+            response.setSuccessful(false);
+            response.setMessage("Error: " + e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 }
