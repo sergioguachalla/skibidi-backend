@@ -1,10 +1,7 @@
 package com.ucb.skibidi.bl;
 
 import com.ucb.skibidi.config.exceptions.InvalidInputException;
-import com.ucb.skibidi.dao.BookAuthorsRepository;
-import com.ucb.skibidi.dao.BookRepository;
-import com.ucb.skibidi.dao.EditorialRepository;
-import com.ucb.skibidi.dao.LanguageRepository;
+import com.ucb.skibidi.dao.*;
 import com.ucb.skibidi.dto.BookDetailsDto;
 import com.ucb.skibidi.dto.BookDto;
 import com.ucb.skibidi.dto.BookManualDto;
@@ -49,6 +46,10 @@ public class BookBl {
     private LanguageRepository languageRepository;
     @Autowired
     private EditorialRepository editorialRepository;
+    @Autowired
+    private ReadingListRepository readingListRepository;
+    @Autowired
+    private UserClientRepository userClientRepository;
 
 
     public void createBookManually(BookManualDto bookDto) throws Exception {
@@ -390,6 +391,33 @@ public class BookBl {
         bookDetailsDto.setLanguageName(book.getIdLanguage() != null ? book.getIdLanguage().getLanguage() : null);
 
         return bookDetailsDto;
+    }
+
+    public void addToFavorites(String kcId, Long bookId) {
+        log.info("Adding book to favorites...");
+
+        UserClient userClient = userClientRepository.findByKcId(kcId);
+        if(userClient == null){
+            log.error("User not found with kcId: {}", kcId);
+            throw new EntityNotFoundException("User not found with kcId: " + kcId);
+        }
+
+        Book book = bookRepository.findById(bookId).orElseThrow(() -> new EntityNotFoundException("Book not found with id: " + bookId));
+
+        ReadingList existingEntry = readingListRepository.findReadingListByClientAndBook(userClient, book);
+        if(existingEntry != null){
+            log.info("Book already added to favorites, this action wil remove it.");
+            readingListRepository.delete(existingEntry);
+            return;
+        }
+
+        ReadingList newReadingListEntry = new ReadingList();
+        newReadingListEntry.setClient(userClient);
+        newReadingListEntry.setBook(book);
+
+        readingListRepository.save(newReadingListEntry);
+
+        log.info("Book added to favorites: {}", book.getTitle());
     }
 }
 
