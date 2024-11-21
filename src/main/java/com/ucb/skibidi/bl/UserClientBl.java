@@ -52,6 +52,26 @@ public class UserClientBl {
         return user.getCanUseStudyRoom();
     }
 
+    public boolean getBorrowingStatus(String kcId) {
+        UserClient user = userClientRepository.findByPersonIdKcUuid(kcId);
+        if(user == null){
+            throw new RuntimeException("User not found with kcId: " + kcId);
+        }
+        return user.getCanBorrowBooks();
+    }
+
+    public boolean changeBorrowingStatus(String kcId) {
+        UserClient user = userClientRepository.findByPersonIdKcUuid(kcId);
+        if(user == null){
+            throw new RuntimeException("User not found with kcId: " + kcId);
+        }
+        Boolean currentStatus = user.getCanBorrowBooks();
+        user.setCanBorrowBooks(!currentStatus);
+        userClientRepository.save(user);
+
+        return user.getCanUseStudyRoom();
+    }
+
     public boolean toggleStudyRoomStatus(String kcId) {
         UserClient user = userClientRepository.findByPersonIdKcUuid(kcId);
         if(user == null){

@@ -106,6 +106,42 @@ public class UserApi {
         }
     }
 
+    @GetMapping("{kcId}/books/status")
+    public ResponseEntity<ResponseDto<Boolean>> getBorrowingStatus(
+            @PathVariable String kcId
+    ) {
+        ResponseDto<Boolean> response = new ResponseDto<>();
+        try {
+            boolean status = userClientBl.getBorrowingStatus(kcId);
+            response.setData(status);
+            response.setMessage("Borrow Books status fetched successfully.");
+            response.setSuccessful(true);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.setMessage(e.getMessage());
+            response.setSuccessful(false);
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    @PostMapping("{kcId}/books/status")
+    public ResponseEntity<ResponseDto<Boolean>> changeBorrowingStatus(
+            @PathVariable String kcId
+    ){
+        ResponseDto<Boolean> response = new ResponseDto<>();
+        try{
+            boolean currentStatus = userClientBl.changeBorrowingStatus(kcId);
+            response.setSuccessful(true);
+            response.setData(currentStatus);
+            response.setMessage("Borrow Books status updated successfully.");
+            return ResponseEntity.ok(response);
+        } catch(Exception e) {
+            response.setSuccessful(false);
+            response.setMessage("Error: " + e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
     @PostMapping("{kcId}/studyroom/status")
     public ResponseEntity<ResponseDto<Boolean>> toggleStudyRoomStatus(
             @PathVariable String kcId
