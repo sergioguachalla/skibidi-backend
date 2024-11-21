@@ -52,7 +52,8 @@ public class TypeFineBl {
 
     public void deleteTypeFine(Long id){
         if(fineRepository.existsByTypeFineTypeFineId(id)){
-            throw new TypeFineDeleteException("Cannot delete type fine because it is being used in a fine");
+            throw new TypeFineDeleteException
+                    ("No se puede eliminar el tipo de multa porque hay multas asociadas a este tipo");
         }
         typeFineRepository.deleteById(id);
     }
