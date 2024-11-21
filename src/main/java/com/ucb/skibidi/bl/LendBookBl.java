@@ -110,7 +110,7 @@ public class LendBookBl {
         }
     }
 
-    //1: prestado, 2: devuelto 3: solicitud pendiente
+    //1: prestado, 2: devuelto
     public void updateStatusToReturned(Long lendBookId) throws Exception {
         Optional<LendBook> optionalLendBook = lendBookRepository.findById(lendBookId);
         if (optionalLendBook.isPresent()) {
