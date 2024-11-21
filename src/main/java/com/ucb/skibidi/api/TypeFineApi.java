@@ -45,4 +45,13 @@ public class TypeFineApi {
         responseDto.setData(typeFineDto);
         return responseDto;
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseDto<TypeFineDto> deleteFineDto(@PathVariable Long id){
+        typeFineBl.deleteTypeFine(id);
+        ResponseDto<TypeFineDto> responseDto = new ResponseDto<>();
+        responseDto.setSuccessful(true);
+        responseDto.setMessage("fine deleted successfully");
+        return responseDto;
+    }
 }

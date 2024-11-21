@@ -1,5 +1,8 @@
 package com.ucb.skibidi.bl;
 
+import com.ucb.skibidi.config.exceptions.TypeFineDeleteException;
+import com.ucb.skibidi.dao.FineRepository;
+import com.ucb.skibidi.dao.LendBookRepository;
 import com.ucb.skibidi.dao.TypeFineRepository;
 import com.ucb.skibidi.dto.TypeFineDto;
 import com.ucb.skibidi.entity.TypeFines;
@@ -14,6 +17,8 @@ public class TypeFineBl {
 
     @Autowired
     private TypeFineRepository typeFineRepository;
+    @Autowired
+    FineRepository fineRepository;
 
     public List<TypeFineDto> findAll(){
         List<TypeFines> typeFineList = typeFineRepository.findAll();
@@ -43,6 +48,13 @@ public class TypeFineBl {
             typeFineToUpdate.setAmount(typeFineDto.getAmount());
             typeFineRepository.save(typeFineToUpdate);
         }
-
     }
+
+    public void deleteTypeFine(Long id){
+        if(fineRepository.existsByTypeFineTypeFineId(id)){
+            throw new TypeFineDeleteException("Cannot delete type fine because it is being used in a fine");
+        }
+        typeFineRepository.deleteById(id);
+    }
+
 }
