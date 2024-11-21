@@ -102,6 +102,7 @@ public class LendBookBl {
                 lendBook.setRequest_extension(0);
                 lendBookRepository.save(lendBook);
                 log.info("Updating return date for lend book: {}", lendBookId);
+                notificationBl.sendNotification(createLendNotification(lendBook), lendBook.getClientId().getPersonId().getPhoneNumber(), 6L);
                 return "Fecha de retorno actualizada";
             } else {
                 throw new Exception("No se ha solicitado una extensión para este préstamo.");
