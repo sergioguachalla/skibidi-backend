@@ -10,4 +10,6 @@ import org.springframework.stereotype.Repository;
 public interface FineRepository extends JpaRepository<Fine, Long>, JpaSpecificationExecutor<Fine> {
 
     Boolean existsByLendBook(LendBook lendBook);
+
+    Boolean existsByTypeFineTypeFineId(Long id);
 }
