@@ -2,12 +2,13 @@ package com.ucb.skibidi.dao;
 
 import com.ucb.skibidi.entity.UserClient;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface UserClientRepository extends JpaRepository<UserClient, Long> {
+public interface UserClientRepository extends JpaRepository<UserClient, Long>, JpaSpecificationExecutor<UserClient> {
     UserClient findByUsername(String username);
     List<UserClient> findAll();
 
