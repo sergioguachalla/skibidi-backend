@@ -20,5 +20,6 @@ public interface UserClientRepository extends JpaRepository<UserClient, Long>, J
     @Query("SELECT p.kcUuid FROM Person p WHERE p.email = :email")
     String findKcUuidIdByEmail(@Param("email") String email);
 
-
+    @Query("SELECT u FROM UserClient u JOIN u.personId p WHERE p.kcUuid = :kcId")
+    UserClient findByKcId(@Param("kcId") String kcId);
 }
