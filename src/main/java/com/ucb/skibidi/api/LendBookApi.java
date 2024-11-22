@@ -100,4 +100,18 @@ public class LendBookApi {
         }
         return responseDto;
     }
+    @PutMapping("/{id}/return-before")
+    public ResponseDto<?> updateStatusToReturnedBefore(@PathVariable Long id) {
+        ResponseDto<?> responseDto = new ResponseDto<>();
+        try {
+            lendBookBl.updateStatusToReturnedBefore(id);
+            responseDto.setMessage("Book status updated to returned before");
+            responseDto.setSuccessful(true);
+        } catch (Exception e) {
+            responseDto.setData(null);
+            responseDto.setMessage("Error updating book status: " + e.getMessage());
+            responseDto.setSuccessful(false);
+        }
+        return responseDto;
+    }
 }
