@@ -52,6 +52,59 @@ public class UserClientBl {
         return user.getCanUseStudyRoom();
     }
 
+    public boolean getBorrowingStatus(String kcId) {
+        UserClient user = userClientRepository.findByPersonIdKcUuid(kcId);
+        if(user == null){
+            throw new RuntimeException("User not found with kcId: " + kcId);
+        }
+        return user.getCanBorrowBooks();
+    }
+
+    public boolean getBlockedUserStatus(String kcId) {
+        UserClient user = userClientRepository.findByPersonIdKcUuid(kcId);
+        if(user == null){
+            throw new RuntimeException("User not found with kcId: " + kcId);
+        }
+        return user.getIsBlocked();
+    }
+
+    public boolean blockUser(String kcId) {
+        UserClient user = userClientRepository.findByPersonIdKcUuid(kcId);
+        if(user == null){
+            throw new RuntimeException("User not found with kcId: " + kcId);
+        }
+        Boolean currentStatus = user.getIsBlocked();
+        user.setIsBlocked(!currentStatus);
+        userClientRepository.save(user);
+
+//        String email = user.getPersonId().getEmail();
+//        String subject;
+//        String text;
+//
+//        if(!user.getIsBlocked()){
+//            subject = "Skibidi Libros | Cuenta restablecida para los servicios de la biblioteca";
+//            text = "Tu cuenta fue restablecida para los servicios de la biblioteca. \n Soporte Skibidi Libros";
+//        } else {
+//            subject = "Skibidi Libros | Cuenta restringida para todos los servicios de la biblioteca";
+//            text = "Tu cuenta fue restringida para los servicios de la biblioteca. Ponte en contacto con un administrador para solucionar este problema.\n Soporte Skibidi Libros";
+//        }
+//        emailService.sendMail(email, subject, text);
+
+        return user.getIsBlocked();
+    }
+
+    public boolean changeBorrowingStatus(String kcId) {
+        UserClient user = userClientRepository.findByPersonIdKcUuid(kcId);
+        if(user == null){
+            throw new RuntimeException("User not found with kcId: " + kcId);
+        }
+        Boolean currentStatus = user.getCanBorrowBooks();
+        user.setCanBorrowBooks(!currentStatus);
+        userClientRepository.save(user);
+
+        return user.getCanUseStudyRoom();
+    }
+
     public boolean toggleStudyRoomStatus(String kcId) {
         UserClient user = userClientRepository.findByPersonIdKcUuid(kcId);
         if(user == null){

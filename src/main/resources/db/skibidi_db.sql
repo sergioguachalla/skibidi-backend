@@ -135,6 +135,14 @@ CREATE TABLE Person (
                         CONSTRAINT Person_pk PRIMARY KEY (person_id)
 );
 
+-- Table: Reading_List
+CREATE TABLE Reading_List (
+                              reading_list_id serial  NOT NULL,
+                              client_id int  NOT NULL,
+                              book_id int  NOT NULL,
+                              CONSTRAINT Reading_List_pk PRIMARY KEY (reading_list_id)
+);
+
 -- Table: Type_Fines
 CREATE TABLE Type_Fines (
                             type_fine_id serial  NOT NULL,
@@ -161,6 +169,7 @@ CREATE TABLE User_Client (
                              status boolean  NOT NULL,
                              infraction_count int  NOT NULL,
                              can_use_studyroom boolean  NOT NULL DEFAULT TRUE,
+                             can_borrow_books boolean  NOT NULL DEFAULT TRUE,
                              CONSTRAINT User_Client_pk PRIMARY KEY (client_id)
 );
 

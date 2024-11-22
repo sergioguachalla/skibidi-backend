@@ -67,10 +67,16 @@ public class FineBl {
             clientDebtDto.setStatus(fine.getPaidDate() == null ? "Pendiente" : "Pagada");
             clientDebtDto.setDueDate(fine.getEndDate());
             clientDebtDto.setPaidDate(Optional.ofNullable(fine.getPaidDate() == null ? "N/A" : fine.getPaidDate().toString()));
+
+            // Aquí se obtiene el atributo canBorrowBooks (suponiendo que está en Client)
+            clientDebtDto.setCanBorrowBooks(fine.getLendBook().getClientId().getCanBorrowBooks());
+            clientDebtDto.setIsBlocked(fine.getLendBook().getClientId().getIsBlocked());
+
             return clientDebtDto;
         });
         return finesDto;
     }
+
 
     @Scheduled(fixedRate = 60000)
     public void updateFines() {
@@ -152,5 +158,15 @@ public class FineBl {
         parameters.put("5", "El motivo de la multa es por devolución tardía del libro indicado anteriormente, por lo que la" +
                 " multa inicial será de 10 BS, sumando cada día el 15% adicional al monto inicial en caso de la no devolución. Para ver el estado de su deuda, ingrese a la plataforma.");
         return parameters;
+    }
+
+    public Boolean payFine(Long fineId) {
+        var fine = fineRepository.findById(fineId).get();
+        if (fine.getPaidDate() != null) {
+            return false;
+        }
+        fine.setPaidDate(new Date());
+        fineRepository.save(fine);
+        return true;
     }
 }

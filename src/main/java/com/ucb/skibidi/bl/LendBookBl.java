@@ -43,6 +43,9 @@ public class LendBookBl {
     @Autowired
     private NotificationBl notificationBl;
 
+    @Autowired
+    private BookBl bookBl;
+
     public Page<LendBookDto> findLendBooksByKcUuid(int page, int size, String kcUuid, String sortField, String sortOrder) {
         Sort sort = buildSort(sortField, sortOrder);
         Pageable pageable = PageRequest.of(page, size, sort);
@@ -118,6 +121,7 @@ public class LendBookBl {
         if (optionalLendBook.isPresent()) {
             LendBook lendBook = optionalLendBook.get();
             lendBook.setStatus(2);
+            notificationBl.sendNotification(createLendNotification(lendBook), lendBook.getClientId().getPersonId().getPhoneNumber(), 7L);
             Book book = lendBook.getBookId();
             if (book != null) {
                 book.setStatus(1);
@@ -131,13 +135,17 @@ public class LendBookBl {
         }
     }
 
-    public void saveLendBook(LendBookResponseDto lendBookResponseDto){
+    public void saveLendBook(LendBookResponseDto lendBookResponseDto) throws Exception {
         LendBook lendBook = new LendBook();
         Book book = new Book();
         UserLibrarian userLibrarian =new UserLibrarian();
         UserClient userClient = userClientRepository.findByPersonIdKcUuid(lendBookResponseDto.getClientKcId());
         userLibrarian.setLibrarianId(1l);
+
+        //update book availability
         book.setBookId(Long.valueOf(lendBookResponseDto.getBookId()));
+        bookBl.updateBookAvailability(book.getBookId()); //update book availability
+
         lendBook.setBookId(book);
         lendBook.setLibrarianId(userLibrarian);
         lendBook.setClientId(userClient);

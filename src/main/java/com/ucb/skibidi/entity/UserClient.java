@@ -32,4 +32,7 @@ public class UserClient {
     @Column(name = "can_use_studyroom")
     private Boolean canUseStudyRoom = true;
 
+    @Column(name = "can_borrow_books")
+    private Boolean canBorrowBooks = true;
+
 }
