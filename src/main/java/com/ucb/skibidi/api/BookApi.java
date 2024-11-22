@@ -8,6 +8,8 @@ import com.ucb.skibidi.dto.ResponseDto;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.ws.rs.PUT;
@@ -153,5 +155,21 @@ public class BookApi {
             responseDto.setSuccessful(false);
         }
         return responseDto;
+    }
+    @PutMapping("/archive/{id}")
+    public ResponseDto<?> archiveBook(@PathVariable Long id) {
+        try {
+            ResponseDto<BookDto> responseDto = new ResponseDto<>();
+            bookBl.archiveBook(id);
+            responseDto.setMessage("Book archived successfully");
+            responseDto.setSuccessful(true);
+            return responseDto;
+        } catch (Exception e) {
+            ResponseDto<BookDto> responseDto = new ResponseDto<>();
+            responseDto.setData(null);
+            responseDto.setMessage("Error archiving book: " + e.getMessage());
+            responseDto.setSuccessful(false);
+            return responseDto;
+        }
     }
 }

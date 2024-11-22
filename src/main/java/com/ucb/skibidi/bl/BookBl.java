@@ -232,6 +232,8 @@ public class BookBl {
 
         Specification<Book> spec = Specification.where(null);
         try {
+            spec = spec.and(BookSpecification.notArchived());
+
             if (genreId != null) {
                 spec = spec.and(BookSpecification.hasGenre((long) genreId));
             }
@@ -239,27 +241,25 @@ public class BookBl {
             if (from != null && to != null) {
                 spec = spec.and(BookSpecification.startDateBetween(from, to));
             }
-            if(isAvailable != null){
-                if(isAvailable){
+            if (isAvailable != null) {
+                if (isAvailable) {
                     spec = spec.and(BookSpecification.isAvailable());
-                }else{
+                } else {
                     spec = spec.and(BookSpecification.isNotAvailable());
                 }
             }
-            if(author != null){
+            if (author != null) {
                 spec = spec.and(BookSpecification.hasAuthor(author));
             }
-            if(languageId != null){
+            if (languageId != null) {
                 spec = spec.and(BookSpecification.hasLanguage(languageId));
             }
-            if(title != null){
+            if (title != null) {
                 spec = spec.and(BookSpecification.hasTitle(title));
             }
-            if(editorialId != null){
+            if (editorialId != null) {
                 spec = spec.and(BookSpecification.hasEditorial(editorialId));
             }
-
-
 
             Page<Book> bookEntities = bookRepository.findAll(spec, pageable);
             Page<BookManualDto> booksDto = bookEntities.map(bookEntity -> {
@@ -282,6 +282,7 @@ public class BookBl {
             throw e;
         }
     }
+
 
 
     public void updateBookAvailability(Long bookId) throws Exception {
@@ -391,5 +392,19 @@ public class BookBl {
 
         return bookDetailsDto;
     }
+    public void archiveBook(Long bookId) throws Exception {
+        log.info("Archiving book with ID: {}", bookId);
+        try {
+            Book book = bookRepository.findById(bookId)
+                    .orElseThrow(() -> new Exception("Book not found with ID: " + bookId));
+            book.setStatus(2);
+            bookRepository.save(book);
+            log.info("Book archived successfully");
+        } catch (Exception e) {
+            log.error("Error archiving book: {}", e.getMessage());
+            throw e;
+        }
+    }
+
 }
 

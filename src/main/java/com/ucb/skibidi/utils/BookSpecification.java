@@ -63,4 +63,9 @@ public class BookSpecification {
             return cb.equal(join.get("editorialId"), editorialId);
         };
         }
+
+    public static Specification<Book> notArchived() {
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.notEqual(root.get("status"), 2);
     }
+}
