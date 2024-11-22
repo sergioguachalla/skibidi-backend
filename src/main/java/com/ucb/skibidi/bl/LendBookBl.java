@@ -178,7 +178,7 @@ public class LendBookBl {
             lendBook.setStatus(4);
             Book book = lendBook.getBookId();
             if (book != null) {
-                book.setStatus(true);
+                book.setStatus(1);
                 bookRepository.save(book);
             } else {
                 throw new Exception("El libro asociado al préstamo no existe.");

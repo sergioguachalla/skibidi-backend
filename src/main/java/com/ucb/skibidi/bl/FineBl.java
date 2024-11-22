@@ -153,4 +153,14 @@ public class FineBl {
                 " multa inicial será de 10 BS, sumando cada día el 15% adicional al monto inicial en caso de la no devolución. Para ver el estado de su deuda, ingrese a la plataforma.");
         return parameters;
     }
+
+    public Boolean payFine(Long fineId) {
+        var fine = fineRepository.findById(fineId).get();
+        if (fine.getPaidDate() != null) {
+            return false;
+        }
+        fine.setPaidDate(new Date());
+        fineRepository.save(fine);
+        return true;
+    }
 }

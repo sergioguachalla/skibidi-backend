@@ -61,4 +61,21 @@ public class FineApi {
         responseDto.setSuccessful(true);
         return responseDto;
     }
+
+    @PutMapping("/pay/{fineId}")
+    public ResponseDto<String> payFine(@PathVariable Long fineId){
+        if(fineBl.payFine(fineId)){
+            ResponseDto<String> responseDto = new ResponseDto<>();
+            responseDto.setData("Fine paid successfully");
+            responseDto.setMessage(null);
+            responseDto.setSuccessful(true);
+            return responseDto;}
+        else{
+            ResponseDto<String> responseDto = new ResponseDto<>();
+            responseDto.setData("Fine already paid");
+            responseDto.setMessage(null);
+            responseDto.setSuccessful(false);
+            return responseDto;
+        }
+    }
 }
