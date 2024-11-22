@@ -1,8 +1,7 @@
 package com.ucb.skibidi.bl;
 
 import com.ucb.skibidi.dao.*;
-import com.ucb.skibidi.dto.EnvironmentDto;
-import com.ucb.skibidi.dto.EnvironmentReservationDto;
+import com.ucb.skibidi.dto.*;
 import com.ucb.skibidi.entity.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.User;
@@ -34,6 +33,8 @@ public class EnvironmentUseBl {
     private EnvironmentRepository environmentRepository;
     @Autowired
     private UserClientRepository userClientRepository;
+    @Autowired
+    private LendBookRepository lendBookRepository;
     @Autowired
     private PersonRepository personRepository;
     @Autowired
@@ -336,5 +337,49 @@ public class EnvironmentUseBl {
             }
         }
     }
+
+    public CalendarDto getCalendar(String kcid) {
+        List<CalendarBookDto> calendarBookDtos= getCalendarBook(kcid);
+        log.info("Fetching calendar for user with kcId {}", kcid);
+        List<CalendarEnvironmentDto> environmentReservationDtos = getCalendarEnvironment(kcid);
+        CalendarDto calendarDto = new CalendarDto();
+        calendarDto.setEnvironments(environmentReservationDtos);
+        calendarDto.setBooks(calendarBookDtos);
+        return calendarDto;
+    }
+
+    public List<CalendarBookDto> getCalendarBook(String kcid) {
+        log.info("Fetching calendar for user with kcId {}", kcid);
+        List<LendBook> lendBooks = lendBookRepository.findAllByClientIdPersonIdKcUuid(kcid);
+        List<CalendarBookDto> calendarBookDtos = lendBooks.stream()
+                .map(lendBook -> {
+                    CalendarBookDto calendarBookDto = new CalendarBookDto();
+                    calendarBookDto.setBookName(lendBook.getBookId().getTitle());
+                    calendarBookDto.setAuthor(lendBook.getBookId().getAuthors().stream().map(Author::getName).collect(Collectors.joining(", ")));
+                    calendarBookDto.setDate(lendBook.getReturnDate());
+                    calendarBookDto.setGenre(lendBook.getBookId().getGenreId().getName());
+                   return calendarBookDto;
+                })
+                .toList();
+        return calendarBookDtos;
+    }
+
+    public List<CalendarEnvironmentDto> getCalendarEnvironment(String kcid) {
+        log.info("Fetching calendar for user with kcId {}", kcid);
+        List<EnvironmentUse> environmentUses = environmentUseRepository.findAllByClientIdPersonIdKcUuid(kcid);
+        List<CalendarEnvironmentDto> calendarEnvironmentDtos = environmentUses.stream()
+                .map(environmentUse -> {
+                    CalendarEnvironmentDto calendarEnvironmentDto = new CalendarEnvironmentDto();
+                    calendarEnvironmentDto.setEnvironment(environmentUse.getEnvironmentId().getName());
+                    calendarEnvironmentDto.setReservationDate(environmentUse.getReservationDate());
+                    calendarEnvironmentDto.setClockIn(environmentUse.getClockIn());
+                    calendarEnvironmentDto.setClockOut(environmentUse.getClockOut());
+                    return calendarEnvironmentDto;
+                })
+                .toList();
+        return calendarEnvironmentDtos;
+    }
+
+
 
 }

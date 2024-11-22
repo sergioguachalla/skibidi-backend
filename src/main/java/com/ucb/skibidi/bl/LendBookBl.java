@@ -101,6 +101,8 @@ public class LendBookBl {
                 lendBook.setReturnDate(newReturnDate);
                 lendBook.setRequest_extension(0);
                 lendBookRepository.save(lendBook);
+                log.info("Updating return date for lend book: {}", lendBookId);
+                notificationBl.sendNotification(createLendNotification(lendBook), lendBook.getClientId().getPersonId().getPhoneNumber(), 6L);
                 return "Fecha de retorno actualizada";
             } else {
                 throw new Exception("No se ha solicitado una extensión para este préstamo.");
@@ -109,6 +111,8 @@ public class LendBookBl {
             throw new Exception("El préstamo con ID " + lendBookId + " no existe.");
         }
     }
+
+    //1: prestado, 2: devuelto
     public void updateStatusToReturned(Long lendBookId) throws Exception {
         Optional<LendBook> optionalLendBook = lendBookRepository.findById(lendBookId);
         if (optionalLendBook.isPresent()) {
@@ -116,7 +120,7 @@ public class LendBookBl {
             lendBook.setStatus(2);
             Book book = lendBook.getBookId();
             if (book != null) {
-                book.setStatus(true);
+                book.setStatus(1);
                 bookRepository.save(book);
             } else {
                 throw new Exception("El libro asociado al préstamo no existe.");
@@ -163,7 +167,14 @@ public class LendBookBl {
         parameters.put("2", lendBook.getBookId().getTitle());
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         parameters.put("3", dateFormat.format(lendBook.getReturnDate()));
+        parameters.put("4", dateFormat.format(new Date()));
+        log.info("Parameters created: {}", parameters);
         return parameters;
     }
+
+
+
+
+
 
 }

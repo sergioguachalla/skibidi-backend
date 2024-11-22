@@ -43,6 +43,7 @@ public class NotificationBl {
 
 
     public void sendNotification(Map<String,String> parameters, String phoneNumber, Long templateId) {
+        log.info("Enviando notificación....");
         try{
             String token = parameterRepository.findValueByParameterId(1);
             Map<String, Object> headerMap = crearHeaderMap(token);

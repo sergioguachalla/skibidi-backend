@@ -41,4 +41,5 @@ public interface LendBookRepository extends JpaRepository<LendBook, Long> {
             "AND lb.returnDate BETWEEN :now AND :next24Hours")
     List<LendBook> findBooksDueIn24Hours(Date now, Date next24Hours);
 
+    List<LendBook> findAllByClientIdPersonIdKcUuid(String kcUuid);
 }

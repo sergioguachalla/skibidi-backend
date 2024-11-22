@@ -20,7 +20,7 @@ public class Book {
 
     private Date registrationDate = new Date();
 
-    private Boolean status = true;
+    private Integer status=1;
 
     private String imageUrl;
 
