@@ -22,4 +22,7 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
     List<Long> findBooksByAuthorName(@Param("authorName") String authorName);
     @Query("SELECT b.editorialId.editorial, b.idLanguage.language FROM book b WHERE b.BookId = :bookId")
     Object[] findEditorialAndLanguageByBookId(@Param("bookId") Long bookId);
+
+    @Query("SELECT b FROM book b JOIN ReadingList rl ON b.BookId = rl.book.BookId JOIN UserClient uc ON rl.client.clientId = uc.clientId JOIN Person p ON uc.personId.personId = p.personId WHERE p.kcUuid = :kcId")
+    List<Book> findFavoritesByKcId(@Param("kcId") String kcId);
 }

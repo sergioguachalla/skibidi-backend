@@ -393,7 +393,7 @@ public class BookBl {
         return bookDetailsDto;
     }
 
-    public void addToFavorites(String kcId, Long bookId) {
+    public String addToFavorites(String kcId, Long bookId) {
         log.info("Adding book to favorites...");
 
         UserClient userClient = userClientRepository.findByKcId(kcId);
@@ -408,7 +408,7 @@ public class BookBl {
         if(existingEntry != null){
             log.info("Book already added to favorites, this action wil remove it.");
             readingListRepository.delete(existingEntry);
-            return;
+            return "El libro ya estaba en favoritos, esta acción lo borrará de tu lista.";
         }
 
         ReadingList newReadingListEntry = new ReadingList();
@@ -418,6 +418,32 @@ public class BookBl {
         readingListRepository.save(newReadingListEntry);
 
         log.info("Book added to favorites: {}", book.getTitle());
+        return "Libro añadido a favoritos: " + book.getTitle();
+    }
+
+    public List<BookDto> getFavorites(String kcId) {
+        List<Book> favoriteBooks = bookRepository.findFavoritesByKcId(kcId);
+
+        return favoriteBooks.stream()
+                .map(this::mapToBookDto)
+                .toList();
+    }
+
+    private BookDto mapToBookDto(Book book) {
+        return new BookDto(
+                book.getBookId(),
+                book.getTitle(),
+                book.getIsbn(),
+                book.getRegistrationDate(),
+                book.getStatus(),
+                book.getImageUrl(),
+                book.getGenreId().getName(),
+                book.getAuthors().stream()
+                        .map(Author::getName)
+                        .collect(Collectors.toList()),
+                book.getEditorialId().getEditorialId(),
+                book.getIdLanguage().getLanguageId()
+        );
     }
 }
 

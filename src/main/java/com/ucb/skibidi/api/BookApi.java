@@ -162,9 +162,9 @@ public class BookApi {
         var bookId = body.getBookId();
 
         try{
-            bookBl.addToFavorites(kcId, bookId);
+            String message = bookBl.addToFavorites(kcId, bookId);
             response.setSuccessful(true);
-            response.setData(null);
+            response.setData(message);
             response.setMessage("Action performed successfully.");
             return ResponseEntity.ok(response);
         } catch(Exception e) {
@@ -172,6 +172,25 @@ public class BookApi {
            response.setMessage("Error: " + e.getMessage());
            return ResponseEntity.badRequest().body(response);
         }
+    }
+
+    @GetMapping("/favorites")
+    public ResponseEntity<ResponseDto<List<BookDto>>> getAllFavorites(
+            @RequestParam("kcId") String kcId
+    ){
+       ResponseDto<List<BookDto>> response = new ResponseDto<>();
+
+       try {
+          List<BookDto> favoriteBooks = bookBl.getFavorites(kcId);
+          response.setSuccessful(true);
+          response.setData(favoriteBooks);
+          response.setMessage("Favorite books retrieved successfully.");
+          return ResponseEntity.ok(response);
+       } catch (Exception e ) {
+           response.setSuccessful(false);
+           response.setMessage("");
+           return ResponseEntity.badRequest().body(response);
+       }
     }
 
 }
