@@ -55,7 +55,7 @@ public class GoogleBooksBl {
                 bookDto.setTitle(volume.getVolumeInfo().getTitle());
                 bookDto.setIsbn(isbn);  // Asignar el ISBN proporcionado
                 bookDto.setRegistrationDate(new Date());  // Asignar la fecha actual
-                bookDto.setStatus(true);  // Asignar estado
+                bookDto.setStatus(1);  // Asignar estado
                 bookDto.setImageUrl(volume.getVolumeInfo().getImageLinks() != null ?
                         volume.getVolumeInfo().getImageLinks().getThumbnail() : null);
 

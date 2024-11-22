@@ -25,6 +25,7 @@ public interface EnvironmentUseRepository extends JpaRepository<EnvironmentUse, 
 
     EnvironmentUse findByEnvironmentUse(Long environmentUseId);
 
+    List<EnvironmentUse> findAllByClientIdPersonIdKcUuid(String kcUuid);
 
     @Query(value = "SELECT * FROM Environment_Use WHERE (status = 1 OR status = 2) " +
             "AND clock_out < :now", nativeQuery = true)

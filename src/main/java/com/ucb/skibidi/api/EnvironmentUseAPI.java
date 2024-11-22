@@ -1,6 +1,7 @@
 package com.ucb.skibidi.api;
 
 import com.ucb.skibidi.bl.EnvironmentUseBl;
+import com.ucb.skibidi.dto.CalendarDto;
 import com.ucb.skibidi.dto.EnvironmentDto;
 import com.ucb.skibidi.dto.EnvironmentReservationDto;
 import com.ucb.skibidi.dto.ResponseDto;
@@ -130,6 +131,25 @@ public class EnvironmentUseAPI {
             responseDto.setSuccessful(false);
         }
         return responseDto;
+    }
+
+    @GetMapping("/calendar")
+    public ResponseDto<CalendarDto> getCalendar(
+            @RequestParam(required = true) String kcid
+    ) {
+        ResponseDto<CalendarDto> responseDto = new ResponseDto<>();
+        try {
+            CalendarDto calendar = environmentUseBl.getCalendar(kcid);
+            responseDto.setData(calendar);
+            responseDto.setMessage("Calendar fetched successfully");
+            responseDto.setSuccessful(true);
+            return responseDto;
+        } catch (Exception e) {
+            responseDto.setData(null);
+            responseDto.setMessage("Error fetching calendar: " + e.getMessage());
+            responseDto.setSuccessful(false);
+            return responseDto;
+        }
     }
 
 
