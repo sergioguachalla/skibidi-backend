@@ -41,14 +41,17 @@ public class FineBl {
 
 
 
-    public Page<ClientDebtDto> findDebts(Pageable pageable, Long typeFineId, Boolean isPaid,
-                                         String userKcId) {
+    public Page<ClientDebtDto> findDebts(Pageable pageable, Boolean isPaid,
+                                         String userKcId, Date startDate, Date endDate) {
         Specification<Fine> specification = Specification.where(null);
         if (isPaid != null) {
             specification = specification.and(FineSpecification.hasPaidDate());
         }
         if (userKcId != null) {
             specification = specification.and(FineSpecification.hasUserKcId(userKcId));
+        }
+        if (startDate != null || endDate != null) {
+            specification = specification.and(FineSpecification.isBetweenDates(startDate, endDate));
         }
         Page<Fine> fines = fineRepository.findAll(specification, pageable);
         Page<ClientDebtDto> finesDto = fines.map(fine -> {
@@ -155,5 +158,15 @@ public class FineBl {
         parameters.put("5", "El motivo de la multa es por devolución tardía del libro indicado anteriormente, por lo que la" +
                 " multa inicial será de 10 BS, sumando cada día el 15% adicional al monto inicial en caso de la no devolución. Para ver el estado de su deuda, ingrese a la plataforma.");
         return parameters;
+    }
+
+    public Boolean payFine(Long fineId) {
+        var fine = fineRepository.findById(fineId).get();
+        if (fine.getPaidDate() != null) {
+            return false;
+        }
+        fine.setPaidDate(new Date());
+        fineRepository.save(fine);
+        return true;
     }
 }
