@@ -1,13 +1,11 @@
 package com.ucb.skibidi.api;
 
 import com.ucb.skibidi.bl.BookBl;
-import com.ucb.skibidi.dto.BookDetailsDto;
-import com.ucb.skibidi.dto.BookDto;
-import com.ucb.skibidi.dto.BookManualDto;
-import com.ucb.skibidi.dto.ResponseDto;
+import com.ucb.skibidi.dto.*;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.ws.rs.PUT;
@@ -154,4 +152,45 @@ public class BookApi {
         }
         return responseDto;
     }
+
+    @PostMapping("/favorites")
+    public ResponseEntity<ResponseDto<String>> addOrRemoveFromFavorites(
+            @RequestBody AddBookToFavoritesDto body
+    ){
+        ResponseDto<String> response = new ResponseDto<>();
+        var kcId = body.getKcId();
+        var bookId = body.getBookId();
+
+        try{
+            String message = bookBl.addToFavorites(kcId, bookId);
+            response.setSuccessful(true);
+            response.setData(message);
+            response.setMessage("Action performed successfully.");
+            return ResponseEntity.ok(response);
+        } catch(Exception e) {
+           response.setSuccessful(false);
+           response.setMessage("Error: " + e.getMessage());
+           return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    @GetMapping("/favorites")
+    public ResponseEntity<ResponseDto<List<BookDto>>> getAllFavorites(
+            @RequestParam("kcId") String kcId
+    ){
+       ResponseDto<List<BookDto>> response = new ResponseDto<>();
+
+       try {
+          List<BookDto> favoriteBooks = bookBl.getFavorites(kcId);
+          response.setSuccessful(true);
+          response.setData(favoriteBooks);
+          response.setMessage("Favorite books retrieved successfully.");
+          return ResponseEntity.ok(response);
+       } catch (Exception e ) {
+           response.setSuccessful(false);
+           response.setMessage("");
+           return ResponseEntity.badRequest().body(response);
+       }
+    }
+
 }
