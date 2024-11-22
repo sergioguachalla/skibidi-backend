@@ -118,6 +118,8 @@ public class LendBookBl {
         if (optionalLendBook.isPresent()) {
             LendBook lendBook = optionalLendBook.get();
             lendBook.setStatus(2);
+            //TODO: DEVUELTO
+            notificationBl.sendNotification(createLendNotification(lendBook), lendBook.getClientId().getPersonId().getPhoneNumber(), 7L);
             Book book = lendBook.getBookId();
             if (book != null) {
                 book.setStatus(1);
@@ -178,7 +180,7 @@ public class LendBookBl {
             lendBook.setStatus(4);
             Book book = lendBook.getBookId();
             if (book != null) {
-                book.setStatus(true);
+                book.setStatus(1);
                 bookRepository.save(book);
             } else {
                 throw new Exception("El libro asociado al préstamo no existe.");
