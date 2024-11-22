@@ -8,7 +8,10 @@ import com.ucb.skibidi.dto.ResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
 
 @RestController
 @RequestMapping("/api/v1/fines")
@@ -21,10 +24,12 @@ public class FineApi {
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "4") Integer size,
             @RequestParam(required = false) Boolean isPaid,
-            @RequestParam(required = false) String userKcId
-    ){
+            @RequestParam(required = false) String userKcId,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate
+            ){
         Pageable pageable = Pageable.ofSize(size).withPage(page);
-        var debts = fineBl.findDebts(pageable, null, isPaid, userKcId);
+        var debts = fineBl.findDebts(pageable,  isPaid, userKcId, startDate, endDate);
         ResponseDto<Page<ClientDebtDto>> responseDto = new ResponseDto<>();
         responseDto.setData(debts);
         responseDto.setMessage(null);

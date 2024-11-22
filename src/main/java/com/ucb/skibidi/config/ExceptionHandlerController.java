@@ -1,6 +1,7 @@
 package com.ucb.skibidi.config;
 
 import com.ucb.skibidi.config.exceptions.InvalidInputException;
+import com.ucb.skibidi.config.exceptions.TypeFineDeleteException;
 import com.ucb.skibidi.config.exceptions.UserAlreadyExistsException;
 import com.ucb.skibidi.dto.ResponseDto;
 import org.slf4j.Logger;
@@ -34,6 +35,16 @@ public class ExceptionHandlerController {
         responseDto.setMessage(e.getMessage());
         responseDto.setSuccessful(false);
         return ResponseEntity.badRequest().body(responseDto);
+    }
+
+    @ExceptionHandler(TypeFineDeleteException.class)
+    public ResponseEntity<ResponseDto<String>> handleTypeFineDeleteException(TypeFineDeleteException e) {
+        log.error("Type fine delete exception", e);
+        ResponseDto<String> responseDto = new ResponseDto<>();
+        responseDto.setData(null);
+        responseDto.setMessage(e.getMessage());
+        responseDto.setSuccessful(false);
+        return ResponseEntity.internalServerError().body(responseDto);
     }
 
 
