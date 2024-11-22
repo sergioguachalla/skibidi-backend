@@ -118,7 +118,6 @@ public class LendBookBl {
         if (optionalLendBook.isPresent()) {
             LendBook lendBook = optionalLendBook.get();
             lendBook.setStatus(2);
-            //TODO: DEVUELTO
             notificationBl.sendNotification(createLendNotification(lendBook), lendBook.getClientId().getPersonId().getPhoneNumber(), 7L);
             Book book = lendBook.getBookId();
             if (book != null) {
