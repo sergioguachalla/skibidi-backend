@@ -128,7 +128,7 @@ public class UserApi {
         }
     }
 
-    @PostMapping("{kcId}/books/status")
+    @PutMapping("{kcId}/books/status")
     public ResponseEntity<ResponseDto<Boolean>> changeBorrowingStatus(
             @PathVariable String kcId
     ){
@@ -147,6 +147,47 @@ public class UserApi {
             return ResponseEntity.badRequest().body(response);
         }
     }
+
+    @GetMapping("{kcId}/blocked/status")
+    public ResponseEntity<ResponseDto<Boolean>> getBlockedUserStatus(
+            @PathVariable String kcId
+    ){
+        ResponseDto<Boolean> response = new ResponseDto<>();
+        try{
+            boolean status = userClientBl.getBlockedUserStatus(kcId);
+            response.setSuccessful(true);
+            response.setData(status);
+            response.setMessage("Blocked User Status status fetched successfully.");
+            return ResponseEntity.ok(response);
+        } catch(Exception e) {
+            response.setSuccessful(false);
+            response.setMessage("Error: " + e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    @PutMapping("{kcId}/blocked/status")
+    public ResponseEntity<ResponseDto<Boolean>> blockUser(
+            @PathVariable String kcId
+    ){
+        ResponseDto<Boolean> response = new ResponseDto<>();
+        try{
+            boolean currentStatus = userClientBl.blockUser(kcId);
+            response.setSuccessful(true);
+            response.setData(currentStatus);
+            response.setMessage("Blocked User status updated successfully.");
+            log.info("User blocked status updated successfully.");
+            return ResponseEntity.ok(response);
+        } catch(Exception e) {
+            log.error("Error al actualizar el estado de bloqueo del usuario");
+            response.setSuccessful(false);
+            response.setMessage("Error: " + e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+
+
 
     @PostMapping("{kcId}/studyroom/status")
     public ResponseEntity<ResponseDto<Boolean>> toggleStudyRoomStatus(

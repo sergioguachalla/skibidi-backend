@@ -67,6 +67,7 @@ public class FineBl {
 
             // Aquí se obtiene el atributo canBorrowBooks (suponiendo que está en Client)
             clientDebtDto.setCanBorrowBooks(fine.getLendBook().getClientId().getCanBorrowBooks());
+            clientDebtDto.setIsBlocked(fine.getLendBook().getClientId().getIsBlocked());
 
             return clientDebtDto;
         });

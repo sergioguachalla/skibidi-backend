@@ -17,4 +17,5 @@ public class ClientDebtDto {
     private String userKcId;
     private Optional<?> paidDate;
     private Boolean canBorrowBooks; // Añadido el campo
+    private Boolean isBlocked;
 }
