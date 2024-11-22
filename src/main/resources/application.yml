@@ -21,7 +21,7 @@ server:
 keycloak:
   auth-server-url: ${KEYCLOAK_AUTH_SERVER_URL:http://localhost:8080}
   credentials:
-    secret: ${KEYCLOAK_CLIENT_SECRET:FMXpECUk2qHWWZAbx8PQVKV2ZMQmzkuw}
+    secret: ${KEYCLOAK_CLIENT_SECRET:QjhIN5mjZIlMbeWJvDT5iQmceWWpmoXi}
     realm: ${KEYCLOAK_REALM:skibidi-realm}
     resource: ${KEYCLOAK_RESOURCE:sk-backend}
 

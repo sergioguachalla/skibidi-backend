@@ -165,5 +165,22 @@ public class LendBookBl {
         parameters.put("3", dateFormat.format(lendBook.getReturnDate()));
         return parameters;
     }
+    public void updateStatusToReturnedBefore(Long lendBookId) throws Exception {
+        Optional<LendBook> optionalLendBook = lendBookRepository.findById(lendBookId);
+        if (optionalLendBook.isPresent()) {
+            LendBook lendBook = optionalLendBook.get();
+            lendBook.setStatus(4);
+            Book book = lendBook.getBookId();
+            if (book != null) {
+                book.setStatus(true);
+                bookRepository.save(book);
+            } else {
+                throw new Exception("El libro asociado al préstamo no existe.");
+            }
+            lendBookRepository.save(lendBook);
+        } else {
+            throw new Exception("El préstamo con ID " + lendBookId + " no existe.");
+        }
+    }
 
 }
