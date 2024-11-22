@@ -169,6 +169,7 @@ CREATE TABLE User_Client (
                              status boolean  NOT NULL,
                              infraction_count int  NOT NULL,
                              can_use_studyroom boolean  NOT NULL DEFAULT TRUE,
+                             can_borrow_books boolean  NOT NULL DEFAULT TRUE,
                              CONSTRAINT User_Client_pk PRIMARY KEY (client_id)
 );
 

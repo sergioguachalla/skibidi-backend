@@ -7,6 +7,8 @@ import com.ucb.skibidi.dto.UserClientDto;
 import com.ucb.skibidi.dto.UserDto;
 import com.ucb.skibidi.dto.UserRegistrationDto;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +28,8 @@ public class UserApi {
 
     @Autowired
     private UserClientBl userClientBl;
+
+    private Logger log = LoggerFactory.getLogger(UserApi.class);
 
     @PostMapping("/clients")
     public ResponseDto<String> createClient(@RequestBody UserRegistrationDto userDto) {
@@ -105,6 +109,85 @@ public class UserApi {
             return ResponseEntity.badRequest().body(response);
         }
     }
+
+    @GetMapping("{kcId}/books/status")
+    public ResponseEntity<ResponseDto<Boolean>> getBorrowingStatus(
+            @PathVariable String kcId
+    ) {
+        ResponseDto<Boolean> response = new ResponseDto<>();
+        try {
+            boolean status = userClientBl.getBorrowingStatus(kcId);
+            response.setData(status);
+            response.setMessage("Borrow Books status fetched successfully.");
+            response.setSuccessful(true);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.setMessage(e.getMessage());
+            response.setSuccessful(false);
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    @PutMapping("{kcId}/books/status")
+    public ResponseEntity<ResponseDto<Boolean>> changeBorrowingStatus(
+            @PathVariable String kcId
+    ){
+        ResponseDto<Boolean> response = new ResponseDto<>();
+        try{
+            log.info("actualizando status de prestamos");
+            boolean currentStatus = userClientBl.changeBorrowingStatus(kcId);
+            response.setSuccessful(true);
+            response.setData(currentStatus);
+            response.setMessage("Borrow Books status updated successfully.");
+            return ResponseEntity.ok(response);
+        } catch(Exception e) {
+            log.info("error al actualizar status de prestamos");
+            response.setSuccessful(false);
+            response.setMessage("Error: " + e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    @GetMapping("{kcId}/blocked/status")
+    public ResponseEntity<ResponseDto<Boolean>> getBlockedUserStatus(
+            @PathVariable String kcId
+    ){
+        ResponseDto<Boolean> response = new ResponseDto<>();
+        try{
+            boolean status = userClientBl.getBlockedUserStatus(kcId);
+            response.setSuccessful(true);
+            response.setData(status);
+            response.setMessage("Blocked User Status status fetched successfully.");
+            return ResponseEntity.ok(response);
+        } catch(Exception e) {
+            response.setSuccessful(false);
+            response.setMessage("Error: " + e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    @PutMapping("{kcId}/blocked/status")
+    public ResponseEntity<ResponseDto<Boolean>> blockUser(
+            @PathVariable String kcId
+    ){
+        ResponseDto<Boolean> response = new ResponseDto<>();
+        try{
+            boolean currentStatus = userClientBl.blockUser(kcId);
+            response.setSuccessful(true);
+            response.setData(currentStatus);
+            response.setMessage("Blocked User status updated successfully.");
+            log.info("User blocked status updated successfully.");
+            return ResponseEntity.ok(response);
+        } catch(Exception e) {
+            log.error("Error al actualizar el estado de bloqueo del usuario");
+            response.setSuccessful(false);
+            response.setMessage("Error: " + e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+
+
 
     @PostMapping("{kcId}/studyroom/status")
     public ResponseEntity<ResponseDto<Boolean>> toggleStudyRoomStatus(

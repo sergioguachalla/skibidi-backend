@@ -67,10 +67,16 @@ public class FineBl {
             clientDebtDto.setStatus(fine.getPaidDate() == null ? "Pendiente" : "Pagada");
             clientDebtDto.setDueDate(fine.getEndDate());
             clientDebtDto.setPaidDate(Optional.ofNullable(fine.getPaidDate() == null ? "N/A" : fine.getPaidDate().toString()));
+
+            // Aquí se obtiene el atributo canBorrowBooks (suponiendo que está en Client)
+            clientDebtDto.setCanBorrowBooks(fine.getLendBook().getClientId().getCanBorrowBooks());
+            clientDebtDto.setIsBlocked(fine.getLendBook().getClientId().getIsBlocked());
+
             return clientDebtDto;
         });
         return finesDto;
     }
+
 
     @Scheduled(fixedRate = 60000)
     public void updateFines() {
