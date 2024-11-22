@@ -16,4 +16,5 @@ public class ClientDebtDto {
     private String username;
     private String userKcId;
     private Optional<?> paidDate;
+    private Boolean canBorrowBooks; // Añadido el campo
 }

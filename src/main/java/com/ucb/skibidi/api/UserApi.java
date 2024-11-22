@@ -7,6 +7,8 @@ import com.ucb.skibidi.dto.UserClientDto;
 import com.ucb.skibidi.dto.UserDto;
 import com.ucb.skibidi.dto.UserRegistrationDto;
 import jakarta.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +28,8 @@ public class UserApi {
 
     @Autowired
     private UserClientBl userClientBl;
+
+    private Logger log = LoggerFactory.getLogger(UserApi.class);
 
     @PostMapping("/clients")
     public ResponseDto<String> createClient(@RequestBody UserRegistrationDto userDto) {
@@ -130,12 +134,14 @@ public class UserApi {
     ){
         ResponseDto<Boolean> response = new ResponseDto<>();
         try{
+            log.info("actualizando status de prestamos");
             boolean currentStatus = userClientBl.changeBorrowingStatus(kcId);
             response.setSuccessful(true);
             response.setData(currentStatus);
             response.setMessage("Borrow Books status updated successfully.");
             return ResponseEntity.ok(response);
         } catch(Exception e) {
+            log.info("error al actualizar status de prestamos");
             response.setSuccessful(false);
             response.setMessage("Error: " + e.getMessage());
             return ResponseEntity.badRequest().body(response);
