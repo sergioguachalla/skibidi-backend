@@ -11,7 +11,7 @@ public class BookManualDto {
     private String title;
     private String isbn;
     private Date registrationDate;
-    private Boolean status;
+    private Integer status;
     private String imageUrl;
     private int genreId;
     private List<String> authors;

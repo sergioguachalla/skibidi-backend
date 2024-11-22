@@ -11,7 +11,7 @@ public class BookDto {
     private String title;
     private String isbn;
     private Date registrationDate;
-    private Boolean status;
+    private Integer status;
     private String imageUrl;
     private String genre;
     private List<String> authors;

@@ -14,7 +14,7 @@ public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificat
 
     @Transactional
     @Modifying(flushAutomatically = true)
-    @Query(value = "UPDATE book b SET b.status = CASE WHEN b.status = true THEN false ELSE true END WHERE b.BookId = :bookId")
+    @Query(value = "UPDATE book b SET b.status = CASE WHEN b.status = 1 THEN 0 ELSE 1 END WHERE b.BookId = :bookId")
     void updateBookStatus(@Param("bookId") Long bookId);
     // Buscar libros por título (contiene la palabra clave)
     List<Book> findByTitleContainingIgnoreCase(String title);
