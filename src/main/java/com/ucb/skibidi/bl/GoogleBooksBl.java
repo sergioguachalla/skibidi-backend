@@ -23,7 +23,7 @@ import java.util.List;
 public class GoogleBooksBl {
 
     private static final Logger logger = LoggerFactory.getLogger(GoogleBooksBl.class);  // Logger
-    private static final String API_KEY = "AIzaSyB1uZ8FQLtA9_beKHYe_Br30x3Ylhm4fnU";
+    private static final String API_KEY = "";
 
     public BookDto getBookByIsbn(String isbn) {
         try {
@@ -95,3 +95,4 @@ public class GoogleBooksBl {
         return null;  // Retornar null si no se encuentra el libro o hay un error
     }
 }
+
